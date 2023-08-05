@@ -1,0 +1,4 @@
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="#BD5454" /> <!-- Kırmızı arka plan rengi -->
+    <corners android:radius="20dp" /> <!-- Kenar yarıçapı (yumuşaklık için değeri artırabilirsiniz) -->
+</shape>

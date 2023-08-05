@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">GroceriesWizard</string>
+    <string name="recipe_title">Recipe Title</string>
+    <string name="ask_recipe_name">Recipe Name: </string>
+    <string name="ingredients">Ingredients: </string>
+    <string name="hint_recipe_ingredients">tomato 1 kg, onion 2 pcs</string>
+    <string name="how_to_prepare">How to Prepare:</string>
+    <string name="hint_how_to_prepare">Start with chopping tomatoes</string>
+    <string name="save_recipe">Save Recipe</string>
+    <string name="delete_recipe">Delete Recipe</string>
+    <string name="recipe_title_show">RECIPE TITLE SHOW</string>
+    <string name="ingredients_show_default">Ingredients</string>
+    <string name="show_how_to_prepare">how to prepare</string>
+</resources>

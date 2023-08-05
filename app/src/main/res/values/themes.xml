@@ -1,0 +1,16 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.GroceriesWizard" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your light theme here. -->
+        <item name="colorPrimary">@color/light_primary</item>
+        <item name="colorPrimaryVariant">@color/light_primary_variant</item>
+        <item name="colorOnPrimary">@color/light_color_on_primary</item>
+        <!-- Add more customizations for your light theme as needed -->
+    </style>
+
+    <style name="Theme.GroceriesWizard" parent="Base.Theme.GroceriesWizard" />
+
+    <color name="light_primary">#F8DAD8</color>
+    <color name="light_primary_variant">#FF1201</color>
+    <color name="light_color_on_primary">#000000</color>
+</resources>
