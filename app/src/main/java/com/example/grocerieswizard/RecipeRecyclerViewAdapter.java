@@ -3,7 +3,9 @@ package com.example.grocerieswizard;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -51,9 +53,11 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
     public static class RecipeViewHolder extends RecyclerView.ViewHolder {
 
         private TextView title;
+        private ImageButton starButton;
         public RecipeViewHolder(View itemView, RecyclerViewInterface  recyclerViewInterface) {
             super(itemView);
             title = itemView.findViewById(R.id.textView);
+            starButton = itemView.findViewById(R.id.fav_icon);
             itemView.setOnClickListener(v -> {
                 if (recyclerViewInterface != null) {
                     int pos = getAdapterPosition();
@@ -61,6 +65,13 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
                         recyclerViewInterface.onItemClick(pos);
                     }
 
+                }
+            });
+
+            starButton.setOnClickListener(v -> {
+                int pos = getAdapterPosition();
+                if (pos != RecyclerView.NO_POSITION) {
+                    Toast.makeText(itemView.getContext(), "Star button clicked for " + title.getText(), Toast.LENGTH_SHORT).show();
                 }
             });
         }
