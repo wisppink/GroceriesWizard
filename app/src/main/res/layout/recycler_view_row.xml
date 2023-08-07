@@ -52,7 +52,8 @@
                 app:layout_constraintHorizontal_bias="0.459"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                android:singleLine="true"/>
+                android:singleLine="true"
+                android:gravity="center_vertical" />
 
             <ImageButton
                 android:id="@+id/fav_icon"

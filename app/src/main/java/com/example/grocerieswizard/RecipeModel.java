@@ -12,9 +12,9 @@ public class RecipeModel implements Parcelable {
     private String ingredients;
     public RecipeModel(String recipeName, String ingredients, String howToPrepare, Uri recipeImageUri) {
         this.recipeName = recipeName;
-        this.recipeImageUri = recipeImageUri;
-        this.howToPrepare = howToPrepare;
         this.ingredients = ingredients;
+        this.howToPrepare = howToPrepare;
+        this.recipeImageUri = recipeImageUri;
     }
 
     protected RecipeModel(Parcel in) {

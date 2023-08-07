@@ -67,10 +67,6 @@ public class AddRecipe extends AppCompatActivity {
                 Toast.makeText(this, "Please fill all fields!", Toast.LENGTH_SHORT).show();
                 return;
             }
-            if (selectedImageUri == null) {
-                Toast.makeText(this, "Please select an image!", Toast.LENGTH_SHORT).show();
-                return;
-            }
             RecipeModel recipe = new RecipeModel(recipeName, ingredients, howToPrepare, selectedImageUri);
             Intent resultIntent = new Intent();
             resultIntent.putExtra("recipe", recipe);
@@ -110,6 +106,8 @@ public class AddRecipe extends AppCompatActivity {
         editRecipeName.setText(savedInstanceState.getString(KEY_RECIPE_NAME));
         editRecipeIngredients.setText(savedInstanceState.getString(KEY_RECIPE_INGREDIENTS));
         editRecipeHowToPrepare.setText(savedInstanceState.getString(KEY_RECIPE_HOW_TO_PREPARE));
-        selectedImageUri = savedInstanceState.getParcelable(KEY_SELECTED_IMAGE_URI);
+        if (savedInstanceState.containsKey(KEY_SELECTED_IMAGE_URI)) {
+            selectedImageUri = savedInstanceState.getParcelable(KEY_SELECTED_IMAGE_URI);
+        }
     }
 }
