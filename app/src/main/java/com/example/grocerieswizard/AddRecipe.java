@@ -11,6 +11,7 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class AddRecipe extends AppCompatActivity {
@@ -39,7 +40,6 @@ public class AddRecipe extends AppCompatActivity {
 
         Button btnSaveRecipe = findViewById(R.id.save_recipe_button);
 
-        ImageButton deleteRecipeButton = findViewById(R.id.delete_recipe_button);
         ImageButton dischargeRecipe = findViewById(R.id.discharge_recipe);
 
         pickImageLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
@@ -79,14 +79,19 @@ public class AddRecipe extends AppCompatActivity {
             Toast.makeText(this, "saveButton works", Toast.LENGTH_SHORT).show();
         });
 
-        deleteRecipeButton.setOnClickListener(v -> {
-            //delete the recipe
-            // show a confirmation dialog before deleting
+        dischargeRecipe.setOnClickListener(v -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Confirm Discharge")
+                    .setMessage("Are you sure you want to discharge this recipe?")
+                    .setPositiveButton("Yes", (dialog, which) -> {
+                        finish();
+                    })
+                    .setNegativeButton("Cancel", (dialog, which) -> {
+                        dialog.dismiss();
+                    })
+                    .show();
         });
 
-        dischargeRecipe.setOnClickListener(v -> {
-            // show a confirmation dialog before discharge
-        });
     }
 
 
