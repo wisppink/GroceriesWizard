@@ -4,19 +4,25 @@ import static java.security.AccessController.getContext;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.os.Build;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.view.menu.MenuView;
 import androidx.core.view.GravityCompat;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
 
 import java.util.ArrayList;
 
@@ -95,11 +101,14 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
 
         private TextView title;
         private ImageButton starButton;
+        private ImageView resImage;
 
         public RecipeViewHolder(View itemView) {
             super(itemView);
             title = itemView.findViewById(R.id.textView);
             starButton = itemView.findViewById(R.id.fav_icon);
+            resImage = itemView.findViewById(R.id.default_card_recipe_image);
+
 
             itemView.setOnClickListener(v -> {
                 int pos = getAdapterPosition();
@@ -154,7 +163,15 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
         }
 
         public void bind(RecipeModel recipeModel) {
+
             title.setText(recipeModel.getRecipeName());
+            if (recipeModel.getRecipeImageUri() != null) {
+                resImage.setImageURI(recipeModel.getRecipeImageUri());
+            } else {
+                resImage.setImageResource(R.drawable.recipe_image_default);
+            }
+
+
         }
     }
 }

@@ -26,11 +26,12 @@
 
             <ImageView
                 android:id="@+id/default_card_recipe_image"
-                android:layout_width="50dp"
-                android:layout_height="0dp"
-                android:layout_marginStart="8dp"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_marginStart="4dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
+                android:scaleType="fitXY"
                 android:src="@drawable/recipe_image_default"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -38,22 +39,25 @@
 
             <TextView
                 android:id="@+id/textView"
-                android:layout_width="160dp"
-                android:layout_height="51dp"
+                android:layout_width="229dp"
+                android:layout_height="47dp"
                 android:layout_margin="10dp"
+                android:layout_marginStart="32dp"
                 android:layout_marginTop="8dp"
+                android:layout_marginEnd="32dp"
                 android:layout_marginBottom="8dp"
+                android:gravity="center_vertical"
+                android:singleLine="true"
                 android:text="@string/recipe_title"
+                android:textColor="@color/black"
                 android:textSize="26sp"
                 android:textStyle="bold"
-                android:textColor="@color/black"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.459"
+                app:layout_constraintHorizontal_bias="0.6"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                android:singleLine="true"
-                android:gravity="center_vertical" />
+                app:layout_constraintVertical_bias="0.515" />
 
             <ImageButton
                 android:id="@+id/fav_icon"
