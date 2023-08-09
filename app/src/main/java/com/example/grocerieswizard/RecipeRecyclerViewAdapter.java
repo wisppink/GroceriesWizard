@@ -1,8 +1,11 @@
 package com.example.grocerieswizard;
 
+import static java.security.AccessController.getContext;
+
+import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Build;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -11,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.view.GravityCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -19,17 +23,22 @@ import java.util.ArrayList;
 public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecyclerViewAdapter.RecipeViewHolder> {
 
     private ArrayList<RecipeModel> recipeList = new ArrayList<>();
-    private  RecyclerViewInterface recyclerViewInterface;
+    private RecyclerViewInterface recyclerViewInterface;
+    private Context context;
+    public RecipeRecyclerViewAdapter(Context context) {
+        this.context = context;
+    }
 
     @NonNull
     @Override
-    public RecipeRecyclerViewAdapter.RecipeViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new RecipeViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler_view_row, parent, false), recyclerViewInterface);
+    public RecipeViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler_view_row, parent, false);
+        return new RecipeViewHolder(itemView);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull RecipeRecyclerViewAdapter.RecipeViewHolder holder, int position) {
-        RecipeModel recipeModel = recipeList.get(holder.getAdapterPosition());
+    public void onBindViewHolder(@NonNull RecipeViewHolder holder, int position) {
+        RecipeModel recipeModel = recipeList.get(position);
         holder.bind(recipeModel);
     }
 
@@ -38,10 +47,12 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
         return recipeList.size();
     }
 
+    // Add a new recipe to the list and notify the adapter
     public void addRecipe(RecipeModel recipe) {
         recipeList.add(recipe);
-        notifyItemInserted(recipeList.size()-1);
+        notifyItemInserted(recipeList.size() - 1);
     }
+
 
     public RecipeModel getItemAtPosition(int position) {
         if (position >= 0 && position < recipeList.size()) {
@@ -49,31 +60,56 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
         }
         return null;
     }
-    public void setRecyclerViewInterface(RecyclerViewInterface recyclerViewInterface) {
-        this.recyclerViewInterface = recyclerViewInterface;
+
+    // Remove a recipe from the list and notify the adapter
+    public void removeRecipe(RecipeModel recipeModel) {
+        // Find the position of the recipe in the list
+        int pos = recipeList.indexOf(recipeModel);
+
+        // Show a confirmation dialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("Confirm Deletion");
+        builder.setMessage("Are you sure you want to delete " + recipeModel.getRecipeName()+" recipe?");
+        builder.setPositiveButton("Delete", (dialog, which) -> {
+            // User confirmed deletion, remove the recipe and update the RecyclerView
+            recipeList.remove(recipeModel);
+            notifyItemRemoved(pos);
+            dialog.dismiss();
+        });
+        builder.setNegativeButton("Cancel", (dialog, which) -> {
+            // User canceled deletion, dismiss the dialog
+            dialog.dismiss();
+        });
+
+        // Create and show the dialog
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
     }
 
 
-    public static class RecipeViewHolder extends RecyclerView.ViewHolder {
+    // Set the interface for handling RecyclerView interactions
+    public void setRecyclerViewInterface(RecyclerViewInterface recyclerViewInterface) {
+        this.recyclerViewInterface = recyclerViewInterface;}
+
+    public class RecipeViewHolder extends RecyclerView.ViewHolder {
 
         private TextView title;
         private ImageButton starButton;
-        public RecipeViewHolder(View itemView, RecyclerViewInterface  recyclerViewInterface) {
+
+        public RecipeViewHolder(View itemView) {
             super(itemView);
             title = itemView.findViewById(R.id.textView);
             starButton = itemView.findViewById(R.id.fav_icon);
-            itemView.setOnClickListener(v -> {
-                if (recyclerViewInterface != null) {
-                    int pos = getAdapterPosition();
-                    if(pos != RecyclerView.NO_POSITION){
-                        recyclerViewInterface.onItemClick(pos);
-                    }
 
+            itemView.setOnClickListener(v -> {
+                int pos = getAdapterPosition();
+                if (pos != RecyclerView.NO_POSITION) {
+                    recyclerViewInterface.onItemClick(pos);
                 }
             });
 
             itemView.setOnLongClickListener(v -> {
-                Toast.makeText(itemView.getContext(),"Long clicked " + title.getText(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(itemView.getContext(), "Long clicked " + title.getText(), Toast.LENGTH_SHORT).show();
                 showPopUpMenu(v, getAdapterPosition());
                 return false;
             });
@@ -88,42 +124,33 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
 
         private void showPopUpMenu(View v, int position) {
             PopupMenu popupMenu = new PopupMenu(itemView.getContext(), v, GravityCompat.END);
-            popupMenu.inflate(R.menu.item_long_tap_popup_menu); // Inflate your menu resource here
+            popupMenu.inflate(R.menu.item_long_tap_popup_menu);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 popupMenu.setForceShowIcon(true);
             }
 
             popupMenu.setOnMenuItemClickListener(item -> {
-                if (item.getItemId() == R.id.menu_delete) {
-                    deleteRecipe(position);
-                    popupMenu.dismiss();
-                    return true;
-                } else if (item.getItemId() == R.id.menu_edit) {
-                    editRecipe(position);
-                    popupMenu.dismiss();
-                    return true;
-                } else if (item.getItemId() == R.id.menu_unFav) {
-                    //TODO:UnFAV but first do the fav list
-                    Toast.makeText(itemView.getContext(), "unfavorite clicked", Toast.LENGTH_SHORT).show();
-                    popupMenu.dismiss();
-                    return false; //for now
-
+                int itemPosition = getAdapterPosition();
+                if (itemPosition != RecyclerView.NO_POSITION) {
+                    if (item.getItemId() == R.id.menu_delete) {
+                        recyclerViewInterface.onDeleteRecipe(itemPosition);
+                        popupMenu.dismiss();
+                        return true;
+                    } else if (item.getItemId() == R.id.menu_edit) {
+                        recyclerViewInterface.onEditRecipe(itemPosition);
+                        Toast.makeText(itemView.getContext(), "edit clicked" + title, Toast.LENGTH_SHORT).show();
+                        popupMenu.dismiss();
+                        return true;
+                    } else if (item.getItemId() == R.id.menu_unFav) {
+                        // TODO: Unfavorite
+                        Toast.makeText(itemView.getContext(), "Unfavorite clicked", Toast.LENGTH_SHORT).show();
+                        popupMenu.dismiss();
+                        return true;
+                    }
                 }
-                else
                 return false;
             });
             popupMenu.show();
-        }
-
-        private void editRecipe(int position) {
-            Toast.makeText(itemView.getContext(), "editRecipe clicked", Toast.LENGTH_SHORT).show();
-        }
-
-        private void deleteRecipe(int position) {
-            // Delete the message at the given position from the list
-            // Notify the adapter to update the list view
-            // Perform any other necessary actions
-            Toast.makeText(itemView.getContext(), "deleteRecipe clicked", Toast.LENGTH_SHORT).show();
         }
 
         public void bind(RecipeModel recipeModel) {

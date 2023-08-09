@@ -21,13 +21,13 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
 
     private RecipeRecyclerViewAdapter adapter;
 
-
+    // Launcher for starting AddRecipe activity and receiving results
     ActivityResultLauncher<Intent> launcher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
 
         Intent data = result.getData();
         if (data != null && data.hasExtra("recipe")) {
             RecipeModel recipe = data.getParcelableExtra("recipe");
-
+            // Add the new recipe to the RecyclerView
             if (recipe != null) {
                 adapter.addRecipe(recipe);
             }
@@ -39,9 +39,9 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        // Initialize RecyclerView
         RecyclerView recyclerView = findViewById(R.id.mRecyclerView);
-
-        adapter = new RecipeRecyclerViewAdapter();
+        adapter = new RecipeRecyclerViewAdapter(this);
         recyclerView.setAdapter(adapter);
         adapter.setRecyclerViewInterface(this);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(v -> {
-            Toast.makeText(MainActivity.this, "fab clicked!", Toast.LENGTH_SHORT).show();
+            // Launch the AddRecipe activity to add a new recipe
             Intent intent = new Intent(MainActivity.this, AddRecipe.class);
             launcher.launch(intent);
 
@@ -63,14 +63,33 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
 
     @Override
     public void onItemClick(int position) {
+        // Handle item click to show details of a recipe
         RecipeModel recipeModel = adapter.getItemAtPosition(position);
         if (recipeModel != null) {
             Toast.makeText(this, "Clicked on recipe: " + recipeModel.getRecipeName(), Toast.LENGTH_SHORT).show();
         }
-
+        // Start the DetailActivity to show recipe details
         Intent intent = new Intent(this, DetailActivity.class);
         intent.putExtra("recipe", recipeModel);
         startActivity(intent);
+    }
+
+    @Override
+    public void onDeleteRecipe(int position) {
+        // Handle delete action for a recipe
+        RecipeModel recipeModel = adapter.getItemAtPosition(position);
+        if (recipeModel != null) {
+            // Remove the recipe from the RecyclerView
+            adapter.removeRecipe(recipeModel);
+            Toast.makeText(this, "Recipe deleted: " + recipeModel.getRecipeName(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onEditRecipe(int position) {
+        // TODO: Handle edit action for a recipe
+        RecipeModel recipeModel = adapter.getItemAtPosition(position);
+        // TODO: Implement editing functionality
     }
 
 }
