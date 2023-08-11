@@ -11,6 +11,8 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.util.List;
+
 public class DetailActivity extends AppCompatActivity {
     private String title;
     private String ingredients;
@@ -22,25 +24,37 @@ public class DetailActivity extends AppCompatActivity {
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
                 Intent data = result.getData();
-                RecipeModel recipe = null;
                 if (data != null && data.hasExtra("recipe")) {
-                    recipe = data.getParcelableExtra("recipe");
-                }
-                if (recipe != null) {
-                    title = recipe.getRecipeName();
-                    ingredients = recipe.getIngredients();
-                    howtoprepare = recipe.getHowToPrepare();
-                    selectedImage = recipe.getRecipeImageUri();
+                    RecipeModel recipe = data.getParcelableExtra("recipe");
+                    if (recipe != null) {
+                        title = recipe.getRecipeName();
+                        List<IngredientModel> ingredientList = recipe.getIngredients(); // Get the list of ingredients
+                        howtoprepare = recipe.getHowToPrepare();
+                        selectedImage = recipe.getRecipeImageUri();
 
-                    // Update UI with recipe information
-                    TextView titleTextView = findViewById(R.id.show_title);
-                    titleTextView.setText(title);
+                        // Update UI with recipe information
+                        TextView titleTextView = findViewById(R.id.show_title);
+                        titleTextView.setText(title);
 
-                    TextView ingredientsTextView = findViewById(R.id.show_ingredients);
-                    ingredientsTextView.setText(ingredients);
+                        TextView ingredientsTextView = findViewById(R.id.show_ingredients);
 
-                    ImageView imageRecipe = findViewById(R.id.showRecipeImage);
-                    imageRecipe.setImageURI(selectedImage);
+                        // Format the list of ingredients as a comma-separated string
+                        StringBuilder ingredientsBuilder = new StringBuilder();
+                        for (IngredientModel ingredient : ingredientList) {
+                            String ingredientLine = ingredient.getName() + " " + ingredient.getQuantity() + " " + ingredient.getUnit();
+                            ingredientsBuilder.append(ingredientLine).append(", ");
+                        }
+                        // Remove the trailing comma and space
+                        if (ingredientsBuilder.length() > 0) {
+                            ingredientsBuilder.setLength(ingredientsBuilder.length() - 2);
+                        }
+                        String formattedIngredients = ingredientsBuilder.toString();
+
+                        ingredientsTextView.setText(formattedIngredients);
+
+                        ImageView imageRecipe = findViewById(R.id.showRecipeImage);
+                        imageRecipe.setImageURI(selectedImage);
+                    }
                 }
             }
     );
@@ -52,27 +66,39 @@ public class DetailActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
 
-            RecipeModel recipe = intent.getParcelableExtra("recipe");
-            if (recipe != null) {
-                title = recipe.getRecipeName();
-                ingredients = recipe.getIngredients();
-                howtoprepare = recipe.getHowToPrepare();
-                selectedImage = recipe.getRecipeImageUri();
+        RecipeModel recipe = intent.getParcelableExtra("recipe");
+        if (recipe != null) {
+            title = recipe.getRecipeName();
+            List<IngredientModel> ingredientList = recipe.getIngredients(); // Get the list of ingredients
+            howtoprepare = recipe.getHowToPrepare();
+            selectedImage = recipe.getRecipeImageUri();
 
+            TextView titleTextView = findViewById(R.id.show_title);
+            titleTextView.setText(title);
 
-                TextView titleTextView = findViewById(R.id.show_title);
-                titleTextView.setText(title);
+            TextView ingredientsTextView = findViewById(R.id.show_ingredients);
 
-                TextView ingredientsTextView = findViewById(R.id.show_ingredients);
-                ingredientsTextView.setText(ingredients);
-
-                TextView prepareTextView = findViewById(R.id.show_how_to_prepare);
-                prepareTextView.setText(howtoprepare);
-
-                //ImageView imageRecipe = findViewById(R.id.showRecipeImage);
-                //imageRecipe.setImageURI(selectedImage);
+            // Format the list of ingredients as a comma-separated string
+            StringBuilder ingredientsBuilder = new StringBuilder();
+            for (IngredientModel ingredient : ingredientList) {
+                String ingredientLine = ingredient.getName() + " " + ingredient.getQuantity() + " " + ingredient.getUnit();
+                ingredientsBuilder.append(ingredientLine).append(", ");
             }
+            // Remove the trailing comma and space
+            if (ingredientsBuilder.length() > 0) {
+                ingredientsBuilder.setLength(ingredientsBuilder.length() - 2);
+            }
+            String formattedIngredients = ingredientsBuilder.toString();
 
+            ingredientsTextView.setText(formattedIngredients);
+
+            TextView prepareTextView = findViewById(R.id.show_how_to_prepare);
+            prepareTextView.setText(howtoprepare);
+
+            ImageView imageRecipe = findViewById(R.id.showRecipeImage);
+            imageRecipe.setImageURI(selectedImage);
+        }
     }
+
 }
 

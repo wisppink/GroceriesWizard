@@ -14,4 +14,7 @@
     <string name="popup_delete">Delete</string>
     <string name="popup_edit">Edit</string>
     <string name="popup_unfavorite">unFavorite</string>
+    <string name="ingredient_name">Ingredient Name</string>
+    <string name="quantity_0">Quantity: 0</string>
+    <string name="unit">Unit</string>
 </resources>
