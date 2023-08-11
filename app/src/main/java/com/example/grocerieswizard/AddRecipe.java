@@ -3,9 +3,11 @@ package com.example.grocerieswizard;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -32,25 +34,32 @@ public class AddRecipe extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.add_recipe);
 
-        ImageButton addImage = findViewById(R.id.add_image);
-
         editRecipeName = findViewById(R.id.edit_recipe_name);
         editRecipeIngredients = findViewById(R.id.edit_recipe_ingredients);
         editRecipeHowToPrepare = findViewById(R.id.edit_recipe_how_to_prepare);
 
         Button btnSaveRecipe = findViewById(R.id.save_recipe_button);
-
         ImageButton dischargeRecipe = findViewById(R.id.discharge_recipe);
+        //TODO: when user tap back button, show alert too
+
+        ImageView addImage = findViewById(R.id.add_image);
+        Uri defaultImageUri = Uri.parse("android.resource://com.example.grocerieswizard/" + R.drawable.recipe_image_default);
+
 
         pickImageLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     if (result.getResultCode() == RESULT_OK && result.getData() != null) {
                         selectedImageUri = result.getData().getData();
                         //TODO: change the resolution
-
+                        addImage.setImageURI(selectedImageUri);
+                    } else {
+                        // User didn't choose an image, display the default image
+                        selectedImageUri = defaultImageUri;
                         addImage.setImageURI(selectedImageUri);
                     }
                 });
+        addImage.setImageURI(defaultImageUri);
+        Log.d("DefaultImageURI", defaultImageUri.toString());
 
         addImage.setOnClickListener(v -> {
             Intent pickImageIntent = new Intent(Intent.ACTION_PICK);
@@ -67,13 +76,21 @@ public class AddRecipe extends AppCompatActivity {
                 Toast.makeText(this, "Please fill all fields!", Toast.LENGTH_SHORT).show();
                 return;
             }
-            RecipeModel recipe = new RecipeModel(recipeName, ingredients, howToPrepare, selectedImageUri);
+
+            RecipeModel recipe;
+            if (selectedImageUri != null) {
+                recipe = new RecipeModel(recipeName, ingredients, howToPrepare, selectedImageUri);
+            } else {
+                recipe = new RecipeModel(recipeName, ingredients, howToPrepare, defaultImageUri);
+            }
+
             Intent resultIntent = new Intent();
             resultIntent.putExtra("recipe", recipe);
             setResult(RESULT_OK, resultIntent);
             finish();
             Toast.makeText(this, "saveButton works", Toast.LENGTH_SHORT).show();
         });
+
 
         dischargeRecipe.setOnClickListener(v -> {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
