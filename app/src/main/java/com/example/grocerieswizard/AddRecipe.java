@@ -106,6 +106,36 @@ public class AddRecipe extends AppCompatActivity {
         });
 
     }
+    @Override
+    public void onBackPressed() {
+        if (unsavedChangesExist()) {
+            showUnsavedChangesDialog();
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    private boolean unsavedChangesExist() {
+        // Check if there are any unsaved changes (e.g., fields are not empty)
+        String recipeName = editRecipeName.getText().toString();
+        String ingredients = editRecipeIngredients.getText().toString();
+        String howToPrepare = editRecipeHowToPrepare.getText().toString();
+
+        return !recipeName.isEmpty() || !ingredients.isEmpty() || !howToPrepare.isEmpty();
+    }
+
+    private void showUnsavedChangesDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Unsaved Changes")
+                .setMessage("You have unsaved changes. Are you sure you want to discard them?")
+                .setPositiveButton("Discard", (dialog, which) -> {
+                    finish();
+                })
+                .setNegativeButton("Cancel", (dialog, which) -> {
+                    dialog.dismiss();
+                })
+                .show();
+    }
 
 
     @Override
