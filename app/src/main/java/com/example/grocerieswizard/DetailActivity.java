@@ -23,7 +23,7 @@ public class DetailActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
 
-        RecipeModel recipe = intent.getParcelableExtra("recipe");
+        RecipeModel recipe = intent.getParcelableExtra("MyRecipe");
         TextView titleTextView = findViewById(R.id.show_title);
         TextView ingredientsTextView = findViewById(R.id.show_ingredients);
         ImageView imageRecipe = findViewById(R.id.showRecipeImage);
@@ -34,15 +34,14 @@ public class DetailActivity extends AppCompatActivity {
             imageRecipe.setImageURI(recipe.getRecipeImageUri());
             howtoTextView.setText(recipe.getHowToPrepare());
             ingredients = recipe.getIngredients();
+            System.out.println(ingredients);
             StringBuilder ingredientsBuilder = new StringBuilder();
             for (IngredientModel ingredient : ingredients) {
-                ingredientsBuilder.append(ingredient.getName()).append("\n");
+                //TODO:show nicely, like max 30 char for name, then quantity, then unit
+                ingredientsBuilder.append(ingredient.getName()).append(" ").append(ingredient.getQuantity()).append(" ").append(ingredient.getUnit()).append("\n");
             }
             ingredientsTextView.setText(ingredientsBuilder.toString());
         }
-
-        //show ingredients name
-
     }
 
 }

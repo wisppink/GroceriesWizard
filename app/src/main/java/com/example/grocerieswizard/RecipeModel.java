@@ -3,7 +3,6 @@ package com.example.grocerieswizard;
 import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
 
 import java.util.List;
 
@@ -45,9 +44,8 @@ public class RecipeModel implements Parcelable {
         dest.writeString(recipeName);
         dest.writeParcelable(recipeImageUri, flags);
         dest.writeString(howToPrepare);
-        dest.writeList(ingredients);
+        dest.writeTypedList(ingredients); // Changed from writeList to writeTypedList
     }
-
 
     @Override
     public int describeContents() {
@@ -69,5 +67,23 @@ public class RecipeModel implements Parcelable {
     public List<IngredientModel> getIngredients() {
         return ingredients;
     }
+    public void addIngredient(IngredientModel ingredient) {
+        ingredients.add(ingredient);
+    }
 
+    public void setRecipeName(String recipeName) {
+        this.recipeName = recipeName;
+    }
+
+    public void setRecipeImageUri(Uri recipeImageUri) {
+        this.recipeImageUri = recipeImageUri;
+    }
+
+    public void setHowToPrepare(String howToPrepare) {
+        this.howToPrepare = howToPrepare;
+    }
+
+    public void setIngredients(List<IngredientModel> ingredients) {
+        this.ingredients = ingredients;
+    }
 }

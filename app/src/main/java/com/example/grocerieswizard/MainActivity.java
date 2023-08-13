@@ -18,10 +18,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity implements RecyclerViewInterface {
 
     //TODO:ekranı döndürünce recipeler gidiyor lol
     private RecipeRecyclerViewAdapter adapter;
+    List<IngredientModel> ing;
 
     // Launcher for starting AddRecipe activity and receiving results
     ActivityResultLauncher<Intent> launcher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
@@ -69,7 +72,11 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
         RecipeModel recipeModel = adapter.getItemAtPosition(position);
         if (recipeModel != null) {
             Intent intent = new Intent(this, DetailActivity.class);
-            intent.putExtra("recipe", recipeModel);
+            intent.putExtra("MyRecipe", recipeModel);
+            ing = recipeModel.getIngredients();
+            for (IngredientModel ingredientModel : ing) {
+                System.out.println(ingredientModel.getName());
+            }
             startActivity(intent);
         }
         else{

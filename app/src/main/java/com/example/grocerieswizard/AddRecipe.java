@@ -55,6 +55,8 @@ public class AddRecipe extends AppCompatActivity {
         ImageView addImage = findViewById(R.id.add_image);
         Uri defaultImageUri = Uri.parse("android.resource://com.example.grocerieswizard/" + R.drawable.recipe_image_default);
 
+        //create an empty recipe
+        recipe = new RecipeModel(null, null, null, selectedImageUri);
 
         pickImageLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
                 result -> {
@@ -87,10 +89,15 @@ public class AddRecipe extends AppCompatActivity {
                 return;
             }
             if (selectedImageUri != null) {
-                recipe = new RecipeModel(recipeName, mylist, howToPrepare, selectedImageUri);
-                Log.d("addrecipe",mylist.get(1).getName());
+                recipe.setRecipeName(recipeName);
+                recipe.setHowToPrepare(howToPrepare);
+                recipe.setRecipeImageUri(selectedImageUri);
+                recipe.setIngredients(mylist);
             } else {
-                recipe = new RecipeModel(recipeName, mylist, howToPrepare, defaultImageUri);
+                recipe.setRecipeName(recipeName);
+                recipe.setHowToPrepare(howToPrepare);
+                recipe.setRecipeImageUri(defaultImageUri);
+                recipe.setIngredients(mylist);
             }
             Intent resultIntent = new Intent();
             resultIntent.putExtra("recipe", recipe);
@@ -127,7 +134,6 @@ public class AddRecipe extends AppCompatActivity {
             String unit = ingredientUnitEditText.getText().toString();
 
             IngredientModel newIngredient = new IngredientModel(name, quantity, unit);
-            Log.d("AddRecipe","new ingredient added: " + name);
             ingredientList.add(newIngredient);
             ingredientAdapter.notifyDataSetChanged();
         });
