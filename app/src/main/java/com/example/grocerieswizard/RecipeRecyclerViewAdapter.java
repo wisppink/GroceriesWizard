@@ -118,7 +118,6 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
             });
 
             itemView.setOnLongClickListener(v -> {
-                Toast.makeText(itemView.getContext(), "Long clicked " + title.getText(), Toast.LENGTH_SHORT).show();
                 showPopUpMenu(v, getAdapterPosition());
                 return false;
             });

@@ -37,7 +37,7 @@ public class IngredientModel implements Parcelable {
     @NonNull
     @Override
     public String toString() {
-        return name + " " + quantity + " " + unit;
+        return getName() + " " + getQuantity() + " " + getUnit();
     }
 
     public static final Creator<IngredientModel> CREATOR = new Creator<IngredientModel>() {

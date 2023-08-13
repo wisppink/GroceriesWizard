@@ -5,7 +5,7 @@
     <string name="ingredients">Ingredients: </string>
     <string name="hint_recipe_ingredients">tomato 1 kg, onion 2 pcs</string>
     <string name="how_to_prepare">How to Prepare:</string>
-    <string name="hint_how_to_prepare">Start with chopping tomatoes</string>
+    <string name="hint_how_to_prepare">How to Prepare:Start with chopping tomatoes, put onions in salted water</string>
     <string name="save_recipe">Save Recipe</string>
     <string name="delete_recipe">Delete Recipe</string>
     <string name="recipe_title_show">RECIPE TITLE SHOW</string>
@@ -17,4 +17,5 @@
     <string name="ingredient_name">Ingredient Name</string>
     <string name="quantity_0">Quantity: 0</string>
     <string name="unit">Unit</string>
+    <string name="add_ingredient">Add Ingredient</string>
 </resources>

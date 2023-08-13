@@ -1,7 +1,6 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -23,9 +22,11 @@
         android:layout_width="192dp"
         android:layout_height="34dp"
         android:layout_above="@+id/edit_recipe_name"
+        android:layout_alignParentTop="true"
         android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
         android:layout_marginEnd="-184dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="16dp"
         android:layout_toStartOf="@+id/edit_recipe_name"
         android:layout_toEndOf="@+id/add_image"
         android:gravity="left"
@@ -39,36 +40,12 @@
         android:layout_alignBottom="@+id/add_image"
         android:layout_alignParentEnd="true"
         android:layout_marginStart="16dp"
-        android:layout_marginEnd="17dp"
-        android:layout_marginBottom="1dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
         android:layout_toEndOf="@+id/add_image"
         android:hint="Recipe Name"
         android:textSize="20dp" />
 
-    <EditText
-        android:id="@+id/edit_recipe_how_to_prepare"
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:layout_above="@+id/save_recipe_button"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
-        android:gravity="left"
-        android:hint="@string/hint_how_to_prepare" />
-
-    <Button
-        android:id="@+id/save_recipe_button"
-        android:layout_width="280dp"
-        android:layout_height="50dp"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
-        android:text="@string/save_recipe" />
 
     <ImageButton
         android:id="@+id/discharge_recipe"
@@ -83,29 +60,51 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView_ingredients"
-        android:layout_width="360dp"
-        android:layout_height="117dp"
-        android:layout_above="@+id/addIngredientButton"
-        android:layout_below="@+id/edit_recipe_name"
+        android:layout_width="361dp"
+        android:layout_height="200dp"
+        android:layout_below="@+id/addIngredientButton"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="4dp" />
+        android:layout_marginEnd="16dp" />
 
     <Button
         android:id="@+id/addIngredientButton"
-        android:layout_width="374dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/edit_recipe_how_to_prepare"
+        android:layout_below="@+id/edit_recipe_how_to_prepare"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
+        android:text="@string/add_ingredient" />
+
+    <EditText
+        android:id="@+id/edit_recipe_how_to_prepare"
+        android:layout_width="344dp"
+        android:layout_height="143dp"
+        android:layout_below="@+id/add_image"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:gravity="left"
+        android:hint="@string/hint_how_to_prepare" />
+
+    <Button
+        android:id="@+id/save_recipe_button"
+        android:layout_width="280dp"
+        android:layout_height="50dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
-        android:text="Add Ingredient" />
+        android:text="@string/save_recipe" />
 
 
 </RelativeLayout>

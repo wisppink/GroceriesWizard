@@ -11,40 +11,31 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class AddRecipe extends AppCompatActivity {
-
-    private static final String KEY_RECIPE_NAME = "recipe_name";
-    private static final String KEY_RECIPE_INGREDIENTS = "recipe_ingredients";
-    private static final String KEY_RECIPE_HOW_TO_PREPARE = "recipe_how_to_prepare";
-    private static final String KEY_SELECTED_IMAGE_URI = "selected_image_uri";
 
     private Uri selectedImageUri;
     private EditText editRecipeName;
     private EditText editRecipeHowToPrepare;
     private ActivityResultLauncher<Intent> pickImageLauncher;
-    private List<IngredientModel> ingredientList;
     private IngredientAdapter ingredientAdapter;
+    private List<IngredientModel> ingredientList = new ArrayList<>(); // Add this line
+    private RecipeModel recipe; // Add this line
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.add_recipe);
-
-        ingredientList = new ArrayList<>();
-        ingredientAdapter = new IngredientAdapter(ingredientList);
 
         editRecipeName = findViewById(R.id.edit_recipe_name);
         editRecipeHowToPrepare = findViewById(R.id.edit_recipe_how_to_prepare);
@@ -52,12 +43,14 @@ public class AddRecipe extends AppCompatActivity {
         Button btnSaveRecipe = findViewById(R.id.save_recipe_button);
         ImageButton dischargeRecipe = findViewById(R.id.discharge_recipe);
 
+
+        ingredientAdapter = new IngredientAdapter(ingredientList);
         RecyclerView ingredientsRecyclerView = findViewById(R.id.recyclerView_ingredients);
         ingredientsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         ingredientsRecyclerView.setAdapter(ingredientAdapter);
 
         Button addIngredientButton = findViewById(R.id.addIngredientButton);
-        addIngredientButton.setOnClickListener(v -> {showAddIngredientDialog();});
+        addIngredientButton.setOnClickListener(v -> showAddIngredientDialog());
 
         ImageView addImage = findViewById(R.id.add_image);
         Uri defaultImageUri = Uri.parse("android.resource://com.example.grocerieswizard/" + R.drawable.recipe_image_default);
@@ -67,8 +60,8 @@ public class AddRecipe extends AppCompatActivity {
                 result -> {
                     if (result.getResultCode() == RESULT_OK && result.getData() != null) {
                         selectedImageUri = result.getData().getData();
-                        //TODO: change the resolution
                         addImage.setImageURI(selectedImageUri);
+                        //TODO: change the resolution
                     } else {
                         // User didn't choose an image, display the default image
                         selectedImageUri = defaultImageUri;
@@ -86,26 +79,23 @@ public class AddRecipe extends AppCompatActivity {
 
         btnSaveRecipe.setOnClickListener(v -> {
             String recipeName = editRecipeName.getText().toString();
-            List<IngredientModel> ingredientModelList = ingredientList;
             String howToPrepare = editRecipeHowToPrepare.getText().toString();
+            List<IngredientModel> mylist = ingredientList;
 
-            if (recipeName.isEmpty() || ingredientModelList.isEmpty() || howToPrepare.isEmpty()) {
+            if (recipeName.isEmpty() || ingredientList.isEmpty() || howToPrepare.isEmpty()) {
                 Toast.makeText(this, "Please fill all fields!", Toast.LENGTH_SHORT).show();
                 return;
             }
-
-            RecipeModel recipe;
             if (selectedImageUri != null) {
-                recipe = new RecipeModel(recipeName, ingredientModelList, howToPrepare, selectedImageUri);
+                recipe = new RecipeModel(recipeName, mylist, howToPrepare, selectedImageUri);
+                Log.d("addrecipe",mylist.get(1).getName());
             } else {
-                recipe = new RecipeModel(recipeName, ingredientModelList, howToPrepare, defaultImageUri);
+                recipe = new RecipeModel(recipeName, mylist, howToPrepare, defaultImageUri);
             }
-
             Intent resultIntent = new Intent();
             resultIntent.putExtra("recipe", recipe);
             setResult(RESULT_OK, resultIntent);
             finish();
-            Toast.makeText(this, "saveButton works", Toast.LENGTH_SHORT).show();
         });
 
 
@@ -113,12 +103,8 @@ public class AddRecipe extends AppCompatActivity {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Confirm Discharge")
                     .setMessage("Are you sure you want to discharge this recipe?")
-                    .setPositiveButton("Yes", (dialog, which) -> {
-                        finish();
-                    })
-                    .setNegativeButton("Cancel", (dialog, which) -> {
-                        dialog.dismiss();
-                    })
+                    .setPositiveButton("Yes", (dialog, which) -> finish())
+                    .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
                     .show();
         });
 
@@ -141,14 +127,11 @@ public class AddRecipe extends AppCompatActivity {
             String unit = ingredientUnitEditText.getText().toString();
 
             IngredientModel newIngredient = new IngredientModel(name, quantity, unit);
+            Log.d("AddRecipe","new ingredient added: " + name);
             ingredientList.add(newIngredient);
             ingredientAdapter.notifyDataSetChanged();
         });
-
-        builder.setNegativeButton("Cancel", (dialog, which) -> {
-            dialog.dismiss();
-        });
-
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
         AlertDialog dialog = builder.create();
         dialog.show();
     }
@@ -175,33 +158,9 @@ public class AddRecipe extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Unsaved Changes")
                 .setMessage("You have unsaved changes. Are you sure you want to discard them?")
-                .setPositiveButton("Discard", (dialog, which) -> {
-                    finish();
-                })
-                .setNegativeButton("Cancel", (dialog, which) -> {
-                    dialog.dismiss();
-                })
+                .setPositiveButton("Discard", (dialog, which) -> finish())
+                .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
                 .show();
     }
 
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putString(KEY_RECIPE_NAME, editRecipeName.getText().toString());
-        outState.putString(KEY_RECIPE_INGREDIENTS, ingredientList.toString());
-        outState.putString(KEY_RECIPE_HOW_TO_PREPARE, editRecipeHowToPrepare.getText().toString());
-        outState.putParcelable(KEY_SELECTED_IMAGE_URI, selectedImageUri);
-    }
-
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        editRecipeName.setText(savedInstanceState.getString(KEY_RECIPE_NAME));
-        ingredientList.addAll(Objects.requireNonNull(savedInstanceState.getParcelableArrayList(KEY_RECIPE_INGREDIENTS)));
-        editRecipeHowToPrepare.setText(savedInstanceState.getString(KEY_RECIPE_HOW_TO_PREPARE));
-        if (savedInstanceState.containsKey(KEY_SELECTED_IMAGE_URI)) {
-            selectedImageUri = savedInstanceState.getParcelable(KEY_SELECTED_IMAGE_URI);
-        }
-    }
 }

@@ -2,6 +2,7 @@ package com.example.grocerieswizard;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -19,6 +20,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class MainActivity extends AppCompatActivity implements RecyclerViewInterface {
 
+    //TODO:ekranı döndürünce recipeler gidiyor lol
     private RecipeRecyclerViewAdapter adapter;
 
     // Launcher for starting AddRecipe activity and receiving results
@@ -66,12 +68,14 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
         // Handle item click to show details of a recipe
         RecipeModel recipeModel = adapter.getItemAtPosition(position);
         if (recipeModel != null) {
-            Toast.makeText(this, "Clicked on recipe: " + recipeModel.getRecipeName(), Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(this, DetailActivity.class);
+            intent.putExtra("recipe", recipeModel);
+            startActivity(intent);
         }
-        // Start the DetailActivity to show recipe details
-        Intent intent = new Intent(this, DetailActivity.class);
-        intent.putExtra("recipe", recipeModel);
-        startActivity(intent);
+        else{
+            Log.d("MainActivity","recipe model null");
+        }
+
     }
 
     @Override

@@ -3,6 +3,7 @@ package com.example.grocerieswizard;
 import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 import java.util.List;
 
@@ -29,8 +30,8 @@ public class RecipeModel implements Parcelable {
 
     public static final Parcelable.Creator<RecipeModel> CREATOR = new Parcelable.Creator<RecipeModel>() {
         @Override
-        public RecipeModel createFromParcel(Parcel in) {
-            return new RecipeModel(in);
+        public RecipeModel createFromParcel(Parcel source) {
+            return new RecipeModel(source);
         }
 
         @Override
@@ -68,4 +69,5 @@ public class RecipeModel implements Parcelable {
     public List<IngredientModel> getIngredients() {
         return ingredients;
     }
+
 }

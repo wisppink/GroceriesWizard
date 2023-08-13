@@ -24,7 +24,8 @@
 
         <activity
             android:name=".AddRecipe"
-            android:label="Add Recipe Activity" />
+            android:label="Add Recipe Activity"
+            android:windowSoftInputMode="adjustPan"/>
         <activity android:name="com.example.grocerieswizard.DetailActivity" />
 
     </application>
