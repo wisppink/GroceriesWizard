@@ -1,16 +1,15 @@
 package com.example.grocerieswizard;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -18,12 +17,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import java.util.List;
-
 public class MainActivity extends AppCompatActivity implements RecyclerViewInterface {
 
     //TODO:ekranı döndürünce recipeler gidiyor lol
     private RecipeRecyclerViewAdapter adapter;
+    Context context;
 
     // Launcher for starting AddRecipe activity and receiving results
     ActivityResultLauncher<Intent> launcher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
@@ -73,30 +71,49 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
             Intent intent = new Intent(this, DetailActivity.class);
             intent.putExtra("MyRecipe", recipeModel);
             startActivity(intent);
-        }
-        else{
-            Log.d("MainActivity","recipe model null");
+        } else {
+            Log.d("MainActivity", "recipe model null");
         }
 
     }
 
     @Override
     public void onItemDelete(int position) {
-        // Handle delete action for a recipe
+        // Handle delete action for a recipe with an alert
         RecipeModel recipeModel = adapter.getItemAtPosition(position);
         if (recipeModel != null) {
-            // Remove the recipe from the RecyclerView
-            adapter.removeRecipe(recipeModel);
-            //TODO: Alert are you sure
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            builder.setTitle("Confirm Deletion");
+            builder.setMessage("Are you sure you want to delete " + recipeModel.getRecipeName() + " recipe?");
+            builder.setPositiveButton("Delete", (dialog, which) -> {
+                // User confirmed deletion, remove the recipe and update the RecyclerView
+                adapter.removeRecipe(recipeModel);
+                dialog.dismiss();
+            });
+            builder.setNegativeButton("Cancel", (dialog, which) -> {
+                // User canceled deletion, dismiss the dialog
+                dialog.dismiss();
+            });
+
+            // Create and show the dialog
+            AlertDialog alertDialog = builder.create();
+            alertDialog.show();
             Toast.makeText(this, "Recipe deleted: " + recipeModel.getRecipeName(), Toast.LENGTH_SHORT).show();
         }
     }
 
     @Override
     public void onItemEdit(int position) {
-        // TODO: Handle edit action for a recipe
         RecipeModel recipeModel = adapter.getItemAtPosition(position);
-        // TODO: Implement editing functionality
+        if (recipeModel != null) {
+            Intent editIntent = new Intent(this, AddRecipe.class);
+            editIntent.putExtra("editRecipe", true);
+            editIntent.putExtra("recipeModel", recipeModel);
+            editIntent.putExtra("position", position);
+            launcher.launch(editIntent);
+            adapter.removeRecipe(recipeModel);
+        }
     }
+
 
 }

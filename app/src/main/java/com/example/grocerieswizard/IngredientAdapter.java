@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
-public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.IngredientViewHolder>  {
+public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.IngredientViewHolder> {
 
     private List<IngredientModel> ingredientList;
     private RecyclerViewInterface recyclerViewInterface;
@@ -28,7 +28,7 @@ public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.In
     @NonNull
     @Override
     public IngredientAdapter.IngredientViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_ingredient,parent,false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_ingredient, parent, false);
         return new IngredientViewHolder(view);
     }
 
@@ -42,12 +42,14 @@ public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.In
     public int getItemCount() {
         return ingredientList.size();
     }
+
     public IngredientModel getItemAtPosition(int position) {
         if (position >= 0 && position < ingredientList.size()) {
             return ingredientList.get(position);
         }
         return null;
     }
+
     public void addIngredient(IngredientModel ingredientModel) {
         ingredientList.add(ingredientModel);
         notifyItemInserted(ingredientList.size() - 1);
@@ -64,7 +66,7 @@ public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.In
         // Show a confirmation dialog
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle("Confirm Deletion");
-        builder.setMessage("Are you sure you want to delete " + ingredientModel.getName()+" recipe?");
+        builder.setMessage("Are you sure you want to delete " + ingredientModel.getName() + " recipe?");
         builder.setPositiveButton("Delete", (dialog, which) -> {
             // User confirmed deletion, remove the recipe and update the RecyclerView
             ingredientList.remove(ingredientModel);
@@ -91,6 +93,7 @@ public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.In
         TextView ingredientName;
         TextView quantity;
         TextView unit;
+
         public IngredientViewHolder(@NonNull View itemView) {
             super(itemView);
             ingredientName = itemView.findViewById(R.id.ingredientName);

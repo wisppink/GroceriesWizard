@@ -11,6 +11,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
+
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
@@ -18,10 +19,11 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class AddRecipe extends AppCompatActivity implements RecyclerViewInterface{
+public class AddRecipe extends AppCompatActivity implements RecyclerViewInterface {
 
     private Uri selectedImageUri;
     private EditText editRecipeName;
@@ -30,6 +32,7 @@ public class AddRecipe extends AppCompatActivity implements RecyclerViewInterfac
     private IngredientAdapter ingredientAdapter;
     private List<IngredientModel> ingredientList = new ArrayList<>();
     private RecipeModel recipe;
+    private boolean editMode = false;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -42,15 +45,17 @@ public class AddRecipe extends AppCompatActivity implements RecyclerViewInterfac
         Button btnSaveRecipe = findViewById(R.id.save_recipe_button);
         ImageButton dischargeRecipe = findViewById(R.id.discharge_recipe);
 
-        ingredientAdapter = new IngredientAdapter(this,ingredientList);
+        ingredientAdapter = new IngredientAdapter(this, ingredientList);
         ingredientAdapter.setRecyclerViewInterface(this);
         RecyclerView ingredientsRecyclerView = findViewById(R.id.recyclerView_ingredients);
         ingredientsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         ingredientsRecyclerView.setAdapter(ingredientAdapter);
 
         Button addIngredientButton = findViewById(R.id.addIngredientButton);
-        addIngredientButton.setOnClickListener(v ->{IngredientModel newIngredient = new IngredientModel(null, 0, null);
-                    showAddIngredientDialog(newIngredient);});
+        addIngredientButton.setOnClickListener(v -> {
+            IngredientModel newIngredient = new IngredientModel(null, 0, null);
+            showAddIngredientDialog(newIngredient);
+        });
 
 
         ImageView addImage = findViewById(R.id.add_image);
@@ -104,6 +109,7 @@ public class AddRecipe extends AppCompatActivity implements RecyclerViewInterfac
             resultIntent.putExtra("recipe", recipe);
             setResult(RESULT_OK, resultIntent);
             finish();
+
         });
 
 
@@ -115,6 +121,33 @@ public class AddRecipe extends AppCompatActivity implements RecyclerViewInterfac
                     .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
                     .show();
         });
+
+        // Check if the activity is opened for editing
+        Intent intent = getIntent();
+        editMode = intent.getBooleanExtra("editRecipe", false);
+        if (editMode) {
+            RecipeModel recipeModel = intent.getParcelableExtra("recipeModel");
+            int position = intent.getIntExtra("position", -1);
+            editRecipeName.setText(recipeModel.getRecipeName());
+            editRecipeHowToPrepare.setText(recipeModel.getHowToPrepare());
+            ingredientList.addAll(recipeModel.getIngredients());
+            selectedImageUri = recipeModel.getRecipeImageUri();
+            String recipeName = editRecipeName.getText().toString();
+            String howToPrepare = editRecipeHowToPrepare.getText().toString();
+            Uri newPhoto = selectedImageUri;
+            recipeModel.setRecipeName(recipeName);
+            recipeModel.setHowToPrepare(howToPrepare);
+            recipeModel.setIngredients(ingredientList);
+            recipeModel.setRecipeImageUri(newPhoto);
+            ingredientAdapter.notifyItemChanged(position);
+            if (editMode) {
+                Intent editintent = new Intent();
+                editintent.putExtra("edited", true);
+                editintent.putExtra("new_recipe", recipeModel);
+                editintent.putExtra("position", position);
+                setResult(RESULT_OK, editintent);
+            }
+        }
 
     }
 
@@ -137,9 +170,8 @@ public class AddRecipe extends AppCompatActivity implements RecyclerViewInterfac
             ingredientModel.setName(name);
             ingredientModel.setUnit(unit);
             ingredientModel.setQuantity(quantity);
-            //ingredientList.add(newIngredient);
             ingredientAdapter.addIngredient(ingredientModel);
-            ingredientAdapter.notifyDataSetChanged();
+
         });
         builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
         AlertDialog dialog = builder.create();
@@ -181,7 +213,7 @@ public class AddRecipe extends AppCompatActivity implements RecyclerViewInterfac
     @Override
     public void onItemDelete(int position) {
         IngredientModel ingredientModel = ingredientAdapter.getItemAtPosition(position);
-        if(ingredientModel != null){
+        if (ingredientModel != null) {
             ingredientAdapter.removeIngredient(ingredientModel);
         }
 
@@ -189,10 +221,9 @@ public class AddRecipe extends AppCompatActivity implements RecyclerViewInterfac
 
     @Override
     public void onItemEdit(int position) {
-        //TODO: Handle edit action for an ingredient
         IngredientModel ingredientModel = ingredientAdapter.getItemAtPosition(position);
-        if(ingredientModel != null){
-            showEditIngredientDialog(ingredientModel,position);
+        if (ingredientModel != null) {
+            showEditIngredientDialog(ingredientModel, position);
 
         }
     }

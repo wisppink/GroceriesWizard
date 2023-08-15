@@ -12,7 +12,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.core.view.GravityCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -23,6 +22,7 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
     private ArrayList<RecipeModel> recipeList = new ArrayList<>();
     private RecyclerViewInterface recyclerViewInterface;
     private Context context;
+
     public RecipeRecyclerViewAdapter(Context context) {
         this.context = context;
     }
@@ -63,31 +63,21 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
     public void removeRecipe(RecipeModel recipeModel) {
         // Find the position of the recipe in the list
         int pos = recipeList.indexOf(recipeModel);
-
-        // Show a confirmation dialog
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("Confirm Deletion");
-        builder.setMessage("Are you sure you want to delete " + recipeModel.getRecipeName()+" recipe?");
-        builder.setPositiveButton("Delete", (dialog, which) -> {
-            // User confirmed deletion, remove the recipe and update the RecyclerView
-            recipeList.remove(recipeModel);
-            notifyItemRemoved(pos);
-            dialog.dismiss();
-        });
-        builder.setNegativeButton("Cancel", (dialog, which) -> {
-            // User canceled deletion, dismiss the dialog
-            dialog.dismiss();
-        });
-
-        // Create and show the dialog
-        AlertDialog alertDialog = builder.create();
-        alertDialog.show();
+        recipeList.remove(pos);
+        notifyItemRemoved(pos);
     }
 
 
     // Set the interface for handling RecyclerView interactions
     public void setRecyclerViewInterface(RecyclerViewInterface recyclerViewInterface) {
-        this.recyclerViewInterface = recyclerViewInterface;}
+        this.recyclerViewInterface = recyclerViewInterface;
+    }
+
+    public void updateRecipe(int position, RecipeModel updatedRecipe) {
+        recipeList.set(position, updatedRecipe);
+        notifyItemChanged(position);
+    }
+
 
     public class RecipeViewHolder extends RecyclerView.ViewHolder {
 

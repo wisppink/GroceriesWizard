@@ -67,6 +67,7 @@ public class RecipeModel implements Parcelable {
     public List<IngredientModel> getIngredients() {
         return ingredients;
     }
+
     public void addIngredient(IngredientModel ingredient) {
         ingredients.add(ingredient);
     }
