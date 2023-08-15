@@ -21,16 +21,15 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AddRecipe extends AppCompatActivity {
+public class AddRecipe extends AppCompatActivity implements RecyclerViewInterface{
 
     private Uri selectedImageUri;
     private EditText editRecipeName;
     private EditText editRecipeHowToPrepare;
     private ActivityResultLauncher<Intent> pickImageLauncher;
     private IngredientAdapter ingredientAdapter;
-    private List<IngredientModel> ingredientList = new ArrayList<>(); // Add this line
-    private RecipeModel recipe; // Add this line
-
+    private List<IngredientModel> ingredientList = new ArrayList<>();
+    private RecipeModel recipe;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -43,14 +42,16 @@ public class AddRecipe extends AppCompatActivity {
         Button btnSaveRecipe = findViewById(R.id.save_recipe_button);
         ImageButton dischargeRecipe = findViewById(R.id.discharge_recipe);
 
-
-        ingredientAdapter = new IngredientAdapter(ingredientList);
+        ingredientAdapter = new IngredientAdapter(this,ingredientList);
+        ingredientAdapter.setRecyclerViewInterface(this);
         RecyclerView ingredientsRecyclerView = findViewById(R.id.recyclerView_ingredients);
         ingredientsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         ingredientsRecyclerView.setAdapter(ingredientAdapter);
 
         Button addIngredientButton = findViewById(R.id.addIngredientButton);
-        addIngredientButton.setOnClickListener(v -> showAddIngredientDialog());
+        addIngredientButton.setOnClickListener(v ->{IngredientModel newIngredient = new IngredientModel(null, 0, null);
+                    showAddIngredientDialog(newIngredient);});
+
 
         ImageView addImage = findViewById(R.id.add_image);
         Uri defaultImageUri = Uri.parse("android.resource://com.example.grocerieswizard/" + R.drawable.recipe_image_default);
@@ -117,7 +118,7 @@ public class AddRecipe extends AppCompatActivity {
 
     }
 
-    private void showAddIngredientDialog() {
+    private void showAddIngredientDialog(IngredientModel ingredientModel) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
         View dialogView = inflater.inflate(R.layout.dialog_add_ingredient, null);
@@ -133,8 +134,11 @@ public class AddRecipe extends AppCompatActivity {
             double quantity = Double.parseDouble(quantityStr);
             String unit = ingredientUnitEditText.getText().toString();
 
-            IngredientModel newIngredient = new IngredientModel(name, quantity, unit);
-            ingredientList.add(newIngredient);
+            ingredientModel.setName(name);
+            ingredientModel.setUnit(unit);
+            ingredientModel.setQuantity(quantity);
+            //ingredientList.add(newIngredient);
+            ingredientAdapter.addIngredient(ingredientModel);
             ingredientAdapter.notifyDataSetChanged();
         });
         builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
@@ -168,5 +172,65 @@ public class AddRecipe extends AppCompatActivity {
                 .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
                 .show();
     }
+
+    @Override
+    public void onItemClick(int position) {
+
+    }
+
+    @Override
+    public void onItemDelete(int position) {
+        IngredientModel ingredientModel = ingredientAdapter.getItemAtPosition(position);
+        if(ingredientModel != null){
+            ingredientAdapter.removeIngredient(ingredientModel);
+        }
+
+    }
+
+    @Override
+    public void onItemEdit(int position) {
+        //TODO: Handle edit action for an ingredient
+        IngredientModel ingredientModel = ingredientAdapter.getItemAtPosition(position);
+        if(ingredientModel != null){
+            showEditIngredientDialog(ingredientModel,position);
+
+        }
+    }
+
+    public void showEditIngredientDialog(IngredientModel ingredientModel, int position) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        LayoutInflater inflater = getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.dialog_add_ingredient, null);
+        builder.setView(dialogView);
+
+        EditText ingredientNameEditText = dialogView.findViewById(R.id.ingredientNameEditText);
+        EditText ingredientQuantityEditText = dialogView.findViewById(R.id.ingredientQuantityEditText);
+        EditText ingredientUnitEditText = dialogView.findViewById(R.id.ingredientUnitEditText);
+
+        // Pre-fill the dialog's fields with the existing ingredient's information
+        ingredientNameEditText.setText(ingredientModel.getName());
+        ingredientQuantityEditText.setText(String.valueOf(ingredientModel.getQuantity()));
+        ingredientUnitEditText.setText(ingredientModel.getUnit());
+
+        builder.setPositiveButton("Save", (dialog, which) -> {
+            // User clicked "Save," update the ingredient model with the new values
+            String name = ingredientNameEditText.getText().toString();
+            String quantityStr = ingredientQuantityEditText.getText().toString();
+            double quantity = Double.parseDouble(quantityStr);
+            String unit = ingredientUnitEditText.getText().toString();
+
+            ingredientModel.setName(name);
+            ingredientModel.setUnit(unit);
+            ingredientModel.setQuantity(quantity);
+            ingredientAdapter.editIngredient(position);
+            dialog.dismiss();
+        });
+
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
 
 }

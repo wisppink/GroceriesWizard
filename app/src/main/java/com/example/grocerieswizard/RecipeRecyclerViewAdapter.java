@@ -1,13 +1,7 @@
 package com.example.grocerieswizard;
 
-import static java.security.AccessController.getContext;
-
 import android.content.Context;
-import android.content.DialogInterface;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
 import android.os.Build;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,10 +13,8 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.view.menu.MenuView;
 import androidx.core.view.GravityCompat;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
 
 import java.util.ArrayList;
 
@@ -141,11 +133,11 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
                 int itemPosition = getAdapterPosition();
                 if (itemPosition != RecyclerView.NO_POSITION) {
                     if (item.getItemId() == R.id.menu_delete) {
-                        recyclerViewInterface.onDeleteRecipe(itemPosition);
+                        recyclerViewInterface.onItemDelete(itemPosition);
                         popupMenu.dismiss();
                         return true;
                     } else if (item.getItemId() == R.id.menu_edit) {
-                        recyclerViewInterface.onEditRecipe(itemPosition);
+                        recyclerViewInterface.onItemEdit(itemPosition);
                         Toast.makeText(itemView.getContext(), "edit clicked" + title, Toast.LENGTH_SHORT).show();
                         popupMenu.dismiss();
                         return true;

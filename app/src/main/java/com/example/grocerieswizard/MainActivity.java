@@ -24,7 +24,6 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
 
     //TODO:ekranı döndürünce recipeler gidiyor lol
     private RecipeRecyclerViewAdapter adapter;
-    List<IngredientModel> ing;
 
     // Launcher for starting AddRecipe activity and receiving results
     ActivityResultLauncher<Intent> launcher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
@@ -73,10 +72,6 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
         if (recipeModel != null) {
             Intent intent = new Intent(this, DetailActivity.class);
             intent.putExtra("MyRecipe", recipeModel);
-            ing = recipeModel.getIngredients();
-            for (IngredientModel ingredientModel : ing) {
-                System.out.println(ingredientModel.getName());
-            }
             startActivity(intent);
         }
         else{
@@ -86,18 +81,19 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
     }
 
     @Override
-    public void onDeleteRecipe(int position) {
+    public void onItemDelete(int position) {
         // Handle delete action for a recipe
         RecipeModel recipeModel = adapter.getItemAtPosition(position);
         if (recipeModel != null) {
             // Remove the recipe from the RecyclerView
             adapter.removeRecipe(recipeModel);
+            //TODO: Alert are you sure
             Toast.makeText(this, "Recipe deleted: " + recipeModel.getRecipeName(), Toast.LENGTH_SHORT).show();
         }
     }
 
     @Override
-    public void onEditRecipe(int position) {
+    public void onItemEdit(int position) {
         // TODO: Handle edit action for a recipe
         RecipeModel recipeModel = adapter.getItemAtPosition(position);
         // TODO: Implement editing functionality
