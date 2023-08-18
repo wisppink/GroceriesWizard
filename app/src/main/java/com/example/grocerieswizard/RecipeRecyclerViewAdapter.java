@@ -193,6 +193,14 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
             // Görünüm içeriğini item görünümüyle değiştirin
             ((ViewGroup)itemView).removeAllViews();
             ((ViewGroup)itemView).addView(swipedView);
+
+            title.setText(recipeModel.getRecipeName());
+            if (recipeModel.getRecipeImageUri() != null) {
+                //resImage.setImageURI(recipeModel.getRecipeImageUri());
+            } else {
+                resImage.setImageResource(R.drawable.recipe_image_default);
+            }
+
         }
 
 

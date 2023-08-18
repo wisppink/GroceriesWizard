@@ -77,7 +77,6 @@ public class AddRecipe extends AppCompatActivity implements RecyclerViewInterfac
                     }
                 });
         addImage.setImageURI(defaultImageUri);
-        Log.d("DefaultImageURI", defaultImageUri.toString());
 
         addImage.setOnClickListener(v -> {
             Intent pickImageIntent = new Intent(Intent.ACTION_PICK);

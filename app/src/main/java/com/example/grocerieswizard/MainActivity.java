@@ -9,7 +9,6 @@ import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -26,6 +25,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
 
     private static final int VIEW_TYPE_SWIPED = 1;
     private static final int VIEW_TYPE_NORMAL = 0;
+
     private static final int ADD_RECIPE_REQUEST_CODE = 1;
 
     //TODO:ekranı döndürünce recipeler gidiyor lol
@@ -79,18 +79,18 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
         starIcon.setOnClickListener(v -> Toast.makeText(MainActivity.this, "Star icon clicked!", Toast.LENGTH_SHORT).show());
 
         /*
-        *
-        * default recipe
-        *
-        * */
+         *
+         * default recipe
+         *
+         * */
 
         List<IngredientModel> mlist = new ArrayList<>();
-        IngredientModel ingredientModel = new IngredientModel("malzeme",1.0, "kg");
-        IngredientModel ingredient2Model = new IngredientModel("malzeme",1.0, "kg");
+        IngredientModel ingredientModel = new IngredientModel("malzeme", 1.0, "kg");
+        IngredientModel ingredient2Model = new IngredientModel("malzeme", 1.0, "kg");
         mlist.add(ingredientModel);
         mlist.add(ingredient2Model);
-        RecipeModel recipeModel = new RecipeModel("isim",mlist,"lalala",null);
-        RecipeModel recipe2Model = new RecipeModel("isim2",mlist,"lalala",null);
+        RecipeModel recipeModel = new RecipeModel("isim", mlist, "lalala", null);
+        RecipeModel recipe2Model = new RecipeModel("isim2", mlist, "lalala", null);
         adapter.addRecipe(recipeModel);
         adapter.addRecipe(recipe2Model);
 
@@ -144,16 +144,16 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
     public void onItemClick(int position) {
         // Handle item click to show details of a recipe
         RecipeModel recipeModel = adapter.getItemAtPosition(position);
-        if(!recipeModel.isSwiped()){
-        if (recipeModel != null) {
-            recipeModel.setSwiped(false);
-            adapter.notifyDataSetChanged();
-            Intent intent = new Intent(this, DetailActivity.class);
-            intent.putExtra("MyRecipe", recipeModel);
-            startActivity(intent);
-        } else {
-            Log.d("MainActivity", "recipe model null");
-        }
+        if (!recipeModel.isSwiped()) {
+            if (recipeModel != null) {
+                recipeModel.setSwiped(false);
+                adapter.notifyDataSetChanged();
+                Intent intent = new Intent(this, DetailActivity.class);
+                intent.putExtra("MyRecipe", recipeModel);
+                startActivity(intent);
+            } else {
+                Log.d("MainActivity", "recipe model null");
+            }
         }
 
     }
