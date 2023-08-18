@@ -37,8 +37,17 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
     @Override
     public void onBindViewHolder(@NonNull RecipeViewHolder holder, int position) {
         RecipeModel recipeModel = recipeList.get(position);
-        holder.bind(recipeModel);
+
+        if (recipeModel.isSwiped()) {
+            View swipedView = LayoutInflater.from(holder.itemView.getContext()).inflate(R.layout.recycler_view_menu, (ViewGroup) holder.itemView, false);
+            ((ViewGroup)holder.itemView).removeAllViews();
+            ((ViewGroup)holder.itemView).addView(swipedView);
+            holder.bindSwipedLayout(recipeModel);
+        } else {
+            holder.bind(recipeModel);
+        }
     }
+
 
     @Override
     public int getItemCount() {
@@ -72,10 +81,11 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
     public void setRecyclerViewInterface(RecyclerViewInterface recyclerViewInterface) {
         this.recyclerViewInterface = recyclerViewInterface;
     }
-
-    public void updateRecipe(int position, RecipeModel updatedRecipe) {
-        recipeList.set(position, updatedRecipe);
-        notifyItemChanged(position);
+    public void removeRecipeAtPosition(int position) {
+        if (position >= 0 && position < recipeList.size()) {
+            recipeList.remove(position);
+            notifyItemRemoved(position);
+        }
     }
 
 
@@ -127,7 +137,6 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
                         popupMenu.dismiss();
                         return true;
                     } else if (item.getItemId() == R.id.menu_edit) {
-                        recyclerViewInterface.onItemEdit(itemPosition);
                         Toast.makeText(itemView.getContext(), "edit clicked" + title, Toast.LENGTH_SHORT).show();
                         popupMenu.dismiss();
                         return true;
@@ -154,5 +163,43 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
 
 
         }
+
+        public void bindSwipedLayout(RecipeModel recipeModel) {
+            View swipedView = LayoutInflater.from(itemView.getContext()).inflate(R.layout.recycler_view_menu, null);
+
+            ImageView editIcon = swipedView.findViewById(R.id.edit_icon);
+            ImageView shareIcon = swipedView.findViewById(R.id.share_icon);
+            ImageView deleteIcon = swipedView.findViewById(R.id.delete_icon);
+
+
+            editIcon.setOnClickListener(v -> {
+                // TODO: editten sonra yeni recipe oluşmuyor ve menu ekranı silinmiyor
+                recyclerViewInterface.onItemEdit(getAdapterPosition());
+
+            });
+
+            shareIcon.setOnClickListener(v -> {
+                // TODO: Handle share icon click
+                Toast.makeText(itemView.getContext(), "Share icon clicked", Toast.LENGTH_SHORT).show();
+            });
+
+            deleteIcon.setOnClickListener(v -> {
+                // TODO: Handle delete icon click
+                recyclerViewInterface.onItemDelete(getAdapterPosition());
+                Toast.makeText(itemView.getContext(), "Delete icon clicked", Toast.LENGTH_SHORT).show();
+            });
+
+            // Şimdi şişirilmiş görünüme erişiminiz var
+            // Görünüm içeriğini item görünümüyle değiştirin
+            ((ViewGroup)itemView).removeAllViews();
+            ((ViewGroup)itemView).addView(swipedView);
+        }
+
+
+
+
+
+
+
     }
 }

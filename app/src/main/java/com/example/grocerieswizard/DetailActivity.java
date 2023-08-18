@@ -22,6 +22,7 @@ public class DetailActivity extends AppCompatActivity {
         Intent intent = getIntent();
 
         RecipeModel recipe = intent.getParcelableExtra("MyRecipe");
+        recipe.setSwiped(false);
         TextView titleTextView = findViewById(R.id.show_title);
         TextView ingredientsTextView = findViewById(R.id.show_ingredients);
         ImageView imageRecipe = findViewById(R.id.showRecipeImage);

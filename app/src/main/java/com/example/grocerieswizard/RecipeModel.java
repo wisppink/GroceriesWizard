@@ -12,12 +12,14 @@ public class RecipeModel implements Parcelable {
     private Uri recipeImageUri;
     private String howToPrepare;
     private List<IngredientModel> ingredients;
+    private boolean isSwiped;
 
     public RecipeModel(String recipeName, List<IngredientModel> ingredients, String howToPrepare, Uri recipeImageUri) {
         this.recipeName = recipeName;
         this.ingredients = ingredients;
         this.howToPrepare = howToPrepare;
         this.recipeImageUri = recipeImageUri;
+        isSwiped = false;
     }
 
     protected RecipeModel(Parcel in) {
@@ -87,4 +89,14 @@ public class RecipeModel implements Parcelable {
     public void setIngredients(List<IngredientModel> ingredients) {
         this.ingredients = ingredients;
     }
+
+    // Getter and Setter for isSwiped
+    public boolean isSwiped() {
+        return isSwiped;
+    }
+
+    public void setSwiped(boolean swiped) {
+        isSwiped = swiped;
+    }
+
 }

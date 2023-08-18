@@ -85,6 +85,30 @@ public class AddRecipe extends AppCompatActivity implements RecyclerViewInterfac
             pickImageLauncher.launch(pickImageIntent);
         });
 
+        Intent intent = getIntent();
+        editMode = intent.getBooleanExtra("editRecipe", false);
+        int position = intent.getIntExtra("position", -1);
+        if (editMode) {
+            RecipeModel recipeModel = intent.getParcelableExtra("recipeModel");
+            Log.d("edit receive ", String.valueOf(recipeModel.isSwiped()));
+            Log.d("edit receive position ", String.valueOf(position));
+            editRecipeName.setText(recipeModel.getRecipeName());
+            editRecipeHowToPrepare.setText(recipeModel.getHowToPrepare());
+            ingredientList.addAll(recipeModel.getIngredients());
+            selectedImageUri = recipeModel.getRecipeImageUri();
+            String recipeName = editRecipeName.getText().toString();
+            String howToPrepare = editRecipeHowToPrepare.getText().toString();
+            Uri newPhoto = selectedImageUri;
+            recipeModel.setRecipeName(recipeName);
+            recipeModel.setHowToPrepare(howToPrepare);
+            recipeModel.setIngredients(ingredientList);
+            recipeModel.setRecipeImageUri(newPhoto);
+            recipeModel.setSwiped(false);
+            Log.d("edit setledi: ", String.valueOf(recipeModel.isSwiped()));
+            ingredientAdapter.notifyItemChanged(position);
+            Log.d("edit notify position: ", String.valueOf(position));
+        }
+
         btnSaveRecipe.setOnClickListener(v -> {
             String recipeName = editRecipeName.getText().toString();
             String howToPrepare = editRecipeHowToPrepare.getText().toString();
@@ -105,9 +129,22 @@ public class AddRecipe extends AppCompatActivity implements RecyclerViewInterfac
                 recipe.setRecipeImageUri(defaultImageUri);
                 recipe.setIngredients(mylist);
             }
-            Intent resultIntent = new Intent();
-            resultIntent.putExtra("recipe", recipe);
-            setResult(RESULT_OK, resultIntent);
+            recipe.setSwiped(false);
+
+
+            if (editMode) {
+                Intent editintent = new Intent();
+                editintent.putExtra("edited", true);
+                editintent.putExtra("new_recipe", recipe);
+                editintent.putExtra("position", position);
+                setResult(RESULT_OK, editintent);
+            }
+            else{
+                Intent resultIntent = new Intent();
+                resultIntent.putExtra("recipe", recipe);
+                setResult(RESULT_OK, resultIntent);
+            }
+
             finish();
 
         });
@@ -123,31 +160,7 @@ public class AddRecipe extends AppCompatActivity implements RecyclerViewInterfac
         });
 
         // Check if the activity is opened for editing
-        Intent intent = getIntent();
-        editMode = intent.getBooleanExtra("editRecipe", false);
-        if (editMode) {
-            RecipeModel recipeModel = intent.getParcelableExtra("recipeModel");
-            int position = intent.getIntExtra("position", -1);
-            editRecipeName.setText(recipeModel.getRecipeName());
-            editRecipeHowToPrepare.setText(recipeModel.getHowToPrepare());
-            ingredientList.addAll(recipeModel.getIngredients());
-            selectedImageUri = recipeModel.getRecipeImageUri();
-            String recipeName = editRecipeName.getText().toString();
-            String howToPrepare = editRecipeHowToPrepare.getText().toString();
-            Uri newPhoto = selectedImageUri;
-            recipeModel.setRecipeName(recipeName);
-            recipeModel.setHowToPrepare(howToPrepare);
-            recipeModel.setIngredients(ingredientList);
-            recipeModel.setRecipeImageUri(newPhoto);
-            ingredientAdapter.notifyItemChanged(position);
-            if (editMode) {
-                Intent editintent = new Intent();
-                editintent.putExtra("edited", true);
-                editintent.putExtra("new_recipe", recipeModel);
-                editintent.putExtra("position", position);
-                setResult(RESULT_OK, editintent);
-            }
-        }
+
 
     }
 
