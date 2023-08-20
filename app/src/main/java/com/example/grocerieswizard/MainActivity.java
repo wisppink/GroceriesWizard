@@ -3,7 +3,9 @@ package com.example.grocerieswizard;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.util.Log;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -23,18 +25,16 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements RecyclerViewInterface {
 
-    private static final int VIEW_TYPE_SWIPED = 1;
-    private static final int VIEW_TYPE_NORMAL = 0;
-
-    private static final int ADD_RECIPE_REQUEST_CODE = 1;
-
     //TODO:ekranı döndürünce recipeler gidiyor lol
     private RecipeRecyclerViewAdapter adapter;
     Context context;
 
+    // List to hold recipes for shopping cart
+    private ArrayList<RecipeModel> shopList = new ArrayList<>();
+
     // Launcher for starting AddRecipe activity and receiving results
     ActivityResultLauncher<Intent> launcher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-
+        // Check if a new recipe was added
         Intent data = result.getData();
         if (data != null && data.hasExtra("recipe")) {
             RecipeModel recipe = data.getParcelableExtra("recipe");
@@ -45,6 +45,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
                 adapter.notifyDataSetChanged();
             }
         }
+        // Check if a new recipe was added
         if (data != null && data.hasExtra("new_recipe")) {
             RecipeModel recipe = data.getParcelableExtra("new_recipe");
             int position = data.getIntExtra("position", -1);
@@ -65,7 +66,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        // Initialize RecyclerView
+
         RecyclerView recyclerView = findViewById(R.id.mRecyclerView);
         adapter = new RecipeRecyclerViewAdapter(this);
         recyclerView.setAdapter(adapter);
@@ -78,27 +79,8 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
         ImageView starIcon = findViewById(R.id.star_icon);
         starIcon.setOnClickListener(v -> Toast.makeText(MainActivity.this, "Star icon clicked!", Toast.LENGTH_SHORT).show());
 
-        /*
-         *
-         * default recipe
-         *
-         * */
-
-        List<IngredientModel> mlist = new ArrayList<>();
-        IngredientModel ingredientModel = new IngredientModel("malzeme", 1.0, "kg");
-        IngredientModel ingredient2Model = new IngredientModel("malzeme", 1.0, "kg");
-        mlist.add(ingredientModel);
-        mlist.add(ingredient2Model);
-        RecipeModel recipeModel = new RecipeModel("isim", mlist, "lalala", null);
-        RecipeModel recipe2Model = new RecipeModel("isim2", mlist, "lalala", null);
-        adapter.addRecipe(recipeModel);
-        adapter.addRecipe(recipe2Model);
-
-        /*
-         *
-         * default recipe
-         *
-         * */
+        context = this;
+        defaultRecipe();
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(v -> {
@@ -107,8 +89,8 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
             launcher.launch(intent);
 
         });
-        context = this;
 
+        // Set up ItemTouchHelper for swipe gestures
         ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new ItemTouchHelper.SimpleCallback(
                 0, ItemTouchHelper.LEFT
         ) {
@@ -134,18 +116,46 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
 
             }
         };
-
-        // Attach the ItemTouchHelper to the RecyclerView
         new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recyclerView);
+
+        // Set up shopping cart button
+        Button shoppingCart = findViewById(R.id.shopping_cart);
+        shoppingCart.setOnClickListener(v -> {
+            shopList.addAll(adapter.getSendRecipes());
+            //TODO: ask these are your recipes, wanna cont?
+            //TODO: send that list to Shopping Menu
+            Intent shopping = new Intent(this, ShoppingMenu.class);
+            shopping.putParcelableArrayListExtra("list",shopList);
+            startActivity(shopping);
+        });
 
     }
 
+    // Default recipes for testing
+    private void defaultRecipe() {
+        List<IngredientModel> mlist = new ArrayList<>();
+        List<IngredientModel> m2list = new ArrayList<>();
+        IngredientModel ingredientModel = new IngredientModel("Domates", 1.0, "kg");
+        IngredientModel ingredient2Model = new IngredientModel("Salatalık", 2.0, "kg");
+        IngredientModel ingredient3Model = new IngredientModel("Domates", 3.0, "lbs");
+        IngredientModel ingredient4Model = new IngredientModel("Salatalık", 1.0, "kg");
+        mlist.add(ingredientModel);
+        mlist.add(ingredient2Model);
+        m2list.add(ingredient3Model);
+        m2list.add(ingredient4Model);
+        RecipeModel recipeModel = new RecipeModel("isim", mlist, "lalala", null);
+        RecipeModel recipe2Model = new RecipeModel("isim2", m2list, "lalala", null);
+        adapter.addRecipe(recipeModel);
+        adapter.addRecipe(recipe2Model);
+    }
+
+    // Handle item click to show details of a recipe
     @Override
     public void onItemClick(int position) {
-        // Handle item click to show details of a recipe
+
         RecipeModel recipeModel = adapter.getItemAtPosition(position);
+        if (recipeModel != null) {
         if (!recipeModel.isSwiped()) {
-            if (recipeModel != null) {
                 recipeModel.setSwiped(false);
                 adapter.notifyDataSetChanged();
                 Intent intent = new Intent(this, DetailActivity.class);
@@ -158,9 +168,9 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
 
     }
 
+    // Handle item delete with confirmation dialog
     @Override
     public void onItemDelete(int position) {
-        // Handle delete action for a recipe with an alert
         RecipeModel recipeModel = adapter.getItemAtPosition(position);
         if (recipeModel != null) {
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -179,13 +189,13 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
                 adapter.notifyItemChanged(position);
                 dialog.dismiss();
             });
-
             // Create and show the dialog
             AlertDialog alertDialog = builder.create();
             alertDialog.show();
         }
     }
 
+    // Handle item edit and start AddRecipe activity for editing
     @Override
     public void onItemEdit(int position) {
         RecipeModel recipeModel = adapter.getItemAtPosition(position);

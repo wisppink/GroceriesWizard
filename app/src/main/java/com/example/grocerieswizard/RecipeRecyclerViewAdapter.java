@@ -3,6 +3,7 @@ package com.example.grocerieswizard;
 import android.content.Context;
 import android.os.Build;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -12,10 +13,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecyclerViewAdapter.RecipeViewHolder> {
 
@@ -23,8 +26,16 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
     private RecyclerViewInterface recyclerViewInterface;
     private Context context;
 
+    public ArrayList<RecipeModel> sendRecipes;
+
     public RecipeRecyclerViewAdapter(Context context) {
         this.context = context;
+        this.sendRecipes = new ArrayList<>();
+    }
+
+
+    public ArrayList<RecipeModel> getSendRecipes() {
+        return sendRecipes;
     }
 
     @NonNull
@@ -110,9 +121,22 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
             });
 
             itemView.setOnLongClickListener(v -> {
-                showPopUpMenu(v, getAdapterPosition());
-                return false;
+                RecipeModel recipeModel = recipeList.get(getAdapterPosition());
+                if (recipeModel != null) {
+                    if (sendRecipes.contains(recipeModel)) {
+                        //already selected, unselect
+                        sendRecipes.remove(recipeModel);
+                        itemView.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), android.R.color.white));
+                        //TODO:unselect yapınca işlemleri geri almıo lol
+                    } else {
+                        // select
+                        sendRecipes.add(recipeModel);
+                        itemView.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), R.color.gray));
+                    }
+                }
+                return true;
             });
+
 
             starButton.setOnClickListener(v -> {
                 int pos = getAdapterPosition();
@@ -122,35 +146,6 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
             });
         }
 
-        private void showPopUpMenu(View v, int position) {
-            PopupMenu popupMenu = new PopupMenu(itemView.getContext(), v, GravityCompat.END);
-            popupMenu.inflate(R.menu.item_long_tap_popup_menu);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                popupMenu.setForceShowIcon(true);
-            }
-
-            popupMenu.setOnMenuItemClickListener(item -> {
-                int itemPosition = getAdapterPosition();
-                if (itemPosition != RecyclerView.NO_POSITION) {
-                    if (item.getItemId() == R.id.menu_delete) {
-                        recyclerViewInterface.onItemDelete(itemPosition);
-                        popupMenu.dismiss();
-                        return true;
-                    } else if (item.getItemId() == R.id.menu_edit) {
-                        Toast.makeText(itemView.getContext(), "edit clicked" + title, Toast.LENGTH_SHORT).show();
-                        popupMenu.dismiss();
-                        return true;
-                    } else if (item.getItemId() == R.id.menu_unFav) {
-                        // TODO: Unfavorite
-                        Toast.makeText(itemView.getContext(), "Unfavorite clicked", Toast.LENGTH_SHORT).show();
-                        popupMenu.dismiss();
-                        return true;
-                    }
-                }
-                return false;
-            });
-            popupMenu.show();
-        }
 
         public void bind(RecipeModel recipeModel) {
 

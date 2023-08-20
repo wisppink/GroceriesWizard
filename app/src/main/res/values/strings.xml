@@ -18,4 +18,7 @@
     <string name="quantity_0">Quantity: 0</string>
     <string name="unit">Unit</string>
     <string name="add_ingredient">Add Ingredient</string>
+    <string name="shopping_cart">Shopping Cart</string>
+    <string name="quantity">0</string>
+    <string name="show_total_unit">show total unit</string>
 </resources>
