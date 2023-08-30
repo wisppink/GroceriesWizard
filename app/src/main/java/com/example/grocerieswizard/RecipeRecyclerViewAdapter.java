@@ -1,24 +1,19 @@
 package com.example.grocerieswizard;
 
 import android.content.Context;
-import android.os.Build;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
-import androidx.core.view.GravityCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecyclerViewAdapter.RecipeViewHolder> {
 
@@ -51,12 +46,26 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
 
         if (recipeModel.isSwiped()) {
             View swipedView = LayoutInflater.from(holder.itemView.getContext()).inflate(R.layout.recycler_view_menu, (ViewGroup) holder.itemView, false);
-            ((ViewGroup)holder.itemView).removeAllViews();
-            ((ViewGroup)holder.itemView).addView(swipedView);
+            ((ViewGroup) holder.itemView).removeAllViews();
+            ((ViewGroup) holder.itemView).addView(swipedView);
             holder.bindSwipedLayout(recipeModel);
         } else {
-            holder.bind(recipeModel);
+            View itemView = LayoutInflater.from(holder.itemView.getContext()).inflate(R.layout.recycler_view_row, (ViewGroup) holder.itemView, false);
+            ((ViewGroup) holder.itemView).removeAllViews();
+            ((ViewGroup) holder.itemView).addView(itemView);
+            TextView title = itemView.findViewById(R.id.textView);
+            ImageView resImage = itemView.findViewById(R.id.default_card_recipe_image);
+            title.setText(recipeModel.getRecipeName());
+
+           /* if (recipeModel.getRecipeImageUri() != null) {
+                resImage.setImageURI(recipeModel.getRecipeImageUri());
+            } else {
+                resImage.setImageResource(R.drawable.recipe_image_default);
+            }*/
+            resImage.setImageResource(R.drawable.recipe_image_default);
         }
+
+
     }
 
 
@@ -92,6 +101,7 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
     public void setRecyclerViewInterface(RecyclerViewInterface recyclerViewInterface) {
         this.recyclerViewInterface = recyclerViewInterface;
     }
+
     public void removeRecipeAtPosition(int position) {
         if (position >= 0 && position < recipeList.size()) {
             recipeList.remove(position);
@@ -147,18 +157,6 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
         }
 
 
-        public void bind(RecipeModel recipeModel) {
-
-            title.setText(recipeModel.getRecipeName());
-            if (recipeModel.getRecipeImageUri() != null) {
-                resImage.setImageURI(recipeModel.getRecipeImageUri());
-            } else {
-                resImage.setImageResource(R.drawable.recipe_image_default);
-            }
-
-
-        }
-
         public void bindSwipedLayout(RecipeModel recipeModel) {
             View swipedView = LayoutInflater.from(itemView.getContext()).inflate(R.layout.recycler_view_menu, null);
 
@@ -168,7 +166,6 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
 
 
             editIcon.setOnClickListener(v -> {
-                // TODO: editten sonra yeni recipe oluşmuyor ve menu ekranı silinmiyor
                 recyclerViewInterface.onItemEdit(getAdapterPosition());
 
             });
@@ -179,29 +176,21 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
             });
 
             deleteIcon.setOnClickListener(v -> {
-                // TODO: Handle delete icon click
                 recyclerViewInterface.onItemDelete(getAdapterPosition());
-                Toast.makeText(itemView.getContext(), "Delete icon clicked", Toast.LENGTH_SHORT).show();
             });
 
-            // Şimdi şişirilmiş görünüme erişiminiz var
-            // Görünüm içeriğini item görünümüyle değiştirin
-            ((ViewGroup)itemView).removeAllViews();
-            ((ViewGroup)itemView).addView(swipedView);
+            ((ViewGroup) itemView).removeAllViews();
+            ((ViewGroup) itemView).addView(swipedView);
 
             title.setText(recipeModel.getRecipeName());
             if (recipeModel.getRecipeImageUri() != null) {
+                //TODO:Image Handle :((
                 //resImage.setImageURI(recipeModel.getRecipeImageUri());
             } else {
                 resImage.setImageResource(R.drawable.recipe_image_default);
             }
 
         }
-
-
-
-
-
 
 
     }
