@@ -17,14 +17,6 @@ import java.util.ArrayList;
 
 public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecyclerViewAdapter.RecipeViewHolder> {
 
-    public ArrayList<RecipeModel> getRecipeList() {
-        return recipeList;
-    }
-
-    public void setRecipeList(ArrayList<RecipeModel> recipeList) {
-        this.recipeList = recipeList;
-    }
-
     private ArrayList<RecipeModel> recipeList = new ArrayList<>();
     private RecyclerViewInterface recyclerViewInterface;
     private RecipeDatabaseHelper recipeDatabaseHelper;
@@ -38,10 +30,24 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
         recipeDatabaseHelper = new RecipeDatabaseHelper(context);
     }
 
-
-    public ArrayList<RecipeModel> getSendRecipes() {
-        return sendRecipes;
+    public void editRecipe(int position, RecipeModel editedRecipe) {
+        if (position >= 0 && position < recipeList.size()) {
+            RecipeModel oldRecipe = getItemAtPosition(position);
+            oldRecipe.setRecipeName(editedRecipe.getRecipeName());
+            oldRecipe.setRecipeImageUri(editedRecipe.getRecipeImageUri());
+            oldRecipe.setHowToPrepare(editedRecipe.getHowToPrepare());
+            oldRecipe.setIngredients(editedRecipe.getIngredients());
+            editedRecipe.setSwiped(false);
+            int updatedRows = recipeDatabaseHelper.updateRecipe(oldRecipe.getId(), oldRecipe);
+            if (updatedRows > 0) {
+                notifyItemChanged(position);
+            } else
+                Toast.makeText(context,
+                        "couldn't edited:" + oldRecipe.getRecipeName(),
+                        Toast.LENGTH_SHORT).show();
+        }
     }
+
 
     @NonNull
     @Override
@@ -78,7 +84,6 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
 
     }
 
-
     @Override
     public int getItemCount() {
         return recipeList.size();
@@ -90,7 +95,6 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
         notifyItemInserted(recipeList.size() - 1);
         recipeDatabaseHelper.insertRecipe(recipe);
     }
-
 
     public RecipeModel getItemAtPosition(int position) {
         if (position >= 0 && position < recipeList.size()) {
@@ -105,19 +109,27 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
         int pos = recipeList.indexOf(recipeModel);
         recipeList.remove(pos);
         notifyItemRemoved(pos);
-    }
-
-
-    // Set the interface for handling RecyclerView interactions
-    public void setRecyclerViewInterface(RecyclerViewInterface recyclerViewInterface) {
-        this.recyclerViewInterface = recyclerViewInterface;
+        recipeDatabaseHelper.deleteRecipe(recipeModel.getId());
     }
 
     public void removeRecipeAtPosition(int position) {
         if (position >= 0 && position < recipeList.size()) {
+            recipeDatabaseHelper.deleteRecipe(getItemAtPosition(position).getId());
             recipeList.remove(position);
             notifyItemRemoved(position);
         }
+    }
+
+    public void setRecyclerViewInterface(RecyclerViewInterface recyclerViewInterface) {
+        this.recyclerViewInterface = recyclerViewInterface;
+    }
+
+    public void setRecipeList(ArrayList<RecipeModel> recipeList) {
+        this.recipeList = recipeList;
+    }
+
+    public ArrayList<RecipeModel> getSendRecipes() {
+        return sendRecipes;
     }
 
 

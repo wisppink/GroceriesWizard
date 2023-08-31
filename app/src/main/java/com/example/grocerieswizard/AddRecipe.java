@@ -51,6 +51,8 @@ public class AddRecipe extends AppCompatActivity implements RecyclerViewInterfac
         ingredientsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         ingredientsRecyclerView.setAdapter(ingredientAdapter);
 
+        RecipeRecyclerViewAdapter recipeRecyclerViewAdapter = new RecipeRecyclerViewAdapter(this);
+
         Button addIngredientButton = findViewById(R.id.addIngredientButton);
         addIngredientButton.setOnClickListener(v -> {
             IngredientModel newIngredient = new IngredientModel(null, 0, null);
@@ -87,25 +89,22 @@ public class AddRecipe extends AppCompatActivity implements RecyclerViewInterfac
         Intent intent = getIntent();
         editMode = intent.getBooleanExtra("editRecipe", false);
         int position = intent.getIntExtra("position", -1);
+
         if (editMode) {
             RecipeModel recipeModel = intent.getParcelableExtra("recipeModel");
-            Log.d("edit receive ", String.valueOf(recipeModel.isSwiped()));
-            Log.d("edit receive position ", String.valueOf(position));
+            //get old ones to show user
             editRecipeName.setText(recipeModel.getRecipeName());
             editRecipeHowToPrepare.setText(recipeModel.getHowToPrepare());
             ingredientList.addAll(recipeModel.getIngredients());
             selectedImageUri = recipeModel.getRecipeImageUri();
+            //get new ones to update
             String recipeName = editRecipeName.getText().toString();
             String howToPrepare = editRecipeHowToPrepare.getText().toString();
             Uri newPhoto = selectedImageUri;
-            recipeModel.setRecipeName(recipeName);
-            recipeModel.setHowToPrepare(howToPrepare);
-            recipeModel.setIngredients(ingredientList);
-            recipeModel.setRecipeImageUri(newPhoto);
-            recipeModel.setSwiped(false);
-            Log.d("edit setledi: ", String.valueOf(recipeModel.isSwiped()));
+
+            RecipeModel editedRecipe = new RecipeModel(recipeName,ingredientList,howToPrepare,newPhoto);
+            recipeRecyclerViewAdapter.editRecipe(position, editedRecipe);
             ingredientAdapter.notifyItemChanged(position);
-            Log.d("edit notify position: ", String.valueOf(position));
         }
 
         btnSaveRecipe.setOnClickListener(v -> {
@@ -261,11 +260,7 @@ public class AddRecipe extends AppCompatActivity implements RecyclerViewInterfac
             String quantityStr = ingredientQuantityEditText.getText().toString();
             double quantity = Double.parseDouble(quantityStr);
             String unit = ingredientUnitEditText.getText().toString();
-
-            ingredientModel.setName(name);
-            ingredientModel.setUnit(unit);
-            ingredientModel.setQuantity(quantity);
-            ingredientAdapter.editIngredient(position);
+            ingredientAdapter.editIngredient(name,unit,quantity,position);
             dialog.dismiss();
         });
 

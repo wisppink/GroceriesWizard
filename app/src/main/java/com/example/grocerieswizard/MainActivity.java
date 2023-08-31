@@ -3,7 +3,6 @@ package com.example.grocerieswizard;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -21,7 +20,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements RecyclerViewInterface {
 
@@ -75,7 +73,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
         adapter.setRecyclerViewInterface(this);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        ArrayList<RecipeModel> recipes = recipeDatabaseHelper.getAllRecipes();
+        ArrayList<RecipeModel> recipes = recipeDatabaseHelper.getAllRecipesFromDB();
         adapter.setRecipeList(recipes);
         adapter.notifyDataSetChanged();
 
@@ -131,7 +129,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
             //TODO: ask these are your recipes, wanna cont?
             //TODO: send that list to Shopping Menu
             Intent shopping = new Intent(this, ShoppingMenu.class);
-            shopping.putParcelableArrayListExtra("list",shopList);
+            shopping.putParcelableArrayListExtra("list", shopList);
             startActivity(shopping);
         });
 
@@ -143,7 +141,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
 
         RecipeModel recipeModel = adapter.getItemAtPosition(position);
         if (recipeModel != null) {
-        if (!recipeModel.isSwiped()) {
+            if (!recipeModel.isSwiped()) {
                 recipeModel.setSwiped(false);
                 adapter.notifyDataSetChanged();
                 Intent intent = new Intent(this, DetailActivity.class);

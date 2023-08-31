@@ -17,11 +17,13 @@ public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.In
 
     private List<IngredientModel> ingredientList;
     private RecyclerViewInterface recyclerViewInterface;
+    private RecipeDatabaseHelper recipeDatabaseHelper;
     private Context context;
 
     public IngredientAdapter(Context context, List<IngredientModel> ingredientList) {
         this.context = context;
         this.ingredientList = ingredientList;
+        recipeDatabaseHelper = new RecipeDatabaseHelper(context);
     }
 
 
@@ -53,6 +55,7 @@ public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.In
     public void addIngredient(IngredientModel ingredientModel) {
         ingredientList.add(ingredientModel);
         notifyItemInserted(ingredientList.size() - 1);
+        recipeDatabaseHelper.insertIngredient(ingredientModel, ingredientModel.getRecipeId());
     }
 
     public void setRecyclerViewInterface(RecyclerViewInterface recyclerViewInterface) {
@@ -70,6 +73,7 @@ public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.In
         builder.setPositiveButton("Delete", (dialog, which) -> {
             // User confirmed deletion, remove the recipe and update the RecyclerView
             ingredientList.remove(ingredientModel);
+            recipeDatabaseHelper.deleteIngredient(ingredientModel.getId());
             notifyItemRemoved(pos);
             dialog.dismiss();
         });
@@ -83,9 +87,13 @@ public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.In
         alertDialog.show();
     }
 
-    public void editIngredient(int position) {
+    public void editIngredient(String name, String unit, Double quantity, int position) {
+        IngredientModel ingredientModel = getItemAtPosition(position);
+        ingredientModel.setName(name);
+        ingredientModel.setUnit(unit);
+        ingredientModel.setQuantity(quantity);
+        recipeDatabaseHelper.updateIngredient(ingredientModel);
         notifyItemChanged(position);
-
     }
 
     public class IngredientViewHolder extends RecyclerView.ViewHolder {

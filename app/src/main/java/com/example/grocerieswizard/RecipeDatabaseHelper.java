@@ -5,14 +5,12 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 import android.net.Uri;
-import java.net.URI;
+import android.util.Log;
+
 import java.util.ArrayList;
 
 public class RecipeDatabaseHelper extends SQLiteOpenHelper {
-
-    RecipeRecyclerViewAdapter adapter;
 
     private static final String DATABASE_NAME = "recipes.db";
     private static final int DATABASE_VERSION = 1;
@@ -23,7 +21,6 @@ public class RecipeDatabaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_RECIPE_NAME = "recipe_name";
     private static final String COLUMN_RECIPE_INSTRUCTIONS = "recipe_instructions";
     private static final String COLUMN_RECIPE_IMAGE_URI = "image_uri";
-    private static final String COLUMN_INGREDIENT_LIST = "ingredient_list";
 
     // Table and column names for ingredients
     private static final String TABLE_INGREDIENTS = "ingredients";
@@ -43,6 +40,8 @@ public class RecipeDatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_CREATE_INGREDIENTS = "create table " + TABLE_INGREDIENTS
             + "(" + COLUMN_INGREDIENT_ID + " integer primary key autoincrement, "
             + COLUMN_INGREDIENT_NAME + " text not null, "
+            + COLUMN_INGREDIENT_QUANTITY + " real not null, "
+            + COLUMN_INGREDIENT_UNIT + " text not null, "  // Here's the ingredient_unit column
             + COLUMN_RECIPE_ID_FK + " integer not null, "
             + "FOREIGN KEY(" + COLUMN_RECIPE_ID_FK + ") REFERENCES " + TABLE_RECIPES + "(" + COLUMN_RECIPE_ID + "));";
 
@@ -71,16 +70,36 @@ public class RecipeDatabaseHelper extends SQLiteOpenHelper {
         values.put(COLUMN_RECIPE_NAME, recipeModel.getRecipeName());
         values.put(COLUMN_RECIPE_INSTRUCTIONS, recipeModel.getHowToPrepare());
         values.put(COLUMN_RECIPE_IMAGE_URI, "null"); // TODO: URI HANDLE
-        db.insert(TABLE_RECIPES, null, values);
+        long recipeId = db.insert(TABLE_RECIPES, null, values);
+
+        ArrayList<IngredientModel> ingredients = new ArrayList<>(recipeModel.getIngredients());
+        for (IngredientModel ingredient : ingredients) {
+            insertIngredient(ingredient,recipeId);
+            ingredient.setRecipeId(recipeId);
+        }
+        db.close();
     }
 
 
-    public int updateRecipe(int recipeId, String newRecipeName) {
+    public int updateRecipe(int recipeId, RecipeModel recipeModel) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(COLUMN_RECIPE_NAME, newRecipeName);
-        return db.update(TABLE_RECIPES, values, COLUMN_RECIPE_ID + " = ?", new String[]{String.valueOf(recipeId)});
+        values.put(COLUMN_RECIPE_NAME, recipeModel.getRecipeName());
+        values.put(COLUMN_RECIPE_INSTRUCTIONS, recipeModel.getHowToPrepare());
+        values.put(COLUMN_RECIPE_IMAGE_URI, "null"); // TODO: URI HANDLE
+
+        // Update the recipe
+        int updatedRecipeRows = db.update(TABLE_RECIPES, values, COLUMN_RECIPE_ID + " = ?", new String[]{String.valueOf(recipeId)});
+
+        // Update the ingredients
+        ArrayList<IngredientModel> updatedIngredients = new ArrayList<>(recipeModel.getIngredients());
+        for (IngredientModel ingredient : updatedIngredients) {
+            updateIngredient(ingredient);
+        }
+        db.close();
+        return updatedRecipeRows;
     }
+
 
     public void deleteRecipe(int recipeId) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -89,20 +108,25 @@ public class RecipeDatabaseHelper extends SQLiteOpenHelper {
 
     // Ingredient CRUD operations
 
-    public long addIngredient(int recipeId, String ingredientName) {
+    public void insertIngredient(IngredientModel ingredient, long recipeId) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(COLUMN_RECIPE_ID_FK, recipeId);
-        values.put(COLUMN_INGREDIENT_NAME, ingredientName);
-        return db.insert(TABLE_INGREDIENTS, null, values);
+        values.put(COLUMN_RECIPE_ID_FK, recipeId); // Assign the recipe ID as a foreign key
+        values.put(COLUMN_INGREDIENT_NAME, ingredient.getName());
+        values.put(COLUMN_INGREDIENT_QUANTITY, ingredient.getQuantity());
+        values.put(COLUMN_INGREDIENT_UNIT, ingredient.getUnit());
+        db.insert(TABLE_INGREDIENTS, null, values); // Insert ingredient into the ingredients table
     }
 
-    public int updateIngredient(int ingredientId, String newIngredientName) {
+    public void updateIngredient(IngredientModel ingredient) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(COLUMN_INGREDIENT_NAME, newIngredientName);
-        return db.update(TABLE_INGREDIENTS, values, COLUMN_INGREDIENT_ID + " = ?", new String[]{String.valueOf(ingredientId)});
+        values.put(COLUMN_INGREDIENT_NAME, ingredient.getName());
+        values.put(COLUMN_INGREDIENT_QUANTITY, ingredient.getQuantity());
+        values.put(COLUMN_INGREDIENT_UNIT, ingredient.getUnit());
+        db.update(TABLE_INGREDIENTS, values, COLUMN_INGREDIENT_ID + " = ?", new String[]{String.valueOf(ingredient.getId())});
     }
+
 
     public void deleteIngredient(int ingredientId) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -111,7 +135,7 @@ public class RecipeDatabaseHelper extends SQLiteOpenHelper {
 
     // Get all recipes
 
-    public ArrayList<RecipeModel> getAllRecipes() {
+    public ArrayList<RecipeModel> getAllRecipesFromDB() {
         ArrayList<RecipeModel> recipes = new ArrayList<>();
 
         SQLiteDatabase db = this.getReadableDatabase();
@@ -123,7 +147,7 @@ public class RecipeDatabaseHelper extends SQLiteOpenHelper {
                 String recipeName = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_RECIPE_NAME));
                 String recipeInstructions = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_RECIPE_INSTRUCTIONS));
                 Uri recipeUri = Uri.parse(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_RECIPE_IMAGE_URI)));
-                ArrayList<IngredientModel> ingredients = getAllIngredientsForRecipe(recipeId);
+                ArrayList<IngredientModel> ingredients = getAllIngredientsForRecipeFromDB(recipeId);
 
                 RecipeModel recipeModel = new RecipeModel(recipeName, ingredients, recipeInstructions, recipeUri);
                 recipeModel.setId(recipeId);
@@ -134,11 +158,11 @@ public class RecipeDatabaseHelper extends SQLiteOpenHelper {
 
         cursor.close();
         db.close();
-        Log.d("RecipeDatabaseHelper", "Retrieved recipes: " + recipes.toString());
+        Log.d("RecipeDatabaseHelper", "Retrieved recipes: " + recipes);
         return recipes;
     }
 
-    public ArrayList<IngredientModel> getAllIngredientsForRecipe(int recipeId) {
+    public ArrayList<IngredientModel> getAllIngredientsForRecipeFromDB(int recipeId) {
         ArrayList<IngredientModel> ingredients = new ArrayList<>();
 
         SQLiteDatabase db = this.getReadableDatabase();

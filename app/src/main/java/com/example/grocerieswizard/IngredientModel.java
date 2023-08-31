@@ -9,6 +9,8 @@ public class IngredientModel implements Parcelable {
     private String name;
     private double quantity;
     private String unit;
+    private int id;
+    private long recipeId;
 
     public IngredientModel(String name, double quantity, String unit) {
         this.name = name;
@@ -74,5 +76,21 @@ public class IngredientModel implements Parcelable {
 
     public void setUnit(String unit) {
         this.unit = unit;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public long getRecipeId() {
+        return recipeId;
+    }
+
+    public void setRecipeId(long recipeId) {
+        this.recipeId = recipeId;
     }
 }
