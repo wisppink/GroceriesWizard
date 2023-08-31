@@ -17,8 +17,17 @@ import java.util.ArrayList;
 
 public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecyclerViewAdapter.RecipeViewHolder> {
 
+    public ArrayList<RecipeModel> getRecipeList() {
+        return recipeList;
+    }
+
+    public void setRecipeList(ArrayList<RecipeModel> recipeList) {
+        this.recipeList = recipeList;
+    }
+
     private ArrayList<RecipeModel> recipeList = new ArrayList<>();
     private RecyclerViewInterface recyclerViewInterface;
+    private RecipeDatabaseHelper recipeDatabaseHelper;
     private Context context;
 
     public ArrayList<RecipeModel> sendRecipes;
@@ -26,6 +35,7 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
     public RecipeRecyclerViewAdapter(Context context) {
         this.context = context;
         this.sendRecipes = new ArrayList<>();
+        recipeDatabaseHelper = new RecipeDatabaseHelper(context);
     }
 
 
@@ -78,6 +88,7 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
     public void addRecipe(RecipeModel recipe) {
         recipeList.add(recipe);
         notifyItemInserted(recipeList.size() - 1);
+        recipeDatabaseHelper.insertRecipe(recipe);
     }
 
 

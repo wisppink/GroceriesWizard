@@ -28,6 +28,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
     //TODO:ekranı döndürünce recipeler gidiyor lol
     private RecipeRecyclerViewAdapter adapter;
     Context context;
+    RecipeDatabaseHelper recipeDatabaseHelper;
 
     // List to hold recipes for shopping cart
     private ArrayList<RecipeModel> shopList = new ArrayList<>();
@@ -66,12 +67,17 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        recipeDatabaseHelper = new RecipeDatabaseHelper(this);
 
         RecyclerView recyclerView = findViewById(R.id.mRecyclerView);
         adapter = new RecipeRecyclerViewAdapter(this);
         recyclerView.setAdapter(adapter);
         adapter.setRecyclerViewInterface(this);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        ArrayList<RecipeModel> recipes = recipeDatabaseHelper.getAllRecipes();
+        adapter.setRecipeList(recipes);
+        adapter.notifyDataSetChanged();
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -80,7 +86,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
         starIcon.setOnClickListener(v -> Toast.makeText(MainActivity.this, "Star icon clicked!", Toast.LENGTH_SHORT).show());
 
         context = this;
-        defaultRecipe();
+
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(v -> {
@@ -129,24 +135,6 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
             startActivity(shopping);
         });
 
-    }
-
-    // Default recipes for testing
-    private void defaultRecipe() {
-        List<IngredientModel> mlist = new ArrayList<>();
-        List<IngredientModel> m2list = new ArrayList<>();
-        IngredientModel ingredientModel = new IngredientModel("Domates", 1.0, "kg");
-        IngredientModel ingredient2Model = new IngredientModel("Salatalık", 2.0, "kg");
-        IngredientModel ingredient3Model = new IngredientModel("Domates", 3.0, "lbs");
-        IngredientModel ingredient4Model = new IngredientModel("Salatalık", 1.0, "kg");
-        mlist.add(ingredientModel);
-        mlist.add(ingredient2Model);
-        m2list.add(ingredient3Model);
-        m2list.add(ingredient4Model);
-        RecipeModel recipeModel = new RecipeModel("isim", mlist, "lalala", null);
-        RecipeModel recipe2Model = new RecipeModel("isim2", m2list, "lalala", null);
-        adapter.addRecipe(recipeModel);
-        adapter.addRecipe(recipe2Model);
     }
 
     // Handle item click to show details of a recipe

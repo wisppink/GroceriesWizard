@@ -13,6 +13,7 @@ public class RecipeModel implements Parcelable {
     private String howToPrepare;
     private List<IngredientModel> ingredients;
     private boolean isSwiped;
+    private int id;
 
     public RecipeModel(String recipeName, List<IngredientModel> ingredients, String howToPrepare, Uri recipeImageUri) {
         this.recipeName = recipeName;
@@ -99,4 +100,11 @@ public class RecipeModel implements Parcelable {
         isSwiped = swiped;
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 }
