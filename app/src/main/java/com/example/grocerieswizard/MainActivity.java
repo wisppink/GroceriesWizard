@@ -48,8 +48,6 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
         if (data != null && data.hasExtra("new_recipe")) {
             RecipeModel recipe = data.getParcelableExtra("new_recipe");
             int position = data.getIntExtra("position", -1);
-            Log.d("main recive: ", String.valueOf(recipe.isSwiped()));
-            Log.d("main recive position: ", String.valueOf(position));
             // Add the new recipe to the RecyclerView
             if (recipe != null) {
                 recipe.setSwiped(false);
@@ -125,7 +123,9 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
         // Set up shopping cart button
         Button shoppingCart = findViewById(R.id.shopping_cart);
         shoppingCart.setOnClickListener(v -> {
-            shopList.addAll(adapter.getSendRecipes());
+            shopList.clear();
+            shopList.addAll(recipeDatabaseHelper.getSelectedRecipes());
+            Log.d("Main get selected list: ", shopList.toString());
             //TODO: ask these are your recipes, wanna cont?
             //TODO: send that list to Shopping Menu
             Intent shopping = new Intent(this, ShoppingMenu.class);
@@ -192,8 +192,6 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
             editIntent.putExtra("editRecipe", true);
             editIntent.putExtra("recipeModel", recipeModel);
             editIntent.putExtra("position", position);
-            Log.d("mainden edite position: ", String.valueOf(position));
-            Log.d("mainden edite ", String.valueOf(recipeModel.isSwiped()));
             launcher.launch(editIntent);
         }
     }

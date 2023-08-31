@@ -3,7 +3,6 @@ package com.example.grocerieswizard;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -94,7 +93,7 @@ public class AddRecipe extends AppCompatActivity implements RecyclerViewInterfac
             RecipeModel recipeModel = intent.getParcelableExtra("recipeModel");
             //get old ones to show user
             editRecipeName.setText(recipeModel.getRecipeName());
-            editRecipeHowToPrepare.setText(recipeModel.getHowToPrepare());
+            editRecipeHowToPrepare.setText(recipeModel.getInstructions());
             ingredientList.addAll(recipeModel.getIngredients());
             selectedImageUri = recipeModel.getRecipeImageUri();
             //get new ones to update
@@ -118,12 +117,12 @@ public class AddRecipe extends AppCompatActivity implements RecyclerViewInterfac
             }
             if (selectedImageUri != null) {
                 recipe.setRecipeName(recipeName);
-                recipe.setHowToPrepare(howToPrepare);
+                recipe.setInstructions(howToPrepare);
                 recipe.setRecipeImageUri(selectedImageUri);
                 recipe.setIngredients(mylist);
             } else {
                 recipe.setRecipeName(recipeName);
-                recipe.setHowToPrepare(howToPrepare);
+                recipe.setInstructions(howToPrepare);
                 recipe.setRecipeImageUri(defaultImageUri);
                 recipe.setIngredients(mylist);
             }

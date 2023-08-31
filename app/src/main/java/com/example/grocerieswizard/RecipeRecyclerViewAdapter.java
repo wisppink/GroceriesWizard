@@ -1,6 +1,7 @@
 package com.example.grocerieswizard;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,11 +23,9 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
     private RecipeDatabaseHelper recipeDatabaseHelper;
     private Context context;
 
-    public ArrayList<RecipeModel> sendRecipes;
 
     public RecipeRecyclerViewAdapter(Context context) {
         this.context = context;
-        this.sendRecipes = new ArrayList<>();
         recipeDatabaseHelper = new RecipeDatabaseHelper(context);
     }
 
@@ -35,7 +34,7 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
             RecipeModel oldRecipe = getItemAtPosition(position);
             oldRecipe.setRecipeName(editedRecipe.getRecipeName());
             oldRecipe.setRecipeImageUri(editedRecipe.getRecipeImageUri());
-            oldRecipe.setHowToPrepare(editedRecipe.getHowToPrepare());
+            oldRecipe.setInstructions(editedRecipe.getInstructions());
             oldRecipe.setIngredients(editedRecipe.getIngredients());
             editedRecipe.setSwiped(false);
             int updatedRows = recipeDatabaseHelper.updateRecipe(oldRecipe.getId(), oldRecipe);
@@ -128,11 +127,6 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
         this.recipeList = recipeList;
     }
 
-    public ArrayList<RecipeModel> getSendRecipes() {
-        return sendRecipes;
-    }
-
-
     public class RecipeViewHolder extends RecyclerView.ViewHolder {
 
         private TextView title;
@@ -156,19 +150,24 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
             itemView.setOnLongClickListener(v -> {
                 RecipeModel recipeModel = recipeList.get(getAdapterPosition());
                 if (recipeModel != null) {
-                    if (sendRecipes.contains(recipeModel)) {
-                        //already selected, unselect
-                        sendRecipes.remove(recipeModel);
-                        itemView.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), android.R.color.white));
-                        //TODO:unselect yapınca işlemleri geri almıo lol
+                    int recipeId = recipeModel.getId();
+                    if (recipeModel.isSelected()) {
+                        // Already selected, unselect
+                        recipeModel.setSelected(false);
+                        recipeDatabaseHelper.deleteSelectedRecipe(recipeId);
+                        Log.d("adapter", "selected, unselect");
+                        itemView.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), android.R.color.transparent));
                     } else {
-                        // select
-                        sendRecipes.add(recipeModel);
+                        // Select
+                        recipeModel.setSelected(true);
+                        Log.d("adapter", "select");
+                        recipeDatabaseHelper.insertSelectedRecipe(recipeId);
                         itemView.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), R.color.gray));
                     }
                 }
                 return true;
             });
+
 
 
             starButton.setOnClickListener(v -> {

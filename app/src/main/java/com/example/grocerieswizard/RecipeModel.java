@@ -10,23 +10,26 @@ public class RecipeModel implements Parcelable {
 
     private String recipeName;
     private Uri recipeImageUri;
-    private String howToPrepare;
+    private String instructions;
     private List<IngredientModel> ingredients;
     private boolean isSwiped;
     private int id;
+    private boolean isSelected;
 
-    public RecipeModel(String recipeName, List<IngredientModel> ingredients, String howToPrepare, Uri recipeImageUri) {
+    public RecipeModel(String recipeName, List<IngredientModel> ingredients, String instructions, Uri recipeImageUri) {
         this.recipeName = recipeName;
         this.ingredients = ingredients;
-        this.howToPrepare = howToPrepare;
+        this.instructions = instructions;
         this.recipeImageUri = recipeImageUri;
         isSwiped = false;
+        isSelected = false;
+
     }
 
     protected RecipeModel(Parcel in) {
         recipeName = in.readString();
         recipeImageUri = in.readParcelable(Uri.class.getClassLoader());
-        howToPrepare = in.readString();
+        instructions = in.readString();
         ingredients = in.createTypedArrayList(IngredientModel.CREATOR);
     }
 
@@ -46,7 +49,7 @@ public class RecipeModel implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(recipeName);
         dest.writeParcelable(recipeImageUri, flags);
-        dest.writeString(howToPrepare);
+        dest.writeString(instructions);
         dest.writeTypedList(ingredients); // Changed from writeList to writeTypedList
     }
 
@@ -63,8 +66,8 @@ public class RecipeModel implements Parcelable {
         return recipeImageUri;
     }
 
-    public String getHowToPrepare() {
-        return howToPrepare;
+    public String getInstructions() {
+        return instructions;
     }
 
     public List<IngredientModel> getIngredients() {
@@ -83,8 +86,8 @@ public class RecipeModel implements Parcelable {
         this.recipeImageUri = recipeImageUri;
     }
 
-    public void setHowToPrepare(String howToPrepare) {
-        this.howToPrepare = howToPrepare;
+    public void setInstructions(String instructions) {
+        this.instructions = instructions;
     }
 
     public void setIngredients(List<IngredientModel> ingredients) {
@@ -107,4 +110,13 @@ public class RecipeModel implements Parcelable {
     public void setId(int id) {
         this.id = id;
     }
+    public boolean isSelected() {
+        return isSelected;
+    }
+
+    public void setSelected(boolean selected) {
+        isSelected = selected;
+    }
+
+
 }
