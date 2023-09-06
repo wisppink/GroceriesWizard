@@ -1,6 +1,7 @@
 package com.example.grocerieswizard;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,26 +11,63 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class SubRecipeRecyclerViewAdapter extends RecyclerView.Adapter<SubRecipeRecyclerViewAdapter.ViewHolder> {
 
     private Context context;
-    private List<String> values;
+    Map<String, Map<String, Double>> ingredientInfo;
+    private ArrayList<String> recipeNames;
+    private ArrayList<String> ingredientUnit;
+    private ArrayList<Double> ingredientQuantity;
+    private String TAG = "subRecipeAdapter";
 
-    private List<Boolean> checkBoxes;
-    private OnSubItemCheckListener onSubItemCheckListener;
-
-    public SubRecipeRecyclerViewAdapter(Context context, List<String> values) {
+    public SubRecipeRecyclerViewAdapter(Context context) {
         this.context = context;
-        this.values = values;
+        recipeNames = new ArrayList<>();
+        ingredientUnit = new ArrayList<>();
+        ingredientQuantity = new ArrayList<>();
 
-        // Initialize checkbox states for each item
-        checkBoxes = new ArrayList<>(values.size());
-        for (int i = 0; i < values.size(); i++) {
-            checkBoxes.add(false);
-        }
     }
+
+
+    public void setIngredientInfo(Map<String, Map<String, Double>> ingredientInfo) {
+        this.ingredientInfo = ingredientInfo;
+        reArrange();
+    }
+
+    private void reArrange() {
+        // Clear existing data
+        recipeNames.clear();
+        ingredientUnit.clear();
+        ingredientQuantity.clear();
+
+        // Check if ingredientInfo is not null and not empty
+        if (ingredientInfo != null && !ingredientInfo.isEmpty()) {
+            for (Map.Entry<String, Map<String, Double>> entry : ingredientInfo.entrySet()) {
+                String recipeName = entry.getKey();
+                Map<String, Double> ingredientData = entry.getValue();
+
+                // Iterate through the inner map to extract unit and quantity
+                for (Map.Entry<String, Double> innerEntry : ingredientData.entrySet()) {
+                    String unit = innerEntry.getKey();
+                    Double quantity = innerEntry.getValue();
+
+                    // Add the extracted data to the respective lists
+                    recipeNames.add(recipeName);
+                    ingredientUnit.add(unit);
+                    ingredientQuantity.add(quantity);
+                }
+            }
+        }
+
+        notifyDataSetChanged(); // Notify the adapter that the data has changed
+        Log.d(TAG, "reArrange ");
+        Log.d(TAG, "recipe names: " + recipeNames.toString() + "unit: " + ingredientUnit.toString() + "quantities: " + ingredientQuantity.toString());
+    }
+
 
     @NonNull
     @Override
@@ -40,75 +78,37 @@ public class SubRecipeRecyclerViewAdapter extends RecyclerView.Adapter<SubRecipe
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        String value = values.get(position);
-        String[] parts = value.split(" ");
-
-        // Set the text values for each view holder element
-        holder.ingredientTitle.setText(parts[0]); // Recipe Name
-        holder.ingredientQuantity.setText(parts[1]); // Quantity
-        holder.ingredientUnit.setText(parts[2]); // Unit
-
-        // Handle checkbox state changes
-        holder.ingredientCB.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            // Update the checkbox state for the current item
-            checkBoxes.set(position, isChecked);
-
-            // Check if all checkboxes are checked
-            boolean isAllChecked = true;
-            for (boolean checked : checkBoxes) {
-                if (!checked) {
-                    isAllChecked = false;
-                    break;
-                }
-            }
-            // Notify the listener about checkbox changes
-            if (onSubItemCheckListener != null) {
-                onSubItemCheckListener.onSubItemChecked(isAllChecked);
-            }
-        });
-
+        holder.bind(recipeNames.get(position), ingredientUnit.get(position), ingredientQuantity.get(position));
+        Log.d(TAG, "onBindViewHolder" + " " + recipeNames.get(position).toString() + " " + ingredientUnit.get(position).toString() + " " + ingredientQuantity.get(position).toString());
     }
 
     @Override
     public int getItemCount() {
-        return values.size();
+        return recipeNames.size();
     }
 
-    // Check if an item's checkbox is checked
-    public boolean isItemChecked(int position) {
-        if (checkBoxes != null && position >= 0 && position < checkBoxes.size()) {
-            return checkBoxes.get(position);
-        }
-        return false;
-    }
 
-    public String getValueAtPosition(int i) {
-        return values.get(i);
-    }
-
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView ingredientTitle;
+    public class ViewHolder extends RecyclerView.ViewHolder {
+        TextView recipeTitle;
         TextView ingredientQuantity;
         TextView ingredientUnit;
         CheckBox ingredientCB;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            ingredientTitle = itemView.findViewById(R.id.sub_ingredient_name);
+            recipeTitle = itemView.findViewById(R.id.sub_recipe_name);
             ingredientQuantity = itemView.findViewById(R.id.sub_ingredient_quantity);
             ingredientUnit = itemView.findViewById(R.id.sub_ingredient_unit);
             ingredientCB = itemView.findViewById(R.id.sub_ingredient_checkbox);
+
+        }
+
+        public void bind(String recipeName, String unit, Double quantity) {
+            recipeTitle.setText(recipeName);
+            ingredientUnit.setText(unit);
+            ingredientQuantity.setText(String.format(String.valueOf(quantity)));
         }
     }
 
-    // Set a listener for checkbox changes
-    public void setOnSubItemCheckListener(OnSubItemCheckListener listener) {
-        this.onSubItemCheckListener = listener;
-    }
-
-    // Interface for notifying checkbox changes
-    public interface OnSubItemCheckListener {
-        void onSubItemChecked(boolean isAllChecked);
-    }
 
 }

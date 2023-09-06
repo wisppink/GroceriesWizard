@@ -85,7 +85,7 @@ public class RecipeDatabaseHelper extends SQLiteOpenHelper {
         values.put(COLUMN_RECIPE_INSTRUCTIONS, recipeModel.getInstructions());
         values.put(COLUMN_RECIPE_IMAGE_URI, "null"); // TODO: URI HANDLE
         long recipeId = db.insert(TABLE_RECIPES, null, values);
-
+        recipeModel.setId((int) recipeId);
         ArrayList<IngredientModel> ingredients = new ArrayList<>(recipeModel.getIngredients());
         for (IngredientModel ingredient : ingredients) {
             insertIngredient(ingredient, recipeId);

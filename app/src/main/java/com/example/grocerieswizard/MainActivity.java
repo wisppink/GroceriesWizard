@@ -23,7 +23,6 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements RecyclerViewInterface {
 
-    //TODO:ekranı döndürünce recipeler gidiyor lol
     private RecipeRecyclerViewAdapter adapter;
     Context context;
     RecipeDatabaseHelper recipeDatabaseHelper;

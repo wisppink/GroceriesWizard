@@ -154,14 +154,17 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
                     if (recipeModel.isSelected()) {
                         // Already selected, unselect
                         recipeModel.setSelected(false);
+                        Log.d("recipe adapter", "before delete from selected: " + recipeDatabaseHelper.getSelectedRecipes().size());
+
                         recipeDatabaseHelper.deleteSelectedRecipe(recipeId);
-                        Log.d("adapter", "selected, unselect");
+                        Log.d("recipe adapter", "after delete from selected: " + recipeDatabaseHelper.getSelectedRecipes().size());
                         itemView.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), android.R.color.transparent));
                     } else {
                         // Select
                         recipeModel.setSelected(true);
-                        Log.d("adapter", "select");
+                        Log.d("recipe adapter", "before insert to selected: " + recipeDatabaseHelper.getSelectedRecipes().size());
                         recipeDatabaseHelper.insertSelectedRecipe(recipeId);
+                        Log.d("recipe adapter", "after insert to selected: " + recipeDatabaseHelper.getSelectedRecipes().size());
                         itemView.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), R.color.gray));
                     }
                 }

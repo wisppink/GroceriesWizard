@@ -238,6 +238,7 @@ public class AddRecipe extends AppCompatActivity implements RecyclerViewInterfac
         }
     }
 
+
     public void showEditIngredientDialog(IngredientModel ingredientModel, int position) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
