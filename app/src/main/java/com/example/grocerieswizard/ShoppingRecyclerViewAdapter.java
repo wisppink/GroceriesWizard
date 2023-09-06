@@ -45,6 +45,14 @@ public class ShoppingRecyclerViewAdapter extends RecyclerView.Adapter<ShoppingRe
         String ingredientName = entry.getKey();
         Map<String, Map<String, Double>> ingredientMap = entry.getValue();
         holder.bind(ingredientName, ingredientMap, position);
+        boolean allSubItemsChecked = true;
+        for (int i = 0; i < ingredientMap.size(); i++) {
+            if (!holder.getSubRecipeAdapter().isItemChecked(i)) {
+                allSubItemsChecked = false;
+                break;
+            }
+        }
+        holder.checkBox.setChecked(allSubItemsChecked);
     }
 
     @Override
@@ -124,13 +132,23 @@ public class ShoppingRecyclerViewAdapter extends RecyclerView.Adapter<ShoppingRe
             subRecipe.setLayoutManager(new LinearLayoutManager(context));
             subRecipeAdapter.setIngredientInfo(ingredientMap);
 
+            subRecipeAdapter.setOnSubItemCheckListener(isAllChecked -> {
+                checkBox.setChecked(isAllChecked);
+                updateTotal();
+            });
+
             updateTotal();
+        }
+
+        public SubRecipeRecyclerViewAdapter getSubRecipeAdapter() {
+            return subRecipeAdapter;
         }
     }
 
     private void updateTotal() {
 
     }
+
 
 }
 

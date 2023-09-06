@@ -24,6 +24,9 @@ public class SubRecipeRecyclerViewAdapter extends RecyclerView.Adapter<SubRecipe
     private ArrayList<Double> ingredientQuantity;
     private String TAG = "subRecipeAdapter";
 
+    private List<Boolean> checkBoxes;
+    private OnSubItemCheckListener onSubItemCheckListener;
+
     public SubRecipeRecyclerViewAdapter(Context context) {
         this.context = context;
         recipeNames = new ArrayList<>();
@@ -63,6 +66,10 @@ public class SubRecipeRecyclerViewAdapter extends RecyclerView.Adapter<SubRecipe
             }
         }
 
+        checkBoxes = new ArrayList<>(recipeNames.size());
+        for (int i = 0; i < recipeNames.size(); i++) {
+            checkBoxes.add(false);
+        }
         notifyDataSetChanged(); // Notify the adapter that the data has changed
         Log.d(TAG, "reArrange ");
         Log.d(TAG, "recipe names: " + recipeNames.toString() + "unit: " + ingredientUnit.toString() + "quantities: " + ingredientQuantity.toString());
@@ -80,12 +87,37 @@ public class SubRecipeRecyclerViewAdapter extends RecyclerView.Adapter<SubRecipe
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         holder.bind(recipeNames.get(position), ingredientUnit.get(position), ingredientQuantity.get(position));
         Log.d(TAG, "onBindViewHolder" + " " + recipeNames.get(position).toString() + " " + ingredientUnit.get(position).toString() + " " + ingredientQuantity.get(position).toString());
+        holder.ingredientCB.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            // Update the checkbox state for the current item
+            checkBoxes.set(position, isChecked);
+
+            // Check if all checkboxes are checked
+            boolean isAllChecked = true;
+            for (boolean checked : checkBoxes) {
+                if (!checked) {
+                    isAllChecked = false;
+                    break;
+                }
+            }
+            // Notify the listener about checkbox changes
+            if (onSubItemCheckListener != null) {
+                onSubItemCheckListener.onSubItemChecked(isAllChecked);
+            }
+        });
     }
 
     @Override
     public int getItemCount() {
         return recipeNames.size();
     }
+
+    public boolean isItemChecked(int position) {
+        if (checkBoxes != null && position >= 0 && position < checkBoxes.size()) {
+            return checkBoxes.get(position);
+        }
+        return false;
+    }
+
 
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -110,5 +142,12 @@ public class SubRecipeRecyclerViewAdapter extends RecyclerView.Adapter<SubRecipe
         }
     }
 
+    public void setOnSubItemCheckListener(OnSubItemCheckListener listener) {
+        this.onSubItemCheckListener = listener;
+    }
 
+    // Interface for notifying checkbox changes
+    public interface OnSubItemCheckListener {
+        void onSubItemChecked(boolean isAllChecked);
+    }
 }
