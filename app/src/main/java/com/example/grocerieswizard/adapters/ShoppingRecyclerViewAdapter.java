@@ -1,4 +1,4 @@
-package com.example.grocerieswizard;
+package com.example.grocerieswizard.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -10,6 +10,12 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.grocerieswizard.models.IngredientModel;
+import com.example.grocerieswizard.R;
+import com.example.grocerieswizard.RecipeDatabaseHelper;
+import com.example.grocerieswizard.models.RecipeModel;
+import com.example.grocerieswizard.RecyclerViewInterface;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,10 +47,13 @@ public class ShoppingRecyclerViewAdapter extends RecyclerView.Adapter<ShoppingRe
 
     @Override
     public void onBindViewHolder(@NonNull ShoppingViewHolder holder, int position) {
+        // Get the entry at the specified position in the ingredientInfo map
         Entry<String, Map<String, Map<String, Double>>> entry = getEntryAtPosition(position);
         String ingredientName = entry.getKey();
         Map<String, Map<String, Double>> ingredientMap = entry.getValue();
+        // Bind the data to the ViewHolder
         holder.bind(ingredientName, ingredientMap, position);
+        // Check if all sub-items are checked and update the checkbox state
         boolean allSubItemsChecked = true;
         for (int i = 0; i < ingredientMap.size(); i++) {
             if (!holder.getSubRecipeAdapter().isItemChecked(i)) {
@@ -64,19 +73,22 @@ public class ShoppingRecyclerViewAdapter extends RecyclerView.Adapter<ShoppingRe
         this.recyclerViewInterface = recyclerViewInterface;
     }
 
+    // Set the selected recipe list and update the ingredientInfo map
     public void setSelectedRecipeList(ArrayList<RecipeModel> selectedRecipeList) {
         this.selectedRecipeList = selectedRecipeList;
         ingredientInfo = rearrange(selectedRecipeList);
         notifyDataSetChanged();
     }
 
+    // Get the entry at the specified position in the ingredientInfo map
     private Entry<String, Map<String, Map<String, Double>>> getEntryAtPosition(int position) {
         List<Entry<String, Map<String, Map<String, Double>>>> entries = new ArrayList<>(ingredientInfo.entrySet());
         return entries.get(position);
     }
 
+    // Rearrange the ingredient information based on selected recipes
     public Map<String, Map<String, Map<String, Double>>> rearrange(ArrayList<RecipeModel> recipes) {
-        // Clear the existing data before rearranging.
+        // Clear the existing data before rearranging
         ingredientInfo.clear();
         ingredientNameKey.clear();
 

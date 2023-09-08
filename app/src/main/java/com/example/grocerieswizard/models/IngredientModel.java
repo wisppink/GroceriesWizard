@@ -1,4 +1,4 @@
-package com.example.grocerieswizard;
+package com.example.grocerieswizard.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;

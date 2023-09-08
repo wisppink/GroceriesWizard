@@ -1,4 +1,4 @@
-package com.example.grocerieswizard;
+package com.example.grocerieswizard.adapters;
 
 import android.content.Context;
 import android.util.Log;
@@ -13,6 +13,11 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.grocerieswizard.R;
+import com.example.grocerieswizard.RecipeDatabaseHelper;
+import com.example.grocerieswizard.models.RecipeModel;
+import com.example.grocerieswizard.RecyclerViewInterface;
 
 import java.util.ArrayList;
 

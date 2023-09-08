@@ -1,4 +1,4 @@
-package com.example.grocerieswizard;
+package com.example.grocerieswizard.models;
 
 import android.net.Uri;
 import android.os.Parcel;

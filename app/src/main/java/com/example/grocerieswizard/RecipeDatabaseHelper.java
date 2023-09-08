@@ -8,8 +8,10 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 import android.util.Log;
 
+import com.example.grocerieswizard.models.IngredientModel;
+import com.example.grocerieswizard.models.RecipeModel;
+
 import java.util.ArrayList;
-import java.util.List;
 
 public class RecipeDatabaseHelper extends SQLiteOpenHelper {
 

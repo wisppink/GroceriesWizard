@@ -1,4 +1,4 @@
-package com.example.grocerieswizard;
+package com.example.grocerieswizard.activities;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -18,6 +18,13 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.grocerieswizard.models.IngredientModel;
+import com.example.grocerieswizard.R;
+import com.example.grocerieswizard.models.RecipeModel;
+import com.example.grocerieswizard.RecyclerViewInterface;
+import com.example.grocerieswizard.adapters.IngredientAdapter;
+import com.example.grocerieswizard.adapters.RecipeRecyclerViewAdapter;
 
 import java.util.ArrayList;
 import java.util.List;

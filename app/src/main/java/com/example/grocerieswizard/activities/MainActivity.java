@@ -1,4 +1,4 @@
-package com.example.grocerieswizard;
+package com.example.grocerieswizard.activities;
 
 import android.content.Context;
 import android.content.Intent;
@@ -17,6 +17,11 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.grocerieswizard.R;
+import com.example.grocerieswizard.RecipeDatabaseHelper;
+import com.example.grocerieswizard.models.RecipeModel;
+import com.example.grocerieswizard.RecyclerViewInterface;
+import com.example.grocerieswizard.adapters.RecipeRecyclerViewAdapter;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;

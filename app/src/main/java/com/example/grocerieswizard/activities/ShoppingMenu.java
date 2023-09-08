@@ -1,19 +1,19 @@
-package com.example.grocerieswizard;
+package com.example.grocerieswizard.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
+
+import com.example.grocerieswizard.R;
+import com.example.grocerieswizard.RecipeDatabaseHelper;
+import com.example.grocerieswizard.models.RecipeModel;
+import com.example.grocerieswizard.RecyclerViewInterface;
+import com.example.grocerieswizard.adapters.ShoppingRecyclerViewAdapter;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 
 public class ShoppingMenu extends AppCompatActivity implements RecyclerViewInterface {
 

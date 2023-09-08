@@ -1,4 +1,4 @@
-package com.example.grocerieswizard;
+package com.example.grocerieswizard.adapters;
 
 import android.content.Context;
 import android.util.Log;
@@ -10,6 +10,8 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.grocerieswizard.R;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,12 +37,12 @@ public class SubRecipeRecyclerViewAdapter extends RecyclerView.Adapter<SubRecipe
 
     }
 
-
     public void setIngredientInfo(Map<String, Map<String, Double>> ingredientInfo) {
         this.ingredientInfo = ingredientInfo;
         reArrange();
     }
 
+    // Rearrange the data for display
     private void reArrange() {
         // Clear existing data
         recipeNames.clear();
@@ -65,14 +67,13 @@ public class SubRecipeRecyclerViewAdapter extends RecyclerView.Adapter<SubRecipe
                 }
             }
         }
-
+        // Initialize checkbox state list
         checkBoxes = new ArrayList<>(recipeNames.size());
         for (int i = 0; i < recipeNames.size(); i++) {
             checkBoxes.add(false);
         }
         notifyDataSetChanged(); // Notify the adapter that the data has changed
-        Log.d(TAG, "reArrange ");
-        Log.d(TAG, "recipe names: " + recipeNames.toString() + "unit: " + ingredientUnit.toString() + "quantities: " + ingredientQuantity.toString());
+        Log.d(TAG, "rearrange: " + "recipe names: " + recipeNames.toString() + "unit: " + ingredientUnit.toString() + "quantities: " + ingredientQuantity.toString());
     }
 
 
@@ -87,6 +88,7 @@ public class SubRecipeRecyclerViewAdapter extends RecyclerView.Adapter<SubRecipe
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         holder.bind(recipeNames.get(position), ingredientUnit.get(position), ingredientQuantity.get(position));
         Log.d(TAG, "onBindViewHolder" + " " + recipeNames.get(position).toString() + " " + ingredientUnit.get(position).toString() + " " + ingredientQuantity.get(position).toString());
+        // Set a listener for checkbox changes
         holder.ingredientCB.setOnCheckedChangeListener((buttonView, isChecked) -> {
             // Update the checkbox state for the current item
             checkBoxes.set(position, isChecked);
@@ -111,13 +113,13 @@ public class SubRecipeRecyclerViewAdapter extends RecyclerView.Adapter<SubRecipe
         return recipeNames.size();
     }
 
+    // Check if an item is checked at the given position
     public boolean isItemChecked(int position) {
         if (checkBoxes != null && position >= 0 && position < checkBoxes.size()) {
             return checkBoxes.get(position);
         }
         return false;
     }
-
 
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -142,6 +144,7 @@ public class SubRecipeRecyclerViewAdapter extends RecyclerView.Adapter<SubRecipe
         }
     }
 
+    // Set a listener for checkbox changes
     public void setOnSubItemCheckListener(OnSubItemCheckListener listener) {
         this.onSubItemCheckListener = listener;
     }

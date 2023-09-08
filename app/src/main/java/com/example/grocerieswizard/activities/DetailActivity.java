@@ -1,4 +1,4 @@
-package com.example.grocerieswizard;
+package com.example.grocerieswizard.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -7,6 +7,10 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.grocerieswizard.models.IngredientModel;
+import com.example.grocerieswizard.R;
+import com.example.grocerieswizard.models.RecipeModel;
 
 import java.util.List;
 

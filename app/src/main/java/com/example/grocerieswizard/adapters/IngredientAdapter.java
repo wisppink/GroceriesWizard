@@ -1,4 +1,4 @@
-package com.example.grocerieswizard;
+package com.example.grocerieswizard.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -10,6 +10,11 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.grocerieswizard.models.IngredientModel;
+import com.example.grocerieswizard.R;
+import com.example.grocerieswizard.RecipeDatabaseHelper;
+import com.example.grocerieswizard.RecyclerViewInterface;
 
 import java.util.List;
 
