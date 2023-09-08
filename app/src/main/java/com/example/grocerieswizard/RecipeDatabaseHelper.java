@@ -243,5 +243,13 @@ public class RecipeDatabaseHelper extends SQLiteOpenHelper {
 
         return selectedRecipes;
     }
+    public boolean isRecipeSelected(int recipeId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_SELECTED, null, COLUMN_RECIPE_ID_SELECTED + " = ?", new String[]{String.valueOf(recipeId)}, null, null, null);
+        boolean isSelected = cursor.getCount() > 0;
+        cursor.close();
+        return isSelected;
+    }
+
 
 }

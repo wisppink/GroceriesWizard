@@ -16,8 +16,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.grocerieswizard.R;
 import com.example.grocerieswizard.RecipeDatabaseHelper;
-import com.example.grocerieswizard.models.RecipeModel;
 import com.example.grocerieswizard.RecyclerViewInterface;
+import com.example.grocerieswizard.models.RecipeModel;
 
 import java.util.ArrayList;
 
@@ -27,6 +27,7 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
     private RecyclerViewInterface recyclerViewInterface;
     private RecipeDatabaseHelper recipeDatabaseHelper;
     private Context context;
+    private String TAG = "RecipeAdapter";
 
 
     public RecipeRecyclerViewAdapter(Context context) {
@@ -84,6 +85,10 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
             }*/
             resImage.setImageResource(R.drawable.recipe_image_default);
         }
+        if (recipeDatabaseHelper.isRecipeSelected(recipeModel.getId())) {
+            holder.itemView.setBackgroundColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.gray));
+            recipeModel.setSelected(true);
+        }
 
 
     }
@@ -130,6 +135,10 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
 
     public void setRecipeList(ArrayList<RecipeModel> recipeList) {
         this.recipeList = recipeList;
+        for (RecipeModel recipeModel : recipeList) {
+            Log.e(TAG, recipeModel.getRecipeName() + " " + recipeModel.isSelected());
+        }
+
     }
 
     public class RecipeViewHolder extends RecyclerView.ViewHolder {
@@ -175,7 +184,6 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
                 }
                 return true;
             });
-
 
 
             starButton.setOnClickListener(v -> {
