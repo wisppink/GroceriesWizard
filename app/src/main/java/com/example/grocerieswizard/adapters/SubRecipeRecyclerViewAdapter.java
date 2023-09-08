@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.grocerieswizard.R;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -21,6 +22,8 @@ public class SubRecipeRecyclerViewAdapter extends RecyclerView.Adapter<SubRecipe
 
     private Context context;
     Map<String, Map<String, Double>> ingredientInfo;
+
+    Map<String, Double> total = new HashMap<>();
     private ArrayList<String> recipeNames;
     private ArrayList<String> ingredientUnit;
     private ArrayList<Double> ingredientQuantity;
@@ -34,13 +37,18 @@ public class SubRecipeRecyclerViewAdapter extends RecyclerView.Adapter<SubRecipe
         recipeNames = new ArrayList<>();
         ingredientUnit = new ArrayList<>();
         ingredientQuantity = new ArrayList<>();
-
+        checkBoxes = new ArrayList<>();
     }
 
     public void setIngredientInfo(Map<String, Map<String, Double>> ingredientInfo) {
         this.ingredientInfo = ingredientInfo;
         reArrange();
     }
+
+    public Map<String, Double> getTotal() {
+        return total;
+    }
+
 
     // Rearrange the data for display
     private void reArrange() {
@@ -64,18 +72,36 @@ public class SubRecipeRecyclerViewAdapter extends RecyclerView.Adapter<SubRecipe
                     recipeNames.add(recipeName);
                     ingredientUnit.add(unit);
                     ingredientQuantity.add(quantity);
+
+                    // Update the 'total' map
+                    if (!total.containsKey(unit)) {
+                        Log.d(TAG, "total does NOT contain this unit: " + unit + " total: " + total.keySet());
+                        total.put(unit, quantity);
+                    } else {
+                        Log.d(TAG, "total contains this unit: " + unit + " OLD VALUE: " + total.get(unit));
+                        Double oldQuantity = total.get(unit);
+                        total.put(unit, oldQuantity + quantity);
+                        Log.d(TAG, "total contains this unit: " + unit + " NEW VALUE: " + total.get(unit));
+                    }
+                    // Add a corresponding entry to the checkBoxes list
+                    checkBoxes.add(false);
+
                 }
             }
         }
-        // Initialize checkbox state list
-        checkBoxes = new ArrayList<>(recipeNames.size());
-        for (int i = 0; i < recipeNames.size(); i++) {
-            checkBoxes.add(false);
-        }
+
         notifyDataSetChanged(); // Notify the adapter that the data has changed
-        Log.d(TAG, "rearrange: " + "recipe names: " + recipeNames.toString() + "unit: " + ingredientUnit.toString() + "quantities: " + ingredientQuantity.toString());
     }
 
+    // Update the total quantity when a checkbox is checked
+    private void updateTotal(String unit, Double quantity, int position) {
+        double existingTotal = total.containsKey(unit) ? total.get(unit) : 0.0;
+        total.put(unit, existingTotal - quantity); // Subtract only when checked
+        checkBoxes.set(position, true);
+        if (onSubItemCheckListener != null) {
+            onSubItemCheckListener.onTotalUpdated(total);
+        }
+    }
 
     @NonNull
     @Override
@@ -87,12 +113,25 @@ public class SubRecipeRecyclerViewAdapter extends RecyclerView.Adapter<SubRecipe
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         holder.bind(recipeNames.get(position), ingredientUnit.get(position), ingredientQuantity.get(position));
-        Log.d(TAG, "onBindViewHolder" + " " + recipeNames.get(position).toString() + " " + ingredientUnit.get(position).toString() + " " + ingredientQuantity.get(position).toString());
-        // Set a listener for checkbox changes
+
+        holder.ingredientCB.setOnCheckedChangeListener(null); // Remove the listener
+
+        // Set the checkbox state based on the checkBoxes list
+        holder.ingredientCB.setChecked(checkBoxes.get(position));
+
+        // Add the listener back to update checkbox state
         holder.ingredientCB.setOnCheckedChangeListener((buttonView, isChecked) -> {
             // Update the checkbox state for the current item
             checkBoxes.set(position, isChecked);
+            // Disable checkbox if it has been checked before
+            if (checkBoxes.get(position)) {
+                holder.ingredientCB.setEnabled(false);
+                // Call updateTotal here to update the total when a checkbox changes
+                updateTotal(ingredientUnit.get(position), ingredientQuantity.get(position), position);
 
+            } else {
+                holder.ingredientCB.setEnabled(true);
+            }
             // Check if all checkboxes are checked
             boolean isAllChecked = true;
             for (boolean checked : checkBoxes) {
@@ -106,6 +145,7 @@ public class SubRecipeRecyclerViewAdapter extends RecyclerView.Adapter<SubRecipe
                 onSubItemCheckListener.onSubItemChecked(isAllChecked);
             }
         });
+
     }
 
     @Override
@@ -120,7 +160,6 @@ public class SubRecipeRecyclerViewAdapter extends RecyclerView.Adapter<SubRecipe
         }
         return false;
     }
-
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         TextView recipeTitle;
@@ -141,6 +180,7 @@ public class SubRecipeRecyclerViewAdapter extends RecyclerView.Adapter<SubRecipe
             recipeTitle.setText(recipeName);
             ingredientUnit.setText(unit);
             ingredientQuantity.setText(String.format(String.valueOf(quantity)));
+            ingredientCB.setChecked(checkBoxes.get(getAdapterPosition()));
         }
     }
 
@@ -152,5 +192,7 @@ public class SubRecipeRecyclerViewAdapter extends RecyclerView.Adapter<SubRecipe
     // Interface for notifying checkbox changes
     public interface OnSubItemCheckListener {
         void onSubItemChecked(boolean isAllChecked);
+
+        void onTotalUpdated(Map<String, Double> total);
     }
 }

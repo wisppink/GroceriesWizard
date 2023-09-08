@@ -1,6 +1,7 @@
 package com.example.grocerieswizard.adapters;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,11 +12,11 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.grocerieswizard.models.IngredientModel;
 import com.example.grocerieswizard.R;
 import com.example.grocerieswizard.RecipeDatabaseHelper;
-import com.example.grocerieswizard.models.RecipeModel;
 import com.example.grocerieswizard.RecyclerViewInterface;
+import com.example.grocerieswizard.models.IngredientModel;
+import com.example.grocerieswizard.models.RecipeModel;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -144,21 +145,42 @@ public class ShoppingRecyclerViewAdapter extends RecyclerView.Adapter<ShoppingRe
             subRecipe.setLayoutManager(new LinearLayoutManager(context));
             subRecipeAdapter.setIngredientInfo(ingredientMap);
 
-            subRecipeAdapter.setOnSubItemCheckListener(isAllChecked -> {
-                checkBox.setChecked(isAllChecked);
-                updateTotal();
-            });
+            // Set the listener to update the total in ShoppingRecyclerViewAdapter
+            subRecipeAdapter.setOnSubItemCheckListener(new SubRecipeRecyclerViewAdapter.OnSubItemCheckListener() {
+                @Override
+                public void onSubItemChecked(boolean isAllChecked) {
+                    checkBox.setChecked(isAllChecked);
+                }
 
-            updateTotal();
+                @Override
+                public void onTotalUpdated(Map<String, Double> totalMap) {
+                    Log.d(TAG, "total: " + totalMap.keySet() + "values: " + totalMap.values());
+                    total.setText(totalString(totalMap));
+
+                }
+
+            });
+            total.setText(totalString(subRecipeAdapter.getTotal()));
         }
+
+        private String totalString(Map<String, Double> totalMap) {
+            StringBuilder builder = new StringBuilder();
+            for (Map.Entry<String, Double> entry : totalMap.entrySet()) {
+                String key = entry.getKey();
+                Double value = entry.getValue();
+                builder.append(key).append(value).append(", ");
+            }
+            // Remove the trailing comma and space
+            if (builder.length() > 0) {
+                builder.setLength(builder.length() - 2);
+            }
+            return builder.toString();
+        }
+
 
         public SubRecipeRecyclerViewAdapter getSubRecipeAdapter() {
             return subRecipeAdapter;
         }
-    }
-
-    private void updateTotal() {
-
     }
 
 
