@@ -15,7 +15,7 @@ import com.example.grocerieswizard.adapters.ShoppingRecyclerViewAdapter;
 
 import java.util.ArrayList;
 
-public class ShoppingMenu extends AppCompatActivity implements RecyclerViewInterface {
+public class ShoppingMenuActivity extends AppCompatActivity implements RecyclerViewInterface {
 
     private ShoppingRecyclerViewAdapter adapter;
     Context context;

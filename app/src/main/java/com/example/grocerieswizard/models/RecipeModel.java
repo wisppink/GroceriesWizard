@@ -16,6 +16,8 @@ public class RecipeModel implements Parcelable {
     private int id;
     private boolean isSelected;
 
+    private boolean isFavorite;
+
     public RecipeModel(String recipeName, List<IngredientModel> ingredients, String instructions, Uri recipeImageUri) {
         this.recipeName = recipeName;
         this.ingredients = ingredients;
@@ -110,6 +112,7 @@ public class RecipeModel implements Parcelable {
     public void setId(int id) {
         this.id = id;
     }
+
     public boolean isSelected() {
         return isSelected;
     }
@@ -118,5 +121,11 @@ public class RecipeModel implements Parcelable {
         isSelected = selected;
     }
 
+    public void setFavorite(boolean favorite) {
+        isFavorite = favorite;
+    }
 
+    public boolean isFavorite() {
+        return isFavorite;
+    }
 }

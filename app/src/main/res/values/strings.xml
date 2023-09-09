@@ -21,4 +21,7 @@
     <string name="shopping_cart">Shopping Cart</string>
     <string name="quantity">0</string>
     <string name="show_total_unit">show total unit</string>
+    <string name="no">No</string>
+    <string name="yes">yes</string>
+    <string name="unfav_recipe_dialog_ask">Do you want to remove this recipe from favorites?</string>
 </resources>

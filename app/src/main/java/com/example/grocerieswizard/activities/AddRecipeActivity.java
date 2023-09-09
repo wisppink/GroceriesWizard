@@ -29,7 +29,7 @@ import com.example.grocerieswizard.adapters.RecipeRecyclerViewAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AddRecipe extends AppCompatActivity implements RecyclerViewInterface {
+public class AddRecipeActivity extends AppCompatActivity implements RecyclerViewInterface {
 
     private Uri selectedImageUri;
     private EditText editRecipeName;

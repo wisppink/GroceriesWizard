@@ -15,6 +15,7 @@ import java.util.ArrayList;
 
 public class RecipeDatabaseHelper extends SQLiteOpenHelper {
 
+    private final String TAG = "RecipeDatabaseHelper";
     private static final String DATABASE_NAME = "recipes.db";
     private static final int DATABASE_VERSION = 1;
 
@@ -33,6 +34,16 @@ public class RecipeDatabaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_INGREDIENT_NAME = "ingredient_name";
     private static final String COLUMN_RECIPE_ID_FK = "recipe_id";
 
+    // Table and column names for selected recipes
+    private static final String TABLE_SELECTED = "selected";
+    private static final String COLUMN_SELECTED_ID = "_id";
+    private static final String COLUMN_RECIPE_ID_SELECTED = "recipe_id";
+
+    // Table and column names for favorite recipes
+    private static final String TABLE_FAV = "fav";
+    private static final String COLUMN_FAV_ID = "_id";
+    private static final String COLUMN_RECIPE_ID_FAV = "recipe_id";
+
     // Database creation SQL statements
     private static final String DATABASE_CREATE_RECIPES = "create table " + TABLE_RECIPES
             + "(" + COLUMN_RECIPE_ID + " integer primary key autoincrement, "
@@ -48,15 +59,14 @@ public class RecipeDatabaseHelper extends SQLiteOpenHelper {
             + COLUMN_RECIPE_ID_FK + " integer not null, "
             + "FOREIGN KEY(" + COLUMN_RECIPE_ID_FK + ") REFERENCES " + TABLE_RECIPES + "(" + COLUMN_RECIPE_ID + "));";
 
-    // Table and column names for selected recipes
-    private static final String TABLE_SELECTED = "selected";
-    private static final String COLUMN_SELECTED_ID = "_id";
-    private static final String COLUMN_RECIPE_ID_SELECTED = "recipe_id";
-
     // Database creation SQL statement for selected recipes
     private static final String DATABASE_CREATE_SELECTED = "create table " + TABLE_SELECTED
             + "(" + COLUMN_SELECTED_ID + " integer primary key autoincrement, "
             + COLUMN_RECIPE_ID_SELECTED + " integer not null);";
+
+    private static final String DATABASE_CREATE_FAV = "create table " + TABLE_FAV
+            + "(" + COLUMN_FAV_ID + " integer primary key autoincrement, "
+            + COLUMN_RECIPE_ID_FAV + " integer not null);";
 
 
     public RecipeDatabaseHelper(Context context) {
@@ -68,6 +78,7 @@ public class RecipeDatabaseHelper extends SQLiteOpenHelper {
         database.execSQL(DATABASE_CREATE_RECIPES);
         database.execSQL(DATABASE_CREATE_INGREDIENTS);
         database.execSQL(DATABASE_CREATE_SELECTED);
+        database.execSQL(DATABASE_CREATE_FAV);
     }
 
     @Override
@@ -75,6 +86,7 @@ public class RecipeDatabaseHelper extends SQLiteOpenHelper {
         database.execSQL("DROP TABLE IF EXISTS " + TABLE_INGREDIENTS);
         database.execSQL("DROP TABLE IF EXISTS " + TABLE_RECIPES);
         database.execSQL("DROP TABLE IF EXISTS " + TABLE_SELECTED);
+        database.execSQL("DROP TABLE IF EXISTS " + TABLE_FAV);
         onCreate(database);
     }
 
@@ -149,8 +161,6 @@ public class RecipeDatabaseHelper extends SQLiteOpenHelper {
         db.delete(TABLE_INGREDIENTS, COLUMN_INGREDIENT_ID + " = ?", new String[]{String.valueOf(ingredientId)});
     }
 
-    // Get all recipes
-
     public ArrayList<RecipeModel> getAllRecipesFromDB() {
         ArrayList<RecipeModel> recipes = new ArrayList<>();
 
@@ -203,6 +213,7 @@ public class RecipeDatabaseHelper extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(COLUMN_RECIPE_ID_SELECTED, recipeId);
         db.insert(TABLE_SELECTED, null, values);
+        Log.d(TAG,"inserted fav");
 
     }
 
@@ -226,7 +237,7 @@ public class RecipeDatabaseHelper extends SQLiteOpenHelper {
             // Get recipe information from the recipes table
             Cursor recipeCursor = db.query(TABLE_RECIPES, new String[]{COLUMN_RECIPE_ID, COLUMN_RECIPE_NAME, COLUMN_RECIPE_INSTRUCTIONS, COLUMN_RECIPE_IMAGE_URI}, COLUMN_RECIPE_ID + "=?", new String[]{String.valueOf(recipeId)}, null, null, null);
             if (recipeCursor.moveToFirst()) {
-                RecipeModel recipe = new RecipeModel(null,null,null,null);
+                RecipeModel recipe = new RecipeModel(null, null, null, null);
                 recipe.setId(recipeCursor.getInt(recipeCursor.getColumnIndexOrThrow(COLUMN_RECIPE_ID)));
                 recipe.setRecipeName(recipeCursor.getString(recipeCursor.getColumnIndexOrThrow(COLUMN_RECIPE_NAME)));
                 recipe.setIngredients(getAllIngredientsForRecipeFromDB(recipeId));
@@ -243,6 +254,7 @@ public class RecipeDatabaseHelper extends SQLiteOpenHelper {
 
         return selectedRecipes;
     }
+
     public boolean isRecipeSelected(int recipeId) {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(TABLE_SELECTED, null, COLUMN_RECIPE_ID_SELECTED + " = ?", new String[]{String.valueOf(recipeId)}, null, null, null);
@@ -251,5 +263,57 @@ public class RecipeDatabaseHelper extends SQLiteOpenHelper {
         return isSelected;
     }
 
+    public void insertRecipeFav(int recipeId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_RECIPE_ID_FAV, recipeId);
+        db.insert(TABLE_FAV, null, values);
+        Log.d(TAG,"inserted to fav");
 
+    }
+    public void deleteRecipeFav(int recipeId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        Log.d(TAG, recipeId + "is deleted");
+        db.delete(TABLE_FAV, COLUMN_RECIPE_ID_FAV + " = ?", new String[]{String.valueOf(recipeId)});
+
+    }
+
+    public ArrayList<RecipeModel> getRecipesFav() {
+        ArrayList<RecipeModel> favRecipes = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // Get recipe IDs from the selected table
+        Cursor cursor = db.query(TABLE_FAV, new String[]{COLUMN_RECIPE_ID_FAV}, null, null, null, null, null);
+        while (cursor.moveToNext()) {
+            int recipeId = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_RECIPE_ID_FAV));
+
+            // Get recipe information from the recipes table
+            Cursor recipeCursor = db.query(TABLE_RECIPES, new String[]{COLUMN_RECIPE_ID, COLUMN_RECIPE_NAME, COLUMN_RECIPE_INSTRUCTIONS, COLUMN_RECIPE_IMAGE_URI}, COLUMN_RECIPE_ID + "=?", new String[]{String.valueOf(recipeId)}, null, null, null);
+            if (recipeCursor.moveToFirst()) {
+                RecipeModel recipe = new RecipeModel(null, null, null, null);
+                recipe.setId(recipeCursor.getInt(recipeCursor.getColumnIndexOrThrow(COLUMN_RECIPE_ID)));
+                recipe.setRecipeName(recipeCursor.getString(recipeCursor.getColumnIndexOrThrow(COLUMN_RECIPE_NAME)));
+                recipe.setIngredients(getAllIngredientsForRecipeFromDB(recipeId));
+                recipe.setInstructions(recipeCursor.getString(recipeCursor.getColumnIndexOrThrow(COLUMN_RECIPE_INSTRUCTIONS)));
+                recipe.setRecipeImageUri(Uri.parse(recipeCursor.getString(recipeCursor.getColumnIndexOrThrow(COLUMN_RECIPE_IMAGE_URI))));
+
+                // Add recipe to the list
+                favRecipes.add(recipe);
+
+            }
+            recipeCursor.close();
+        }
+        cursor.close();
+
+        return favRecipes;
+    }
+
+
+    public boolean isRecipeFavorite(int id) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_FAV, null, COLUMN_RECIPE_ID_FAV + " = ?", new String[]{String.valueOf(id)}, null, null, null);
+        boolean isSelected = cursor.getCount() > 0;
+        cursor.close();
+        return isSelected;
+    }
 }

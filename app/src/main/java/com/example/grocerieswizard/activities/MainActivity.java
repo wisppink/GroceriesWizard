@@ -10,6 +10,8 @@ import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -19,9 +21,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.grocerieswizard.R;
 import com.example.grocerieswizard.RecipeDatabaseHelper;
-import com.example.grocerieswizard.models.RecipeModel;
 import com.example.grocerieswizard.RecyclerViewInterface;
 import com.example.grocerieswizard.adapters.RecipeRecyclerViewAdapter;
+import com.example.grocerieswizard.models.RecipeModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
@@ -31,6 +33,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
     private RecipeRecyclerViewAdapter adapter;
     Context context;
     RecipeDatabaseHelper recipeDatabaseHelper;
+    private static final int FAV_ACTIVITY_REQUEST_CODE = 1;
 
     // List to hold recipes for shopping cart
     private ArrayList<RecipeModel> shopList = new ArrayList<>();
@@ -82,8 +85,18 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        ImageView starIcon = findViewById(R.id.star_icon);
-        starIcon.setOnClickListener(v -> Toast.makeText(MainActivity.this, "Star icon clicked!", Toast.LENGTH_SHORT).show());
+        ImageView open_fav = findViewById(R.id.fav_icon);
+        open_fav.setOnClickListener(v ->
+        {
+            Toast.makeText(MainActivity.this, "open_fav icon clicked!", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(MainActivity.this, FavActivity.class);
+
+            // Start FavActivity with the specified request code
+            startActivityForResult(intent, FAV_ACTIVITY_REQUEST_CODE);
+        });
+
+        ImageView open_menu = findViewById(R.id.open_menu);
+        open_menu.setOnClickListener(v -> Toast.makeText(MainActivity.this, "open_menu icon clicked!", Toast.LENGTH_SHORT).show());
 
         context = this;
 
@@ -91,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(v -> {
             // Launch the AddRecipe activity to add a new recipe
-            Intent intent = new Intent(MainActivity.this, AddRecipe.class);
+            Intent intent = new Intent(MainActivity.this, AddRecipeActivity.class);
             launcher.launch(intent);
 
         });
@@ -101,7 +114,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
                 0, ItemTouchHelper.LEFT
         ) {
             @Override
-            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
                 return false; // We're not interested in moving items in this case
             }
 
@@ -131,8 +144,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
             shopList.addAll(recipeDatabaseHelper.getSelectedRecipes());
             Log.d("Main get selected list: ", shopList.toString());
             //TODO: ask these are your recipes, wanna cont?
-            //TODO: send that list to Shopping Menu
-            Intent shopping = new Intent(this, ShoppingMenu.class);
+            Intent shopping = new Intent(this, ShoppingMenuActivity.class);
             shopping.putParcelableArrayListExtra("list", shopList);
             startActivity(shopping);
         });
@@ -192,12 +204,24 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
         if (recipeModel != null) {
             recipeModel.setSwiped(false);
             adapter.notifyItemChanged(position);
-            Intent editIntent = new Intent(this, AddRecipe.class);
+            Intent editIntent = new Intent(this, AddRecipeActivity.class);
             editIntent.putExtra("editRecipe", true);
             editIntent.putExtra("recipeModel", recipeModel);
             editIntent.putExtra("position", position);
             launcher.launch(editIntent);
         }
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == FAV_ACTIVITY_REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
+                adapter.notifyDataSetChanged();
+            }
+        }
+    }
+
 
 }

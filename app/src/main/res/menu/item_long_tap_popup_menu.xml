@@ -5,7 +5,6 @@
     <item
         android:id="@+id/menu_delete"
         android:title="@string/popup_delete"
-        android:icon="@android:drawable/ic_menu_delete"
         android:orderInCategory="100"
         app:showAsAction="never"
         android:gravity="end"/>
@@ -13,7 +12,6 @@
     <item
         android:id="@+id/menu_edit"
         android:title="@string/popup_edit"
-        android:icon="@android:drawable/ic_menu_edit"
         android:orderInCategory="100"
         app:showAsAction="never"
         android:gravity="end"/>
@@ -21,7 +19,6 @@
     <item
         android:id="@+id/menu_unFav"
         android:title="@string/popup_unfavorite"
-        android:icon="@drawable/un_fav"
         android:orderInCategory="100"
         app:showAsAction="never"
         android:gravity="end"
