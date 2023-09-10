@@ -187,7 +187,6 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
             ((ViewGroup) itemView).removeAllViews();
             ((ViewGroup) itemView).addView(swipedView);
 
-            title.setText(recipeModel.getRecipeName());
             if (recipeModel.getRecipeImageUri() != null) {
                 //TODO:Image Handle :((
                 //resImage.setImageURI(recipeModel.getRecipeImageUri());
