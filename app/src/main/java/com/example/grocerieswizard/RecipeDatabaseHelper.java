@@ -5,16 +5,18 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.net.Uri;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 
 import com.example.grocerieswizard.models.IngredientModel;
 import com.example.grocerieswizard.models.RecipeModel;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 
 public class RecipeDatabaseHelper extends SQLiteOpenHelper {
-
+    private final Context context;
     private final String TAG = "RecipeDatabaseHelper";
     private static final String DATABASE_NAME = "recipes.db";
     private static final int DATABASE_VERSION = 1;
@@ -24,7 +26,9 @@ public class RecipeDatabaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_RECIPE_ID = "_id";
     private static final String COLUMN_RECIPE_NAME = "recipe_name";
     private static final String COLUMN_RECIPE_INSTRUCTIONS = "recipe_instructions";
-    private static final String COLUMN_RECIPE_IMAGE_URI = "image_uri";
+    private static final String COLUMN_RECIPE_IMAGE = "image_uri";
+    private ByteArrayOutputStream byteArrayOutputStream;
+    private byte[] imageInBytes;
 
     // Table and column names for ingredients
     private static final String TABLE_INGREDIENTS = "ingredients";
@@ -49,7 +53,7 @@ public class RecipeDatabaseHelper extends SQLiteOpenHelper {
             + "(" + COLUMN_RECIPE_ID + " integer primary key autoincrement, "
             + COLUMN_RECIPE_NAME + " text not null, "
             + COLUMN_RECIPE_INSTRUCTIONS + " text, "  // Added COLUMN_RECIPE_INSTRUCTIONS column
-            + COLUMN_RECIPE_IMAGE_URI + " text);";
+            + COLUMN_RECIPE_IMAGE + " BLOB);";
 
     private static final String DATABASE_CREATE_INGREDIENTS = "create table " + TABLE_INGREDIENTS
             + "(" + COLUMN_INGREDIENT_ID + " integer primary key autoincrement, "
@@ -71,6 +75,7 @@ public class RecipeDatabaseHelper extends SQLiteOpenHelper {
 
     public RecipeDatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        this.context = context;
     }
 
     @Override
@@ -97,15 +102,26 @@ public class RecipeDatabaseHelper extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(COLUMN_RECIPE_NAME, recipeModel.getRecipeName());
         values.put(COLUMN_RECIPE_INSTRUCTIONS, recipeModel.getInstructions());
-        values.put(COLUMN_RECIPE_IMAGE_URI, "null"); // TODO: URI HANDLE
+
+        Bitmap imageToStoreBitmap = recipeModel.getImageBitmap();
+        byteArrayOutputStream = new ByteArrayOutputStream();
+
+        if (imageToStoreBitmap != null) {
+            imageToStoreBitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+            imageInBytes = byteArrayOutputStream.toByteArray();
+            values.put(COLUMN_RECIPE_IMAGE, imageInBytes);
+        } else {
+            values.putNull(COLUMN_RECIPE_IMAGE);
+        }
+
         long recipeId = db.insert(TABLE_RECIPES, null, values);
         recipeModel.setId((int) recipeId);
+
         ArrayList<IngredientModel> ingredients = new ArrayList<>(recipeModel.getIngredients());
         for (IngredientModel ingredient : ingredients) {
             insertIngredient(ingredient, recipeId);
             ingredient.setRecipeId(recipeId);
         }
-
     }
 
 
@@ -114,8 +130,17 @@ public class RecipeDatabaseHelper extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(COLUMN_RECIPE_NAME, recipeModel.getRecipeName());
         values.put(COLUMN_RECIPE_INSTRUCTIONS, recipeModel.getInstructions());
-        values.put(COLUMN_RECIPE_IMAGE_URI, "null"); // TODO: URI HANDLE
 
+        Bitmap imageToStoreBitmap = recipeModel.getImageBitmap();
+        byteArrayOutputStream = new ByteArrayOutputStream();
+
+        if (imageToStoreBitmap != null) {
+            imageToStoreBitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+            imageInBytes = byteArrayOutputStream.toByteArray();
+            values.put(COLUMN_RECIPE_IMAGE, imageInBytes);
+        } else {
+            values.putNull(COLUMN_RECIPE_IMAGE);
+        }
         // Update the recipe
         int updatedRecipeRows = db.update(TABLE_RECIPES, values, COLUMN_RECIPE_ID + " = ?", new String[]{String.valueOf(recipeId)});
 
@@ -172,10 +197,19 @@ public class RecipeDatabaseHelper extends SQLiteOpenHelper {
                 int recipeId = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_RECIPE_ID));
                 String recipeName = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_RECIPE_NAME));
                 String recipeInstructions = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_RECIPE_INSTRUCTIONS));
-                Uri recipeUri = Uri.parse(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_RECIPE_IMAGE_URI)));
+
+                byte[] imageBytes = cursor.getBlob(cursor.getColumnIndexOrThrow(COLUMN_RECIPE_IMAGE));
+                Bitmap imageBitmap = null;
+
+                if (imageBytes != null) {
+                    imageBitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+                } else {
+                    Log.e(TAG, "getAllRecipesDB  imageBytes is null");
+                }
+
                 ArrayList<IngredientModel> ingredients = getAllIngredientsForRecipeFromDB(recipeId);
 
-                RecipeModel recipeModel = new RecipeModel(recipeName, ingredients, recipeInstructions, recipeUri);
+                RecipeModel recipeModel = new RecipeModel(recipeName, ingredients, recipeInstructions, imageBitmap);
                 recipeModel.setId(recipeId);
 
                 recipes.add(recipeModel);
@@ -213,7 +247,7 @@ public class RecipeDatabaseHelper extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(COLUMN_RECIPE_ID_SELECTED, recipeId);
         db.insert(TABLE_SELECTED, null, values);
-        Log.d(TAG,"inserted fav");
+        Log.d(TAG, "inserted fav");
 
     }
 
@@ -235,14 +269,21 @@ public class RecipeDatabaseHelper extends SQLiteOpenHelper {
             int recipeId = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_RECIPE_ID_SELECTED));
 
             // Get recipe information from the recipes table
-            Cursor recipeCursor = db.query(TABLE_RECIPES, new String[]{COLUMN_RECIPE_ID, COLUMN_RECIPE_NAME, COLUMN_RECIPE_INSTRUCTIONS, COLUMN_RECIPE_IMAGE_URI}, COLUMN_RECIPE_ID + "=?", new String[]{String.valueOf(recipeId)}, null, null, null);
+            Cursor recipeCursor = db.query(TABLE_RECIPES, new String[]{COLUMN_RECIPE_ID, COLUMN_RECIPE_NAME, COLUMN_RECIPE_INSTRUCTIONS, COLUMN_RECIPE_IMAGE}, COLUMN_RECIPE_ID + "=?", new String[]{String.valueOf(recipeId)}, null, null, null);
             if (recipeCursor.moveToFirst()) {
                 RecipeModel recipe = new RecipeModel(null, null, null, null);
                 recipe.setId(recipeCursor.getInt(recipeCursor.getColumnIndexOrThrow(COLUMN_RECIPE_ID)));
                 recipe.setRecipeName(recipeCursor.getString(recipeCursor.getColumnIndexOrThrow(COLUMN_RECIPE_NAME)));
                 recipe.setIngredients(getAllIngredientsForRecipeFromDB(recipeId));
                 recipe.setInstructions(recipeCursor.getString(recipeCursor.getColumnIndexOrThrow(COLUMN_RECIPE_INSTRUCTIONS)));
-                recipe.setRecipeImageUri(Uri.parse(recipeCursor.getString(recipeCursor.getColumnIndexOrThrow(COLUMN_RECIPE_IMAGE_URI))));
+
+                byte[] imageBytes = cursor.getBlob(cursor.getColumnIndexOrThrow(COLUMN_RECIPE_IMAGE));
+                Bitmap imageBitmap;
+
+                if (imageBytes != null) {
+                    imageBitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+                    recipe.setImageBitmap(imageBitmap);
+                }
 
                 // Add recipe to the list
                 selectedRecipes.add(recipe);
@@ -268,9 +309,10 @@ public class RecipeDatabaseHelper extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(COLUMN_RECIPE_ID_FAV, recipeId);
         db.insert(TABLE_FAV, null, values);
-        Log.d(TAG,"inserted to fav");
+        Log.d(TAG, "inserted to fav");
 
     }
+
     public void deleteRecipeFav(int recipeId) {
         SQLiteDatabase db = this.getWritableDatabase();
         Log.d(TAG, recipeId + "is deleted");
@@ -288,14 +330,22 @@ public class RecipeDatabaseHelper extends SQLiteOpenHelper {
             int recipeId = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_RECIPE_ID_FAV));
 
             // Get recipe information from the recipes table
-            Cursor recipeCursor = db.query(TABLE_RECIPES, new String[]{COLUMN_RECIPE_ID, COLUMN_RECIPE_NAME, COLUMN_RECIPE_INSTRUCTIONS, COLUMN_RECIPE_IMAGE_URI}, COLUMN_RECIPE_ID + "=?", new String[]{String.valueOf(recipeId)}, null, null, null);
+            Cursor recipeCursor = db.query(TABLE_RECIPES, new String[]{COLUMN_RECIPE_ID, COLUMN_RECIPE_NAME, COLUMN_RECIPE_INSTRUCTIONS, COLUMN_RECIPE_IMAGE}, COLUMN_RECIPE_ID + "=?", new String[]{String.valueOf(recipeId)}, null, null, null);
             if (recipeCursor.moveToFirst()) {
                 RecipeModel recipe = new RecipeModel(null, null, null, null);
                 recipe.setId(recipeCursor.getInt(recipeCursor.getColumnIndexOrThrow(COLUMN_RECIPE_ID)));
                 recipe.setRecipeName(recipeCursor.getString(recipeCursor.getColumnIndexOrThrow(COLUMN_RECIPE_NAME)));
                 recipe.setIngredients(getAllIngredientsForRecipeFromDB(recipeId));
                 recipe.setInstructions(recipeCursor.getString(recipeCursor.getColumnIndexOrThrow(COLUMN_RECIPE_INSTRUCTIONS)));
-                recipe.setRecipeImageUri(Uri.parse(recipeCursor.getString(recipeCursor.getColumnIndexOrThrow(COLUMN_RECIPE_IMAGE_URI))));
+
+                byte[] imageBytes = cursor.getBlob(cursor.getColumnIndexOrThrow(COLUMN_RECIPE_IMAGE));
+                Bitmap imageBitmap = null;
+
+                if (imageBytes != null) {
+                    imageBitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+                    recipe.setImageBitmap(imageBitmap);
+                }
+
 
                 // Add recipe to the list
                 favRecipes.add(recipe);

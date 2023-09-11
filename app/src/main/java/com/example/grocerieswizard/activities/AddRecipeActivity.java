@@ -1,8 +1,10 @@
 package com.example.grocerieswizard.activities;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -19,19 +21,19 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.grocerieswizard.models.IngredientModel;
 import com.example.grocerieswizard.R;
-import com.example.grocerieswizard.models.RecipeModel;
 import com.example.grocerieswizard.RecyclerViewInterface;
 import com.example.grocerieswizard.adapters.IngredientAdapter;
 import com.example.grocerieswizard.adapters.RecipeRecyclerViewAdapter;
+import com.example.grocerieswizard.models.IngredientModel;
+import com.example.grocerieswizard.models.RecipeModel;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class AddRecipeActivity extends AppCompatActivity implements RecyclerViewInterface {
 
-    private Uri selectedImageUri;
+    private Bitmap selectedImageBitmap;
     private EditText editRecipeName;
     private EditText editRecipeHowToPrepare;
     private ActivityResultLauncher<Intent> pickImageLauncher;
@@ -39,6 +41,11 @@ public class AddRecipeActivity extends AppCompatActivity implements RecyclerView
     private List<IngredientModel> ingredientList = new ArrayList<>();
     private RecipeModel recipe;
     private boolean editMode = false;
+    private Bitmap imageToStore;
+    private Bitmap defaultImageBitmap;
+    private final String TAG = "AddRecipe";
+    private static final int MAX_IMAGE_WIDTH = 60;
+    private static final int MAX_IMAGE_HEIGHT = 60;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -68,26 +75,42 @@ public class AddRecipeActivity extends AppCompatActivity implements RecyclerView
 
         ImageView addImage = findViewById(R.id.add_image);
         Uri defaultImageUri = Uri.parse("android.resource://com.example.grocerieswizard/" + R.drawable.recipe_image_default);
+        try {
+            defaultImageBitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), defaultImageUri);
+        } catch (Exception e) {
+            Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
 
         //create an empty recipe
-        recipe = new RecipeModel(null, null, null, selectedImageUri);
+        recipe = new RecipeModel(null, null, null, null);
 
         pickImageLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     if (result.getResultCode() == RESULT_OK && result.getData() != null) {
-                        selectedImageUri = result.getData().getData();
-                        addImage.setImageURI(selectedImageUri);
-                        //TODO: change the resolution
+                        Uri selectedImageUri = result.getData().getData();
+                        try {
+                            imageToStore = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedImageUri);
+                            // Resize the image before setting it in the ImageView
+                            imageToStore = getResizedBitmap(imageToStore, MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT);
+                            addImage.setImageBitmap(imageToStore);
+                            recipe.setImageBitmap(imageToStore);
+                        } catch (Exception e) {
+                            Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                            imageToStore = defaultImageBitmap; // Assign a default image
+                            addImage.setImageBitmap(defaultImageBitmap);
+                            recipe.setImageBitmap(defaultImageBitmap);
+                        }
                     } else {
                         // User didn't choose an image, display the default image
-                        selectedImageUri = defaultImageUri;
-                        addImage.setImageURI(selectedImageUri);
+                        imageToStore = defaultImageBitmap; // Assign a default image
+                        addImage.setImageBitmap(defaultImageBitmap);
+                        recipe.setImageBitmap(defaultImageBitmap);
                     }
                 });
         addImage.setImageURI(defaultImageUri);
 
         addImage.setOnClickListener(v -> {
-            Intent pickImageIntent = new Intent(Intent.ACTION_PICK);
+            Intent pickImageIntent = new Intent(Intent.ACTION_GET_CONTENT);
             pickImageIntent.setType("image/*");
             pickImageLauncher.launch(pickImageIntent);
         });
@@ -96,19 +119,21 @@ public class AddRecipeActivity extends AppCompatActivity implements RecyclerView
         editMode = intent.getBooleanExtra("editRecipe", false);
         int position = intent.getIntExtra("position", -1);
 
+        // Check if the activity is opened for editing
         if (editMode) {
             RecipeModel recipeModel = intent.getParcelableExtra("recipeModel");
             //get old ones to show user
+            assert recipeModel != null;
             editRecipeName.setText(recipeModel.getRecipeName());
             editRecipeHowToPrepare.setText(recipeModel.getInstructions());
             ingredientList.addAll(recipeModel.getIngredients());
-            selectedImageUri = recipeModel.getRecipeImageUri();
+            selectedImageBitmap = recipeModel.getImageBitmap();
             //get new ones to update
             String recipeName = editRecipeName.getText().toString();
             String howToPrepare = editRecipeHowToPrepare.getText().toString();
-            Uri newPhoto = selectedImageUri;
+            Bitmap newPhoto = selectedImageBitmap;
 
-            RecipeModel editedRecipe = new RecipeModel(recipeName,ingredientList,howToPrepare,newPhoto);
+            RecipeModel editedRecipe = new RecipeModel(recipeName, ingredientList, howToPrepare, newPhoto);
             recipeRecyclerViewAdapter.editRecipe(position, editedRecipe);
             ingredientAdapter.notifyItemChanged(position);
         }
@@ -117,23 +142,16 @@ public class AddRecipeActivity extends AppCompatActivity implements RecyclerView
             String recipeName = editRecipeName.getText().toString();
             String howToPrepare = editRecipeHowToPrepare.getText().toString();
             List<IngredientModel> mylist = ingredientList;
-
             if (recipeName.isEmpty() || ingredientList.isEmpty() || howToPrepare.isEmpty()) {
                 Toast.makeText(this, "Please fill all fields!", Toast.LENGTH_SHORT).show();
                 return;
             }
-            if (selectedImageUri != null) {
-                recipe.setRecipeName(recipeName);
-                recipe.setInstructions(howToPrepare);
-                recipe.setRecipeImageUri(selectedImageUri);
-                recipe.setIngredients(mylist);
-            } else {
-                recipe.setRecipeName(recipeName);
-                recipe.setInstructions(howToPrepare);
-                recipe.setRecipeImageUri(defaultImageUri);
-                recipe.setIngredients(mylist);
-            }
+            if (recipe.getImageBitmap() == null)
+                recipe.setImageBitmap(defaultImageBitmap);
+            recipe.setRecipeName(recipeName);
+            recipe.setInstructions(howToPrepare);
             recipe.setSwiped(false);
+            recipe.setIngredients(mylist);
 
 
             if (editMode) {
@@ -142,8 +160,7 @@ public class AddRecipeActivity extends AppCompatActivity implements RecyclerView
                 editintent.putExtra("new_recipe", recipe);
                 editintent.putExtra("position", position);
                 setResult(RESULT_OK, editintent);
-            }
-            else{
+            } else {
                 Intent resultIntent = new Intent();
                 resultIntent.putExtra("recipe", recipe);
                 setResult(RESULT_OK, resultIntent);
@@ -162,9 +179,6 @@ public class AddRecipeActivity extends AppCompatActivity implements RecyclerView
                     .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
                     .show();
         });
-
-        // Check if the activity is opened for editing
-
 
     }
 
@@ -205,7 +219,6 @@ public class AddRecipeActivity extends AppCompatActivity implements RecyclerView
     }
 
     private boolean unsavedChangesExist() {
-        // Check if there are any unsaved changes (e.g., fields are not empty)
         String recipeName = editRecipeName.getText().toString();
         List<IngredientModel> ingredients = ingredientList;
         String howToPrepare = editRecipeHowToPrepare.getText().toString();
@@ -245,6 +258,27 @@ public class AddRecipeActivity extends AppCompatActivity implements RecyclerView
         }
     }
 
+    private Bitmap getResizedBitmap(Bitmap image, int maxWidth, int maxHeight) {
+        int width = image.getWidth();
+        int height = image.getHeight();
+
+        if (width <= maxWidth && height <= maxHeight) {
+            // No need to resize
+            return image;
+        }
+
+        float ratio = (float) width / (float) height;
+        if (width > height) {
+            width = maxWidth;
+            height = (int) (width / ratio);
+        } else {
+            height = maxHeight;
+            width = (int) (height * ratio);
+        }
+
+        return Bitmap.createScaledBitmap(image, width, height, true);
+    }
+
 
     public void showEditIngredientDialog(IngredientModel ingredientModel, int position) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -267,7 +301,7 @@ public class AddRecipeActivity extends AppCompatActivity implements RecyclerView
             String quantityStr = ingredientQuantityEditText.getText().toString();
             double quantity = Double.parseDouble(quantityStr);
             String unit = ingredientUnitEditText.getText().toString();
-            ingredientAdapter.editIngredient(name,unit,quantity,position);
+            ingredientAdapter.editIngredient(name, unit, quantity, position);
             dialog.dismiss();
         });
 

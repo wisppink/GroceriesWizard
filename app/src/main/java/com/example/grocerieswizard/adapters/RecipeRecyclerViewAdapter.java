@@ -35,7 +35,6 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
         recipeDatabaseHelper = new RecipeDatabaseHelper(context);
     }
 
-
     @NonNull
     @Override
     public RecipeViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -76,7 +75,7 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
         if (position >= 0 && position < recipeList.size()) {
             RecipeModel oldRecipe = getItemAtPosition(position);
             oldRecipe.setRecipeName(editedRecipe.getRecipeName());
-            oldRecipe.setRecipeImageUri(editedRecipe.getRecipeImageUri());
+            oldRecipe.setImageBitmap(editedRecipe.getImageBitmap());
             oldRecipe.setInstructions(editedRecipe.getInstructions());
             oldRecipe.setIngredients(editedRecipe.getIngredients());
             editedRecipe.setSwiped(false);
@@ -187,13 +186,6 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
             ((ViewGroup) itemView).removeAllViews();
             ((ViewGroup) itemView).addView(swipedView);
 
-            if (recipeModel.getRecipeImageUri() != null) {
-                //TODO:Image Handle :((
-                //resImage.setImageURI(recipeModel.getRecipeImageUri());
-            } else {
-                resImage.setImageResource(R.drawable.recipe_image_default);
-            }
-
         }
 
 
@@ -204,9 +196,8 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
 
             title.setText(recipeModel.getRecipeName());
 
-            if (recipeModel.getRecipeImageUri() != null) {
-                //TODO:Image Handle :((
-                //resImage.setImageURI(recipeModel.getRecipeImageUri());
+            if (recipeModel.getImageBitmap() != null) {
+                resImage.setImageBitmap(recipeModel.getImageBitmap());
             } else {
                 resImage.setImageResource(R.drawable.recipe_image_default);
             }

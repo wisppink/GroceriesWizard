@@ -1,15 +1,17 @@
 package com.example.grocerieswizard.models;
 
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 import java.util.List;
 
 public class RecipeModel implements Parcelable {
 
     private String recipeName;
-    private Uri recipeImageUri;
+    private Bitmap imageBitmap;
     private String instructions;
     private List<IngredientModel> ingredients;
     private boolean isSwiped;
@@ -17,12 +19,13 @@ public class RecipeModel implements Parcelable {
     private boolean isSelected;
 
     private boolean isFavorite;
+    private String TAG = "RecipeModel";
 
-    public RecipeModel(String recipeName, List<IngredientModel> ingredients, String instructions, Uri recipeImageUri) {
+    public RecipeModel(String recipeName, List<IngredientModel> ingredients, String instructions, Bitmap imageBitmap) {
         this.recipeName = recipeName;
         this.ingredients = ingredients;
         this.instructions = instructions;
-        this.recipeImageUri = recipeImageUri;
+        this.imageBitmap = imageBitmap;
         isSwiped = false;
         isSelected = false;
 
@@ -30,7 +33,7 @@ public class RecipeModel implements Parcelable {
 
     protected RecipeModel(Parcel in) {
         recipeName = in.readString();
-        recipeImageUri = in.readParcelable(Uri.class.getClassLoader());
+        imageBitmap = in.readParcelable(Uri.class.getClassLoader());
         instructions = in.readString();
         ingredients = in.createTypedArrayList(IngredientModel.CREATOR);
     }
@@ -50,9 +53,9 @@ public class RecipeModel implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(recipeName);
-        dest.writeParcelable(recipeImageUri, flags);
+        dest.writeParcelable(imageBitmap, flags);
         dest.writeString(instructions);
-        dest.writeTypedList(ingredients); // Changed from writeList to writeTypedList
+        dest.writeTypedList(ingredients);
     }
 
     @Override
@@ -64,8 +67,11 @@ public class RecipeModel implements Parcelable {
         return recipeName;
     }
 
-    public Uri getRecipeImageUri() {
-        return recipeImageUri;
+    public Bitmap getImageBitmap() {
+        if (imageBitmap != null) {
+            Log.d(TAG, imageBitmap.toString());
+        }
+        return imageBitmap;
     }
 
     public String getInstructions() {
@@ -84,8 +90,10 @@ public class RecipeModel implements Parcelable {
         this.recipeName = recipeName;
     }
 
-    public void setRecipeImageUri(Uri recipeImageUri) {
-        this.recipeImageUri = recipeImageUri;
+    public void setImageBitmap(Bitmap imageBitmap) {
+        this.imageBitmap = imageBitmap;
+        if (imageBitmap != null)
+            Log.d(TAG, imageBitmap.toString());
     }
 
     public void setInstructions(String instructions) {
@@ -96,7 +104,6 @@ public class RecipeModel implements Parcelable {
         this.ingredients = ingredients;
     }
 
-    // Getter and Setter for isSwiped
     public boolean isSwiped() {
         return isSwiped;
     }

@@ -34,7 +34,7 @@ public class DetailActivity extends AppCompatActivity {
 
         if (recipe != null) {
             titleTextView.setText(recipe.getRecipeName());
-            imageRecipe.setImageURI(recipe.getRecipeImageUri());
+            imageRecipe.setImageBitmap(recipe.getImageBitmap());
             howtoTextView.setText(recipe.getInstructions());
             ingredients = recipe.getIngredients();
             System.out.println(ingredients);
