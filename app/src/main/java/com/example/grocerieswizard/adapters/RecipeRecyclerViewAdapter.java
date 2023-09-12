@@ -115,11 +115,19 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
 
     public void removeRecipeAtPosition(int position) {
         if (position >= 0 && position < recipeList.size()) {
-            recipeDatabaseHelper.deleteRecipe(getItemAtPosition(position).getId());
+
+            RecipeModel removedRecipe = getItemAtPosition(position);
+            if (removedRecipe.isSelected()) {
+                removedRecipe.setSelected(false);
+                notifyItemChanged(position);
+            }
+
+            recipeDatabaseHelper.deleteRecipe(removedRecipe.getId());
             recipeList.remove(position);
             notifyItemRemoved(position);
         }
     }
+
 
     public void setRecyclerViewInterface(RecyclerViewInterface recyclerViewInterface) {
         this.recyclerViewInterface = recyclerViewInterface;
@@ -174,6 +182,10 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
             ImageView shareIcon = swipedView.findViewById(R.id.share_icon);
             ImageView deleteIcon = swipedView.findViewById(R.id.delete_icon);
 
+            if (!recipeModel.isSelected()) {
+                itemView.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), android.R.color.transparent));
+            }
+
             editIcon.setOnClickListener(v -> recyclerViewInterface.onItemEdit(getAdapterPosition()));
 
             shareIcon.setOnClickListener(v -> {
@@ -209,6 +221,9 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
             } else {
                 // Set the non-favorite icon if it is not favorite
                 favButton.setImageResource(R.drawable.baseline_unfavorite_border_24);
+            }
+            if (!recipeModel.isSelected()) {
+                itemView.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), android.R.color.transparent));
             }
 
             favButton.setOnClickListener(v -> {
