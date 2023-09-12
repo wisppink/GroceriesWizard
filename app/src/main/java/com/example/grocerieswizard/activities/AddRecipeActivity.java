@@ -2,9 +2,11 @@ package com.example.grocerieswizard.activities;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -27,6 +29,8 @@ import com.example.grocerieswizard.adapters.IngredientAdapter;
 import com.example.grocerieswizard.adapters.RecipeRecyclerViewAdapter;
 import com.example.grocerieswizard.models.IngredientModel;
 import com.example.grocerieswizard.models.RecipeModel;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,8 +48,6 @@ public class AddRecipeActivity extends AppCompatActivity implements RecyclerView
     private Bitmap imageToStore;
     private Bitmap defaultImageBitmap;
     private final String TAG = "AddRecipe";
-    private static final int MAX_IMAGE_WIDTH = 60;
-    private static final int MAX_IMAGE_HEIGHT = 60;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -88,21 +90,37 @@ public class AddRecipeActivity extends AppCompatActivity implements RecyclerView
                 result -> {
                     if (result.getResultCode() == RESULT_OK && result.getData() != null) {
                         Uri selectedImageUri = result.getData().getData();
+                        Log.d(TAG, "onCreate: selectedImageUri : " + selectedImageUri);
                         try {
-                            imageToStore = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedImageUri);
-                            // Resize the image before setting it in the ImageView
-                            imageToStore = getResizedBitmap(imageToStore, MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT);
-                            addImage.setImageBitmap(imageToStore);
-                            recipe.setImageBitmap(imageToStore);
+                            Picasso.get()
+                                    .load(selectedImageUri)
+                                    .resize(150, 150)
+                                    .centerCrop()
+                                    .into(new Target() {
+                                        @Override
+                                        public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                                            addImage.setImageBitmap(bitmap);
+                                            recipe.setImageBitmap(bitmap);
+                                        }
+
+                                        @Override
+                                        public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+                                            Toast.makeText(AddRecipeActivity.this, "image error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                        }
+
+                                        @Override
+                                        public void onPrepareLoad(Drawable placeHolderDrawable) {
+                                        }
+                                    });
+
                         } catch (Exception e) {
                             Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
-                            imageToStore = defaultImageBitmap; // Assign a default image
+                            imageToStore = defaultImageBitmap;
                             addImage.setImageBitmap(defaultImageBitmap);
                             recipe.setImageBitmap(defaultImageBitmap);
                         }
                     } else {
-                        // User didn't choose an image, display the default image
-                        imageToStore = defaultImageBitmap; // Assign a default image
+                        imageToStore = defaultImageBitmap;
                         addImage.setImageBitmap(defaultImageBitmap);
                         recipe.setImageBitmap(defaultImageBitmap);
                     }
@@ -258,28 +276,6 @@ public class AddRecipeActivity extends AppCompatActivity implements RecyclerView
         }
     }
 
-    private Bitmap getResizedBitmap(Bitmap image, int maxWidth, int maxHeight) {
-        int width = image.getWidth();
-        int height = image.getHeight();
-
-        if (width <= maxWidth && height <= maxHeight) {
-            // No need to resize
-            return image;
-        }
-
-        float ratio = (float) width / (float) height;
-        if (width > height) {
-            width = maxWidth;
-            height = (int) (width / ratio);
-        } else {
-            height = maxHeight;
-            width = (int) (height * ratio);
-        }
-
-        return Bitmap.createScaledBitmap(image, width, height, true);
-    }
-
-
     public void showEditIngredientDialog(IngredientModel ingredientModel, int position) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
@@ -310,6 +306,5 @@ public class AddRecipeActivity extends AppCompatActivity implements RecyclerView
         AlertDialog dialog = builder.create();
         dialog.show();
     }
-
 
 }
