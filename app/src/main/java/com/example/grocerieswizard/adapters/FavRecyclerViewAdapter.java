@@ -1,6 +1,8 @@
 package com.example.grocerieswizard.adapters;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +11,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.grocerieswizard.R;
@@ -24,6 +27,7 @@ public class FavRecyclerViewAdapter extends RecyclerView.Adapter<FavRecyclerView
     private ArrayList<RecipeModel> favList = new ArrayList<>();
     private final Context context;
     private RecyclerViewInterface recyclerViewInterface;
+    private static final String TAG = "FavRecyclerViewAdapter";
 
     public FavRecyclerViewAdapter(Context context) {
         this.context = context;
@@ -39,7 +43,8 @@ public class FavRecyclerViewAdapter extends RecyclerView.Adapter<FavRecyclerView
 
     @Override
     public void onBindViewHolder(@NonNull FavViewHolder holder, int position) {
-        holder.bind(favList.get(position));
+        RecipeModel recipeModel = favList.get(position);
+        holder.bind(recipeModel);
 
     }
 
@@ -62,11 +67,13 @@ public class FavRecyclerViewAdapter extends RecyclerView.Adapter<FavRecyclerView
 
         private TextView title;
         private ImageView favButton;
+        private CardView background;
 
         public FavViewHolder(@NonNull View itemView) {
             super(itemView);
             title = itemView.findViewById(R.id.fav_recipe_title);
             favButton = itemView.findViewById(R.id.unFav);
+            background = itemView.findViewById(R.id.cardView);
 
             favButton.setOnClickListener(v -> {
                 AlertDialog.Builder builder = new AlertDialog.Builder(itemView.getContext());
@@ -92,6 +99,28 @@ public class FavRecyclerViewAdapter extends RecyclerView.Adapter<FavRecyclerView
         public void bind(RecipeModel recipeModel) {
             title.setText(recipeModel.getRecipeName());
             recipeModel.setFavorite(true);
+
+            if(dbHelper.isRecipeSelected(recipeModel.getId())){
+                recipeModel.setSelected(true);
+                background.setBackgroundColor(itemView.getResources().getColor(R.color.gray));
+            }
+            else {
+                background.setBackgroundColor(Color.TRANSPARENT);
+            }
+
+
+            itemView.setOnClickListener(v -> {
+                Log.d(TAG, "bind: clicked!");
+                if (!recipeModel.isSelected()) {
+                    recipeModel.setSelected(true);
+                    background.setBackgroundColor(itemView.getResources().getColor(R.color.gray));
+                    dbHelper.insertSelectedRecipe(recipeModel.getId());
+                } else {
+                    itemView.setBackgroundColor(Color.TRANSPARENT);
+                }
+                notifyDataSetChanged();
+            });
+
         }
     }
 }

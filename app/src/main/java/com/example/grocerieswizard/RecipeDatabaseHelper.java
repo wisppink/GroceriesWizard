@@ -277,7 +277,7 @@ public class RecipeDatabaseHelper extends SQLiteOpenHelper {
                 recipe.setIngredients(getAllIngredientsForRecipeFromDB(recipeId));
                 recipe.setInstructions(recipeCursor.getString(recipeCursor.getColumnIndexOrThrow(COLUMN_RECIPE_INSTRUCTIONS)));
 
-                byte[] imageBytes = cursor.getBlob(cursor.getColumnIndexOrThrow(COLUMN_RECIPE_IMAGE));
+                byte[] imageBytes = recipeCursor.getBlob(recipeCursor.getColumnIndexOrThrow(COLUMN_RECIPE_IMAGE));
                 Bitmap imageBitmap;
 
                 if (imageBytes != null) {
@@ -324,7 +324,7 @@ public class RecipeDatabaseHelper extends SQLiteOpenHelper {
         ArrayList<RecipeModel> favRecipes = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
 
-        // Get recipe IDs from the selected table
+        // Get recipe IDs from the fav table
         Cursor cursor = db.query(TABLE_FAV, new String[]{COLUMN_RECIPE_ID_FAV}, null, null, null, null, null);
         while (cursor.moveToNext()) {
             int recipeId = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_RECIPE_ID_FAV));
@@ -338,7 +338,8 @@ public class RecipeDatabaseHelper extends SQLiteOpenHelper {
                 recipe.setIngredients(getAllIngredientsForRecipeFromDB(recipeId));
                 recipe.setInstructions(recipeCursor.getString(recipeCursor.getColumnIndexOrThrow(COLUMN_RECIPE_INSTRUCTIONS)));
 
-                byte[] imageBytes = cursor.getBlob(cursor.getColumnIndexOrThrow(COLUMN_RECIPE_IMAGE));
+                byte[] imageBytes = recipeCursor.getBlob(recipeCursor.getColumnIndexOrThrow(COLUMN_RECIPE_IMAGE));
+
                 Bitmap imageBitmap = null;
 
                 if (imageBytes != null) {
@@ -346,10 +347,8 @@ public class RecipeDatabaseHelper extends SQLiteOpenHelper {
                     recipe.setImageBitmap(imageBitmap);
                 }
 
-
                 // Add recipe to the list
                 favRecipes.add(recipe);
-
             }
             recipeCursor.close();
         }

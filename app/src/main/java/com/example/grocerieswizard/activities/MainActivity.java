@@ -88,9 +88,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
         ImageView open_fav = findViewById(R.id.fav_icon);
         open_fav.setOnClickListener(v ->
         {
-            Toast.makeText(MainActivity.this, "open_fav icon clicked!", Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(MainActivity.this, FavActivity.class);
-
             // Start FavActivity with the specified request code
             startActivityForResult(intent, FAV_ACTIVITY_REQUEST_CODE);
         });
