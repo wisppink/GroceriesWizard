@@ -16,7 +16,6 @@ import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 
 public class RecipeDatabaseHelper extends SQLiteOpenHelper {
-    private final Context context;
     private final String TAG = "RecipeDatabaseHelper";
     private static final String DATABASE_NAME = "recipes.db";
     private static final int DATABASE_VERSION = 1;
@@ -75,7 +74,6 @@ public class RecipeDatabaseHelper extends SQLiteOpenHelper {
 
     public RecipeDatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
-        this.context = context;
     }
 
     @Override
@@ -340,7 +338,7 @@ public class RecipeDatabaseHelper extends SQLiteOpenHelper {
 
                 byte[] imageBytes = recipeCursor.getBlob(recipeCursor.getColumnIndexOrThrow(COLUMN_RECIPE_IMAGE));
 
-                Bitmap imageBitmap = null;
+                Bitmap imageBitmap;
 
                 if (imageBytes != null) {
                     imageBitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);

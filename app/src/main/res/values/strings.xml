@@ -24,4 +24,5 @@
     <string name="no">No</string>
     <string name="yes">yes</string>
     <string name="unfav_recipe_dialog_ask">Do you want to remove this recipe from favorites?</string>
+    <string name="not_available">not available</string>
 </resources>

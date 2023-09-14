@@ -15,8 +15,7 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.grocerieswizard.R;
-import com.example.grocerieswizard.RecipeDatabaseHelper;
-import com.example.grocerieswizard.RecyclerViewInterface;
+import com.example.grocerieswizard.interfaces.RecipeInterface;
 import com.example.grocerieswizard.models.RecipeModel;
 
 import java.util.ArrayList;
@@ -24,15 +23,13 @@ import java.util.ArrayList;
 public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecyclerViewAdapter.RecipeViewHolder> {
 
     private ArrayList<RecipeModel> recipeList = new ArrayList<>();
-    private RecyclerViewInterface recyclerViewInterface;
-    private final RecipeDatabaseHelper recipeDatabaseHelper;
+    private RecipeInterface recipeInterface;
     private final Context context;
     private final String TAG = "RecipeAdapter";
 
 
     public RecipeRecyclerViewAdapter(Context context) {
         this.context = context;
-        recipeDatabaseHelper = new RecipeDatabaseHelper(context);
     }
 
     @NonNull
@@ -58,7 +55,7 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
             holder.bind(recipeModel);
 
         }
-        if (recipeDatabaseHelper.isRecipeSelected(recipeModel.getId())) {
+        if (recipeInterface.isRecipeSelected(recipeModel.getId())) {
             holder.itemView.setBackgroundColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.gray));
             recipeModel.setSelected(true);
         }
@@ -79,7 +76,7 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
             oldRecipe.setInstructions(editedRecipe.getInstructions());
             oldRecipe.setIngredients(editedRecipe.getIngredients());
             editedRecipe.setSwiped(false);
-            int updatedRows = recipeDatabaseHelper.updateRecipe(oldRecipe.getId(), oldRecipe);
+            int updatedRows = recipeInterface.updateRecipe(oldRecipe);
             if (updatedRows > 0) {
                 notifyItemChanged(position);
             } else
@@ -94,7 +91,7 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
     public void addRecipe(RecipeModel recipe) {
         recipeList.add(recipe);
         notifyItemInserted(recipeList.size() - 1);
-        recipeDatabaseHelper.insertRecipe(recipe);
+        recipeInterface.insertRecipe(recipe);
     }
 
     public RecipeModel getItemAtPosition(int position) {
@@ -110,7 +107,7 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
         int pos = recipeList.indexOf(recipeModel);
         recipeList.remove(pos);
         notifyItemRemoved(pos);
-        recipeDatabaseHelper.deleteRecipe(recipeModel.getId());
+        recipeInterface.deleteRecipe(recipeModel.getId());
     }
 
     public void removeRecipeAtPosition(int position) {
@@ -121,16 +118,15 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
                 removedRecipe.setSelected(false);
                 notifyItemChanged(position);
             }
-
-            recipeDatabaseHelper.deleteRecipe(removedRecipe.getId());
+            recipeInterface.deleteRecipe(removedRecipe.getId());
             recipeList.remove(position);
             notifyItemRemoved(position);
         }
     }
 
 
-    public void setRecyclerViewInterface(RecyclerViewInterface recyclerViewInterface) {
-        this.recyclerViewInterface = recyclerViewInterface;
+    public void setRecyclerViewInterface(RecipeInterface recipeInterface) {
+        this.recipeInterface = recipeInterface;
     }
 
     public void setRecipeList(ArrayList<RecipeModel> recipeList) {
@@ -139,9 +135,7 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
 
     public class RecipeViewHolder extends RecyclerView.ViewHolder {
 
-        private TextView title;
         private ImageButton favButton;
-        private ImageView resImage;
 
         public RecipeViewHolder(View itemView) {
             super(itemView);
@@ -150,7 +144,7 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
             itemView.setOnClickListener(v -> {
                 int pos = getAdapterPosition();
                 if (pos != RecyclerView.NO_POSITION) {
-                    recyclerViewInterface.onItemClick(pos);
+                    recipeInterface.onItemClick(pos);
                 }
             });
 
@@ -161,12 +155,12 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
                     if (recipeModel.isSelected()) {
                         // Already selected, unselect
                         recipeModel.setSelected(false);
-                        recipeDatabaseHelper.deleteSelectedRecipe(recipeId);
+                        recipeInterface.deleteSelectedRecipe(recipeId);
                         itemView.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), android.R.color.transparent));
                     } else {
                         // Select
                         recipeModel.setSelected(true);
-                        recipeDatabaseHelper.insertSelectedRecipe(recipeId);
+                        recipeInterface.insertSelectedRecipe(recipeId);
                         itemView.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), R.color.gray));
                     }
                 }
@@ -186,14 +180,13 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
                 itemView.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), android.R.color.transparent));
             }
 
-            editIcon.setOnClickListener(v -> recyclerViewInterface.onItemEdit(getAdapterPosition()));
+            editIcon.setOnClickListener(v -> recipeInterface.onItemEdit(getAdapterPosition()));
 
-            shareIcon.setOnClickListener(v -> {
-                // TODO: Handle share icon click
+            shareIcon.setOnClickListener(v -> { // TODO: Handle share icon click
                 Toast.makeText(itemView.getContext(), "Share icon clicked", Toast.LENGTH_SHORT).show();
             });
 
-            deleteIcon.setOnClickListener(v -> recyclerViewInterface.onItemDelete(getAdapterPosition()));
+            deleteIcon.setOnClickListener(v -> recipeInterface.onItemDelete(getAdapterPosition()));
 
             ((ViewGroup) itemView).removeAllViews();
             ((ViewGroup) itemView).addView(swipedView);
@@ -203,8 +196,8 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
 
         public void bind(RecipeModel recipeModel) {
             favButton = itemView.findViewById(R.id.fav_icon);
-            resImage = itemView.findViewById(R.id.default_card_recipe_image);
-            title = itemView.findViewById(R.id.textView);
+            ImageView resImage = itemView.findViewById(R.id.default_card_recipe_image);
+            TextView title = itemView.findViewById(R.id.textView);
 
             title.setText(recipeModel.getRecipeName());
 
@@ -214,7 +207,7 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
                 resImage.setImageResource(R.drawable.recipe_image_default);
             }
 
-            boolean isFavorite = recipeDatabaseHelper.isRecipeFavorite(recipeModel.getId());
+            boolean isFavorite = recipeInterface.isRecipeFavorite(recipeModel.getId());
             if (isFavorite) {
                 // Set the favorite icon if it is favorite
                 favButton.setImageResource(R.drawable.baseline_favorite_24);
@@ -230,18 +223,18 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
                 Log.d(TAG, "fav is working");
                 int recipeId = recipeModel.getId();
                 // Toggle the favorite state (add/remove from favorites)
-                boolean isCurrentlyFavorite = recipeDatabaseHelper.isRecipeFavorite(recipeId);
+                boolean isCurrentlyFavorite = recipeInterface.isRecipeFavorite(recipeModel.getId());
                 recipeModel.setFavorite(!isCurrentlyFavorite);
 
                 // Update the UI and database based on the new favorite state
                 if (!isCurrentlyFavorite) {
                     favButton.setImageResource(R.drawable.baseline_favorite_24);
                     Toast.makeText(itemView.getContext(), "Added to Favorites", Toast.LENGTH_SHORT).show();
-                    recipeDatabaseHelper.insertRecipeFav(recipeId);
+                    recipeInterface.insertRecipeFav(recipeId);
                 } else {
                     favButton.setImageResource(R.drawable.baseline_unfavorite_border_24);
                     Toast.makeText(itemView.getContext(), "Removed from Favorites", Toast.LENGTH_SHORT).show();
-                    recipeDatabaseHelper.deleteRecipeFav(recipeId);
+                    recipeInterface.deleteRecipeFav(recipeId);
                 }
                 Log.d(TAG, "Recipe " + recipeModel.getRecipeName() + " isFavorite: " + !isCurrentlyFavorite);
             });

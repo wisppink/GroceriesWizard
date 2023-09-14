@@ -21,14 +21,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.grocerieswizard.R;
 import com.example.grocerieswizard.RecipeDatabaseHelper;
-import com.example.grocerieswizard.RecyclerViewInterface;
+import com.example.grocerieswizard.interfaces.RecipeInterface;
 import com.example.grocerieswizard.adapters.RecipeRecyclerViewAdapter;
 import com.example.grocerieswizard.models.RecipeModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements RecyclerViewInterface {
+public class MainActivity extends AppCompatActivity implements RecipeInterface {
 
     private RecipeRecyclerViewAdapter adapter;
     Context context;
@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
     private static final int FAV_ACTIVITY_REQUEST_CODE = 1;
 
     // List to hold recipes for shopping cart
-    private ArrayList<RecipeModel> shopList = new ArrayList<>();
+    private final ArrayList<RecipeModel> shopList = new ArrayList<>();
 
     // Launcher for starting AddRecipe activity and receiving results
     ActivityResultLauncher<Intent> launcher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
@@ -48,7 +48,8 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
             if (recipe != null) {
                 recipe.setSwiped(false);
                 adapter.addRecipe(recipe);
-                adapter.notifyDataSetChanged();
+                int position = adapter.getItemCount() - 1; // Get the position of the newly added item
+                adapter.notifyItemInserted(position);
             }
         }
         // Check if a new recipe was added
@@ -60,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
                 recipe.setSwiped(false);
                 adapter.addRecipe(recipe);
                 adapter.removeRecipeAtPosition(position);
-                adapter.notifyDataSetChanged();
+                adapter.notifyItemInserted(adapter.getItemCount() - 1);
             }
         }
     });
@@ -208,6 +209,52 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
             editIntent.putExtra("position", position);
             launcher.launch(editIntent);
         }
+    }
+
+    @Override
+    public Boolean isRecipeSelected(int id) {
+        return recipeDatabaseHelper.isRecipeSelected(id);
+    }
+
+    @Override
+    public int updateRecipe(RecipeModel oldRecipe) {
+        return recipeDatabaseHelper.updateRecipe(oldRecipe.getId(), oldRecipe);
+    }
+
+    @Override
+    public void insertRecipe(RecipeModel recipe) {
+        recipeDatabaseHelper.insertRecipe(recipe);
+    }
+
+    @Override
+    public void deleteRecipe(int id) {
+        recipeDatabaseHelper.deleteRecipe(id);
+    }
+
+    @Override
+    public void deleteSelectedRecipe(int recipeId) {
+        recipeDatabaseHelper.deleteSelectedRecipe(recipeId);
+    }
+
+    @Override
+    public void insertSelectedRecipe(int recipeId) {
+        recipeDatabaseHelper.insertSelectedRecipe(recipeId);
+    }
+
+    @Override
+    public boolean isRecipeFavorite(int id) {
+        return recipeDatabaseHelper.isRecipeFavorite(id);
+    }
+
+    @Override
+    public void insertRecipeFav(int recipeId) {
+        recipeDatabaseHelper.insertRecipeFav(recipeId);
+    }
+
+    @Override
+    public void deleteRecipeFav(int recipeId) {
+        recipeDatabaseHelper.deleteRecipeFav(recipeId);
+
     }
 
     @Override

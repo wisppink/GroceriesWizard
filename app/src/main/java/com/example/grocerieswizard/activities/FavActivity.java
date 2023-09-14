@@ -9,13 +9,13 @@ import android.os.Bundle;
 
 import com.example.grocerieswizard.R;
 import com.example.grocerieswizard.RecipeDatabaseHelper;
-import com.example.grocerieswizard.RecyclerViewInterface;
 import com.example.grocerieswizard.adapters.FavRecyclerViewAdapter;
+import com.example.grocerieswizard.interfaces.FavInterface;
 import com.example.grocerieswizard.models.RecipeModel;
 
 import java.util.ArrayList;
 
-public class FavActivity extends AppCompatActivity implements RecyclerViewInterface {
+public class FavActivity extends AppCompatActivity implements FavInterface {
 
     RecipeDatabaseHelper dbHelper;
     private FavRecyclerViewAdapter adapter;
@@ -25,10 +25,10 @@ public class FavActivity extends AppCompatActivity implements RecyclerViewInterf
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fav);
         dbHelper = new RecipeDatabaseHelper(this);
-        adapter = new FavRecyclerViewAdapter(this);
+        adapter = new FavRecyclerViewAdapter();
+        adapter.setFavInterface(this);
         RecyclerView favRecyclerView = findViewById(R.id.FavRecyclerView);
         favRecyclerView.setAdapter(adapter);
-        adapter.setRecyclerViewInterface(this);
         favRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         ArrayList<RecipeModel> recipes = dbHelper.getRecipesFav();
@@ -36,20 +36,6 @@ public class FavActivity extends AppCompatActivity implements RecyclerViewInterf
         adapter.notifyDataSetChanged();
     }
 
-    @Override
-    public void onItemClick(int position) {
-
-    }
-
-    @Override
-    public void onItemDelete(int position) {
-
-    }
-
-    @Override
-    public void onItemEdit(int position) {
-
-    }
 
     @Override
     public void onBackPressed() {
@@ -58,4 +44,21 @@ public class FavActivity extends AppCompatActivity implements RecyclerViewInterf
         super.onBackPressed();
     }
 
+    @Override
+    public void onRemoveFromFavorites(RecipeModel recipeModel) {
+        dbHelper.deleteRecipeFav(recipeModel.getId());
+        adapter.favList.remove(recipeModel);
+        adapter.notifyDataSetChanged();
+        recipeModel.setFavorite(false);
+    }
+
+    @Override
+    public boolean isRecipeSelected(int id) {
+        return dbHelper.isRecipeSelected(id);
+    }
+
+    @Override
+    public void insertSelectedRecipe(int id) {
+        dbHelper.insertSelectedRecipe(id);
+    }
 }
