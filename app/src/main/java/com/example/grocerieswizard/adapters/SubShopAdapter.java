@@ -14,6 +14,7 @@ import com.example.grocerieswizard.models.ShoppingItem;
 import com.example.grocerieswizard.models.SubShoppingItem;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class SubShopAdapter extends RecyclerView.Adapter<SubShopAdapter.ViewHolder> {
@@ -21,7 +22,6 @@ public class SubShopAdapter extends RecyclerView.Adapter<SubShopAdapter.ViewHold
 
     private final ArrayList<SubShoppingItem> shoppingItems;
     private final List<Boolean> checkBoxes;
-    private OnSubItemCheckListener onSubItemCheckListener;
 
 
     public SubShopAdapter() {
@@ -47,13 +47,21 @@ public class SubShopAdapter extends RecyclerView.Adapter<SubShopAdapter.ViewHold
     public int getItemCount() {
         return shoppingItems.size();
     }
+    public void checkAllSubItems(boolean isChecked) {
+        Collections.fill(checkBoxes, isChecked);
+        notifyDataSetChanged();
+    }
 
-    public void setShoppingItems(ShoppingItem shoppingItem) {
+
+    public void setShoppingItems(ShoppingItem shoppingItem, boolean isChecked) {
         this.shoppingItems.addAll(shoppingItem.getSubShoppingItems().keySet());
-        for (SubShoppingItem ignored : shoppingItems) {
-            checkBoxes.add(false);
+        checkBoxes.clear();
+
+        for (int i = 0; i < shoppingItems.size(); i++) {
+            checkBoxes.add(isChecked);
         }
 
+        notifyDataSetChanged();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -74,37 +82,13 @@ public class SubShopAdapter extends RecyclerView.Adapter<SubShopAdapter.ViewHold
             recipeTitle.setText(subShoppingItem.getRecipeName());
             ingredientUnit.setText(subShoppingItem.getIngredientUnit());
             ingredientQuantity.setText(String.format(String.valueOf(subShoppingItem.getIngredientQuantity())));
-            ingredientCB.setOnCheckedChangeListener(null); // Remove the listener
+
+            ingredientCB.setOnCheckedChangeListener(null);
+
             int position = getAdapterPosition();
             ingredientCB.setChecked(checkBoxes.get(position));
-            ingredientCB.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                // Update the checkbox state for the current item
-                checkBoxes.set(position, isChecked);
-
-                // Check if all checkboxes are checked
-                boolean isAllChecked = true;
-                for (boolean checked : checkBoxes) {
-                    if (!checked) {
-                        isAllChecked = false;
-                        break;
-                    }
-                }
-                // Notify the listener about checkbox changes
-                if (onSubItemCheckListener != null) {
-                    onSubItemCheckListener.onSubItemChecked(isAllChecked);
-                }
-            });
+            ingredientCB.setOnCheckedChangeListener((buttonView, isChecked) -> checkBoxes.set(position, isChecked));
         }
     }
 
-    // Set a listener for checkbox changes
-    public void setOnSubItemCheckListener(OnSubItemCheckListener listener) {
-        this.onSubItemCheckListener = listener;
-    }
-
-    // Interface for notifying checkbox changes
-    public interface OnSubItemCheckListener {
-        void onSubItemChecked(boolean isAllChecked);
-
-    }
 }

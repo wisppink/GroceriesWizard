@@ -245,7 +245,7 @@ public class RecipeDatabaseHelper extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(COLUMN_RECIPE_ID_SELECTED, recipeId);
         db.insert(TABLE_SELECTED, null, values);
-        Log.d(TAG, "inserted fav");
+        Log.d(TAG, "insert selected");
 
     }
 
