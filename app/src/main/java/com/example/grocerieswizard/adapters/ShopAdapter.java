@@ -19,15 +19,13 @@ import com.example.grocerieswizard.models.ShoppingItem;
 import com.example.grocerieswizard.models.SubShoppingItem;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ShoppingViewHolder> {
+    private static final String TAG = "ShopAdapter";
     private final Context context;
     private ArrayList<ShoppingItem> shoppingItems = new ArrayList<>();
     private ShopInterface shopInterface;
-    private final List<Boolean> parentCheckBoxes = new ArrayList<>();
-    private static final String TAG = "ShopAdapter";
 
 
     public ShopAdapter(Context context) {
@@ -45,7 +43,7 @@ public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ShoppingViewHo
     @Override
     public void onBindViewHolder(@NonNull ShoppingViewHolder holder, int position) {
         ShoppingItem shoppingItem = shoppingItems.get(position);
-        holder.bind(shoppingItem, parentCheckBoxes.get(position));
+        holder.bind(shoppingItem);
     }
 
 
@@ -56,9 +54,6 @@ public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ShoppingViewHo
 
     public void setSelectedRecipeList(ArrayList<RecipeModel> selectedRecipeList) {
         shoppingItems = shopInterface.generateShoppingItems(selectedRecipeList);
-        for (int i = 0; i < shoppingItems.size(); i++) {
-            parentCheckBoxes.add(false);
-        }
     }
 
     public void setShopInterface(ShopInterface shopInterface) {
@@ -70,8 +65,8 @@ public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ShoppingViewHo
             ShoppingItem shoppingItem = shoppingItems.get(i);
             if (shoppingItem.getSubShoppingItems().containsKey(subShoppingItem)) {
                 shoppingItem.getSubShoppingItems().put(subShoppingItem, subShoppingItem.getChecked());
-                notifyItemChanged(i); // Notify only the affected shopping item
-                break; // Exit the loop after finding the match
+                notifyItemChanged(i);
+                break;
             }
         }
     }
@@ -91,14 +86,14 @@ public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ShoppingViewHo
             checkBox = itemView.findViewById(R.id.is_finished);
         }
 
-        public void bind(ShoppingItem shoppingItem, boolean isChecked) {
+        public void bind(ShoppingItem shoppingItem) {
             Map<SubShoppingItem, Boolean> subShoppingItemBooleanMap = shoppingItem.getSubShoppingItems();
             Log.d(TAG, "bind: every shop Item has sub item Map: " + subShoppingItemBooleanMap);
             ingredient_name.setText(shoppingItem.getIngredientName());
 
             SubShopAdapter subShopAdapter = new SubShopAdapter(ShopAdapter.this);
             subRecipe.setAdapter(subShopAdapter);
-            subShopAdapter.setShoppingItems(shoppingItem, isChecked);
+            subShopAdapter.setShoppingItems(shoppingItem);
             subRecipe.setLayoutManager(new LinearLayoutManager(context));
 
             boolean allValuesTrue = true;
@@ -126,7 +121,6 @@ public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ShoppingViewHo
             }
             totalTV.setText(R.string.not_available);
         }
-
 
 
     }

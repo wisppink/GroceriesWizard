@@ -18,8 +18,7 @@ public class RecipeModel implements Parcelable {
     private int id;
     private boolean isSelected;
 
-    private boolean isFavorite;
-    private String TAG = "RecipeModel";
+    private final String TAG = "RecipeModel";
 
     public RecipeModel(String recipeName, List<IngredientModel> ingredients, String instructions, Bitmap imageBitmap) {
         this.recipeName = recipeName;
@@ -82,10 +81,6 @@ public class RecipeModel implements Parcelable {
         return ingredients;
     }
 
-    public void addIngredient(IngredientModel ingredient) {
-        ingredients.add(ingredient);
-    }
-
     public void setRecipeName(String recipeName) {
         this.recipeName = recipeName;
     }
@@ -128,11 +123,4 @@ public class RecipeModel implements Parcelable {
         isSelected = selected;
     }
 
-    public void setFavorite(boolean favorite) {
-        isFavorite = favorite;
-    }
-
-    public boolean isFavorite() {
-        return isFavorite;
-    }
 }

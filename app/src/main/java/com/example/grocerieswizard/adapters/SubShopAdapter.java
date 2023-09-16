@@ -15,14 +15,11 @@ import com.example.grocerieswizard.models.ShoppingItem;
 import com.example.grocerieswizard.models.SubShoppingItem;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 public class SubShopAdapter extends RecyclerView.Adapter<SubShopAdapter.ViewHolder> {
 
 
     private final ArrayList<SubShoppingItem> shoppingItems;
-    private final List<Boolean> checkBoxes;
     private final ShopAdapter parentAdapter;
     private SubShoppingItem checkedSubItem;
     private static final String TAG = "SubShopAdapter";
@@ -31,7 +28,6 @@ public class SubShopAdapter extends RecyclerView.Adapter<SubShopAdapter.ViewHold
     public SubShopAdapter(ShopAdapter parentAdapter) {
         this.parentAdapter = parentAdapter;
         shoppingItems = new ArrayList<>();
-        checkBoxes = new ArrayList<>();
     }
 
     @NonNull
@@ -61,14 +57,8 @@ public class SubShopAdapter extends RecyclerView.Adapter<SubShopAdapter.ViewHold
     }
 
 
-    public void setShoppingItems(ShoppingItem shoppingItem, boolean isChecked) {
+    public void setShoppingItems(ShoppingItem shoppingItem) {
         this.shoppingItems.addAll(shoppingItem.getSubShoppingItems().keySet());
-        checkBoxes.clear();
-
-        for (int i = 0; i < shoppingItems.size(); i++) {
-            checkBoxes.add(isChecked);
-        }
-
         notifyDataSetChanged();
     }
 

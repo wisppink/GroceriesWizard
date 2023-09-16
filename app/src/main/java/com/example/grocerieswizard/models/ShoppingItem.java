@@ -16,7 +16,6 @@ public class ShoppingItem {
         return subShoppingItems;
     }
 
-
     public String getIngredientName() {
         return ingredientName;
     }
@@ -25,10 +24,5 @@ public class ShoppingItem {
         subShoppingItems.put(subItem, isChecked);
 
     }
-
-    public void updateSubItemStatus(SubShoppingItem subItem, boolean isChecked) {
-        subShoppingItems.put(subItem, isChecked);
-    }
-
 
 }

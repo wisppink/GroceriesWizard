@@ -228,7 +228,6 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
                 int recipeId = recipeModel.getId();
                 // Toggle the favorite state (add/remove from favorites)
                 boolean isCurrentlyFavorite = recipeInterface.isRecipeFavorite(recipeModel.getId());
-                recipeModel.setFavorite(!isCurrentlyFavorite);
 
                 // Update the UI and database based on the new favorite state
                 if (!isCurrentlyFavorite) {

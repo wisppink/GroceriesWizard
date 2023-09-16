@@ -85,7 +85,6 @@ public class FavRecyclerViewAdapter extends RecyclerView.Adapter<FavRecyclerView
 
         public void bind(RecipeModel recipeModel) {
             title.setText(recipeModel.getRecipeName());
-            recipeModel.setFavorite(true);
             if (favInterface.isRecipeSelected(recipeModel.getId())) {
                 recipeModel.setSelected(true);
                 background.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), R.color.gray));

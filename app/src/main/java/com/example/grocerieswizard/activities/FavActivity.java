@@ -49,7 +49,6 @@ public class FavActivity extends AppCompatActivity implements FavInterface {
         dbHelper.deleteRecipeFav(recipeModel.getId());
         adapter.favList.remove(recipeModel);
         adapter.notifyDataSetChanged();
-        recipeModel.setFavorite(false);
     }
 
     @Override

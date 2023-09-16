@@ -4,7 +4,6 @@ public class SubShoppingItem {
     private final String recipeName;
     private final String ingredientUnit;
     private final Double ingredientQuantity;
-
     private Boolean isChecked;
 
     public SubShoppingItem(String recipeName, String ingredientUnit, Double ingredientQuantity) {
@@ -25,7 +24,6 @@ public class SubShoppingItem {
     public Double getIngredientQuantity() {
         return ingredientQuantity;
     }
-
     public Boolean getChecked() {
         return isChecked;
     }
