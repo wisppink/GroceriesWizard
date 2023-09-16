@@ -1,5 +1,6 @@
 package com.example.grocerieswizard.adapters;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,9 +23,13 @@ public class SubShopAdapter extends RecyclerView.Adapter<SubShopAdapter.ViewHold
 
     private final ArrayList<SubShoppingItem> shoppingItems;
     private final List<Boolean> checkBoxes;
+    private final ShopAdapter parentAdapter;
+    private SubShoppingItem checkedSubItem;
+    private static final String TAG = "SubShopAdapter";
 
 
-    public SubShopAdapter() {
+    public SubShopAdapter(ShopAdapter parentAdapter) {
+        this.parentAdapter = parentAdapter;
         shoppingItems = new ArrayList<>();
         checkBoxes = new ArrayList<>();
     }
@@ -47,8 +52,11 @@ public class SubShopAdapter extends RecyclerView.Adapter<SubShopAdapter.ViewHold
     public int getItemCount() {
         return shoppingItems.size();
     }
+
     public void checkAllSubItems(boolean isChecked) {
-        Collections.fill(checkBoxes, isChecked);
+        for (SubShoppingItem subItem : shoppingItems) {
+            subItem.setChecked(isChecked);
+        }
         notifyDataSetChanged();
     }
 
@@ -64,6 +72,14 @@ public class SubShopAdapter extends RecyclerView.Adapter<SubShopAdapter.ViewHold
         notifyDataSetChanged();
     }
 
+    public SubShoppingItem getSubItem() {
+        return checkedSubItem;
+    }
+
+    public void setCheckedSubItem(SubShoppingItem checkedSubItem) {
+        this.checkedSubItem = checkedSubItem;
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder {
         TextView recipeTitle;
         TextView ingredientQuantity;
@@ -76,6 +92,7 @@ public class SubShopAdapter extends RecyclerView.Adapter<SubShopAdapter.ViewHold
             ingredientQuantity = itemView.findViewById(R.id.sub_ingredient_quantity);
             ingredientUnit = itemView.findViewById(R.id.sub_ingredient_unit);
             ingredientCB = itemView.findViewById(R.id.sub_ingredient_checkbox);
+
         }
 
         public void bind(SubShoppingItem subShoppingItem) {
@@ -85,10 +102,17 @@ public class SubShopAdapter extends RecyclerView.Adapter<SubShopAdapter.ViewHold
 
             ingredientCB.setOnCheckedChangeListener(null);
 
-            int position = getAdapterPosition();
-            ingredientCB.setChecked(checkBoxes.get(position));
-            ingredientCB.setOnCheckedChangeListener((buttonView, isChecked) -> checkBoxes.set(position, isChecked));
+            ingredientCB.setChecked(subShoppingItem.getChecked());
+            Log.d(TAG, "bind: setCheckedSubItem: " + subShoppingItem.getRecipeName());
+            setCheckedSubItem(subShoppingItem);
+            ingredientCB.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                subShoppingItem.setChecked(isChecked);
+                parentAdapter.notifySubItemStateChanged(subShoppingItem);
+
+            });
         }
+
+
     }
 
 }

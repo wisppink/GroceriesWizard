@@ -26,4 +26,9 @@ public class ShoppingItem {
 
     }
 
+    public void updateSubItemStatus(SubShoppingItem subItem, boolean isChecked) {
+        subShoppingItems.put(subItem, isChecked);
+    }
+
+
 }

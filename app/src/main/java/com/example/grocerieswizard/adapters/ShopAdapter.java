@@ -16,9 +16,11 @@ import com.example.grocerieswizard.R;
 import com.example.grocerieswizard.interfaces.ShopInterface;
 import com.example.grocerieswizard.models.RecipeModel;
 import com.example.grocerieswizard.models.ShoppingItem;
+import com.example.grocerieswizard.models.SubShoppingItem;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ShoppingViewHolder> {
     private final Context context;
@@ -63,6 +65,17 @@ public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ShoppingViewHo
         this.shopInterface = shopInterface;
     }
 
+    public void notifySubItemStateChanged(SubShoppingItem subShoppingItem) {
+        for (int i = 0; i < shoppingItems.size(); i++) {
+            ShoppingItem shoppingItem = shoppingItems.get(i);
+            if (shoppingItem.getSubShoppingItems().containsKey(subShoppingItem)) {
+                shoppingItem.getSubShoppingItems().put(subShoppingItem, subShoppingItem.getChecked());
+                notifyItemChanged(i); // Notify only the affected shopping item
+                break; // Exit the loop after finding the match
+            }
+        }
+    }
+
 
     public class ShoppingViewHolder extends RecyclerView.ViewHolder {
         private final CheckBox checkBox;
@@ -76,26 +89,47 @@ public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ShoppingViewHo
             subRecipe = itemView.findViewById(R.id.sub_recipe_recycler);
             totalTV = itemView.findViewById(R.id.total);
             checkBox = itemView.findViewById(R.id.is_finished);
-
-
         }
 
         public void bind(ShoppingItem shoppingItem, boolean isChecked) {
+            Map<SubShoppingItem, Boolean> subShoppingItemBooleanMap = shoppingItem.getSubShoppingItems();
+            Log.d(TAG, "bind: every shop Item has sub item Map: " + subShoppingItemBooleanMap);
             ingredient_name.setText(shoppingItem.getIngredientName());
 
-            SubShopAdapter subRecipeAdapter = new SubShopAdapter();
-            subRecipe.setAdapter(subRecipeAdapter);
-            subRecipeAdapter.setShoppingItems(shoppingItem, isChecked);
+            SubShopAdapter subShopAdapter = new SubShopAdapter(ShopAdapter.this);
+            subRecipe.setAdapter(subShopAdapter);
+            subShopAdapter.setShoppingItems(shoppingItem, isChecked);
             subRecipe.setLayoutManager(new LinearLayoutManager(context));
-            //subRecipeAdapter.setInterface(getSubShopInterface());
+
+            boolean allValuesTrue = true;
+            for (Boolean value : subShoppingItemBooleanMap.values()) {
+                if (!value) {
+                    allValuesTrue = false;
+                    break;
+                }
+            }
+            checkBox.setChecked(allValuesTrue);
             checkBox.setOnClickListener(v -> {
                 Log.d(TAG, "CheckBox clicked");
-                subRecipeAdapter.checkAllSubItems(checkBox.isChecked());
+                subShopAdapter.checkAllSubItems(checkBox.isChecked());
+
+                for (Map.Entry<SubShoppingItem, Boolean> entry : subShoppingItemBooleanMap.entrySet()) {
+                    entry.setValue(checkBox.isChecked());
+                }
             });
+
+            SubShoppingItem subShoppingItem = subShopAdapter.getSubItem();
+
+            if (subShoppingItem != null) {
+                subShoppingItemBooleanMap.put(subShoppingItem, subShoppingItem.getChecked());
+                subShopAdapter.checkAllSubItems(checkBox.isChecked());
+            }
             totalTV.setText(R.string.not_available);
         }
 
 
+
     }
+
 
 }
