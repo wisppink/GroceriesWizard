@@ -9,11 +9,16 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.grocerieswizard.R;
 import com.example.grocerieswizard.RecipeDatabaseHelper;
 import com.example.grocerieswizard.adapters.ShopAdapter;
+import com.example.grocerieswizard.interfaces.ShopInterface;
+import com.example.grocerieswizard.models.IngredientModel;
 import com.example.grocerieswizard.models.RecipeModel;
+import com.example.grocerieswizard.models.ShoppingItem;
+import com.example.grocerieswizard.models.SubShoppingItem;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
-public class ShoppingMenuActivity extends AppCompatActivity {
+public class ShoppingMenuActivity extends AppCompatActivity implements ShopInterface {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,6 +30,7 @@ public class ShoppingMenuActivity extends AppCompatActivity {
 
             RecyclerView shoppingRecyclerView = findViewById(R.id.shopping_cart);
             adapter = new ShopAdapter(this);
+            adapter.setShopInterface(this);
             shoppingRecyclerView.setAdapter(adapter);
             shoppingRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
@@ -34,4 +40,40 @@ public class ShoppingMenuActivity extends AppCompatActivity {
         adapter.notifyDataSetChanged();
     }
 
+    @Override
+    public ArrayList<ShoppingItem> generateShoppingItems(ArrayList<RecipeModel> recipes) {
+        ArrayList<ShoppingItem> shoppingItems = new ArrayList<>();
+        for (RecipeModel recipe : recipes) {
+            for (IngredientModel ingredient : recipe.getIngredients()) {
+                String ingredientName = ingredient.getName();
+                String recipeName = recipe.getRecipeName();
+                String unit = ingredient.getUnit();
+                double quantity = ingredient.getQuantity();
+
+                // Check if the shopping item is already in the list
+                boolean itemExists = false;
+                for (ShoppingItem item : shoppingItems) {
+                    if (Objects.equals(item.getIngredientName(), ingredientName)) {
+                        // If it's already in the list, create a sub-shopping item
+                        // and add it to the existing shopping item
+                        SubShoppingItem subItem = new SubShoppingItem(recipeName, unit, quantity);
+                        item.addSubItem(subItem, false);
+                        itemExists = true;
+                        break;
+                    }
+                }
+
+                if (!itemExists) {
+                    // If it's not in the list, create a new shopping item
+                    ShoppingItem newItem = new ShoppingItem(ingredientName);
+                    SubShoppingItem subItem = new SubShoppingItem(recipeName, unit, quantity);
+                    newItem.addSubItem(subItem, false);
+                    shoppingItems.add(newItem);
+                }
+            }
+        }
+
+        return shoppingItems;
+
+    }
 }
