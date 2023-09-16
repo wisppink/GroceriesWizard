@@ -100,6 +100,8 @@ public class FavRecyclerViewAdapter extends RecyclerView.Adapter<FavRecyclerView
                     background.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), R.color.gray));
                     favInterface.insertSelectedRecipe(recipeModel.getId());
                 } else {
+                    recipeModel.setSelected(false);
+                    favInterface.removeSelectedRecipe(recipeModel.getId());
                     itemView.setBackgroundColor(Color.TRANSPARENT);
                 }
                 notifyItemChanged(getAdapterPosition());

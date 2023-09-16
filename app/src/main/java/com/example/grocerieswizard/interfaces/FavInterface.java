@@ -9,4 +9,5 @@ public interface FavInterface {
 
     void insertSelectedRecipe(int id);
 
+    void removeSelectedRecipe(int id);
 }

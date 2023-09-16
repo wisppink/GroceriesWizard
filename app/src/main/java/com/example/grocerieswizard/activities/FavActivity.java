@@ -1,11 +1,11 @@
 package com.example.grocerieswizard.activities;
 
+import android.content.Intent;
+import android.os.Bundle;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import android.content.Intent;
-import android.os.Bundle;
 
 import com.example.grocerieswizard.R;
 import com.example.grocerieswizard.RecipeDatabaseHelper;
@@ -60,5 +60,10 @@ public class FavActivity extends AppCompatActivity implements FavInterface {
     @Override
     public void insertSelectedRecipe(int id) {
         dbHelper.insertSelectedRecipe(id);
+    }
+
+    @Override
+    public void removeSelectedRecipe(int id) {
+        dbHelper.deleteSelectedRecipe(id);
     }
 }
