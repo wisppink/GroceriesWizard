@@ -1,6 +1,7 @@
 package com.example.grocerieswizard.activities;
 
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -16,9 +17,13 @@ import com.example.grocerieswizard.models.ShoppingItem;
 import com.example.grocerieswizard.models.SubShoppingItem;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class ShoppingMenuActivity extends AppCompatActivity implements ShopInterface {
+
+    private static final String TAG = "ShoppingMenuActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,4 +81,43 @@ public class ShoppingMenuActivity extends AppCompatActivity implements ShopInter
         return shoppingItems;
 
     }
+
+    @Override
+    public String generateTotal(Map<SubShoppingItem, Boolean> subShoppingItems) {
+
+        Map<String, Double> unitToQuantity = new HashMap<>();
+
+        subShoppingItems.forEach((item, isChecked) -> {
+            if (!isChecked) {
+                if (!unitToQuantity.containsKey(item.getIngredientUnit())) {
+                    unitToQuantity.put(item.getIngredientUnit(), item.getIngredientQuantity());
+                    Log.d(TAG, "it doesn't contain and it is false added: " + item.getRecipeName() + " " + item.getIngredientUnit() + " " + item.getIngredientQuantity());
+                } else {
+                    Log.d(TAG, "it contains and it is false added: " + item.getRecipeName() + " " + item.getIngredientUnit());
+                    Double oldValue = unitToQuantity.get(item.getIngredientUnit());
+                    Log.d(TAG, "generateTotal: old value " + oldValue);
+                    Double quantity = item.getIngredientQuantity();
+                    Log.d(TAG, "generateTotal: quantity " + quantity);
+                    assert oldValue !=null;
+                    Double newValue = oldValue + quantity;
+                    Log.d(TAG, "generateTotal: new value " + newValue);
+                    unitToQuantity.put(item.getIngredientUnit(), newValue);
+                }
+            }
+        });
+
+        StringBuilder resultBuilder = new StringBuilder();
+
+        unitToQuantity.forEach((unit, quantity) -> resultBuilder.append(quantity).append(" ").append(unit).append(", "));
+
+        // Remove the trailing ", " from the result string.
+        String result = resultBuilder.toString();
+        if (result.endsWith(", ")) {
+            result = result.substring(0, result.length() - 2);
+        }
+        Log.d(TAG, "generateTotal: result: " + result);
+        return result;
+    }
+
+
 }

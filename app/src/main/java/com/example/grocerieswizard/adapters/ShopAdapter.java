@@ -111,6 +111,7 @@ public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ShoppingViewHo
                 for (Map.Entry<SubShoppingItem, Boolean> entry : subShoppingItemBooleanMap.entrySet()) {
                     entry.setValue(checkBox.isChecked());
                 }
+                totalTV.setText(shopInterface.generateTotal(subShoppingItemBooleanMap));
             });
 
             SubShoppingItem subShoppingItem = subShopAdapter.getSubItem();
@@ -119,7 +120,7 @@ public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ShoppingViewHo
                 subShoppingItemBooleanMap.put(subShoppingItem, subShoppingItem.getChecked());
                 subShopAdapter.checkAllSubItems(checkBox.isChecked());
             }
-            totalTV.setText(R.string.not_available);
+            totalTV.setText(shopInterface.generateTotal(subShoppingItemBooleanMap));
         }
 
 
