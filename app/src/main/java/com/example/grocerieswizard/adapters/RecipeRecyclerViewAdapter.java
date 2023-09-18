@@ -72,11 +72,14 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
         return recipeList.size();
     }
 
-    public void editRecipe(int position, RecipeModel editedRecipe) {
+    public RecipeModel editRecipe(int position, RecipeModel editedRecipe) {
         if (position >= 0 && position < recipeList.size()) {
             RecipeModel oldRecipe = getItemAtPosition(position);
             oldRecipe.setRecipeName(editedRecipe.getRecipeName());
             oldRecipe.setImageBitmap(editedRecipe.getImageBitmap());
+            Log.d(TAG, "editRecipe: editedRecipe" + editedRecipe.getImageBitmap());
+            Log.d(TAG, "editRecipe: oldRecipe" + oldRecipe.getImageBitmap());
+
             oldRecipe.setInstructions(editedRecipe.getInstructions());
             oldRecipe.setIngredients(editedRecipe.getIngredients());
             editedRecipe.setSwiped(false);
@@ -88,6 +91,8 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
                         "couldn't edited:" + oldRecipe.getRecipeName(),
                         Toast.LENGTH_SHORT).show();
         }
+
+        return editedRecipe;
     }
 
 
@@ -224,7 +229,6 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
             }
 
             favButton.setOnClickListener(v -> {
-                Log.d(TAG, "fav is working");
                 int recipeId = recipeModel.getId();
                 // Toggle the favorite state (add/remove from favorites)
                 boolean isCurrentlyFavorite = recipeInterface.isRecipeFavorite(recipeModel.getId());

@@ -6,7 +6,6 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -47,7 +46,6 @@ public class AddRecipeActivity extends AppCompatActivity implements AddInterface
     private RecipeModel recipe;
     private boolean editMode = false;
     private Bitmap defaultImageBitmap;
-    private final String TAG = "AddRecipe";
     private RecipeDatabaseHelper recipeDatabaseHelper;
 
 
@@ -71,7 +69,7 @@ public class AddRecipeActivity extends AppCompatActivity implements AddInterface
         ingredientsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         ingredientsRecyclerView.setAdapter(ingredientAdapter);
 
-        RecipeRecyclerViewAdapter recipeRecyclerViewAdapter = new RecipeRecyclerViewAdapter(this);
+        RecipeRecyclerViewAdapter recipeAdapter = new RecipeRecyclerViewAdapter(this);
 
         Button addIngredientButton = findViewById(R.id.addIngredientButton);
         addIngredientButton.setOnClickListener(v -> {
@@ -95,7 +93,6 @@ public class AddRecipeActivity extends AppCompatActivity implements AddInterface
                 result -> {
                     if (result.getResultCode() == RESULT_OK && result.getData() != null) {
                         Uri selectedImageUri = result.getData().getData();
-                        Log.d(TAG, "onCreate: selectedImageUri : " + selectedImageUri);
                         try {
                             Picasso.get()
                                     .load(selectedImageUri)
@@ -128,7 +125,6 @@ public class AddRecipeActivity extends AppCompatActivity implements AddInterface
                         recipe.setImageBitmap(defaultImageBitmap);
                     }
                 });
-        addImage.setImageURI(defaultImageUri);
 
         addImage.setOnClickListener(v -> {
             Intent pickImageIntent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -154,8 +150,11 @@ public class AddRecipeActivity extends AppCompatActivity implements AddInterface
             String howToPrepare = editRecipeHowToPrepare.getText().toString();
 
             RecipeModel editedRecipe = new RecipeModel(recipeName, ingredientList, howToPrepare, selectedImageBitmap);
-            recipeRecyclerViewAdapter.editRecipe(position, editedRecipe);
+            recipe = recipeAdapter.editRecipe(position, editedRecipe);
             ingredientAdapter.notifyItemChanged(position);
+            addImage.setImageBitmap(selectedImageBitmap);
+        } else {
+            addImage.setImageURI(defaultImageUri);
         }
 
         btnSaveRecipe.setOnClickListener(v -> {
@@ -167,6 +166,7 @@ public class AddRecipeActivity extends AppCompatActivity implements AddInterface
             }
             if (recipe.getImageBitmap() == null)
                 recipe.setImageBitmap(defaultImageBitmap);
+
             recipe.setRecipeName(recipeName);
             recipe.setInstructions(howToPrepare);
             recipe.setSwiped(false);

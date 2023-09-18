@@ -68,7 +68,10 @@ public class RecipeModel implements Parcelable {
 
     public Bitmap getImageBitmap() {
         if (imageBitmap != null) {
-            Log.d(TAG, imageBitmap.toString());
+            Log.d(TAG,"getImageBitmap: " + imageBitmap);
+        }
+        else{
+            Log.d(TAG, "getImageBitmap:  null");
         }
         return imageBitmap;
     }
