@@ -33,7 +33,6 @@ public class FavActivity extends AppCompatActivity implements FavInterface {
 
         ArrayList<RecipeModel> recipes = dbHelper.getRecipesFav();
         adapter.setFavList(recipes);
-        adapter.notifyDataSetChanged();
     }
 
 
@@ -47,8 +46,14 @@ public class FavActivity extends AppCompatActivity implements FavInterface {
     @Override
     public void onRemoveFromFavorites(RecipeModel recipeModel) {
         dbHelper.deleteRecipeFav(recipeModel.getId());
-        adapter.favList.remove(recipeModel);
-        adapter.notifyDataSetChanged();
+        ArrayList<RecipeModel> tempList = adapter.getFavList();
+        for (int i = 0; i < tempList.size(); i++) {
+            RecipeModel model = tempList.get(i);
+            if(model.getId() == recipeModel.getId()){
+                adapter.removeItem(i);
+            }
+        }
+
     }
 
     @Override

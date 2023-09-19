@@ -1,5 +1,6 @@
 package com.example.grocerieswizard.adapters;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -7,11 +8,11 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.grocerieswizard.R;
 import com.example.grocerieswizard.interfaces.AddInterface;
-import com.example.grocerieswizard.interfaces.IngredientInterface;
 import com.example.grocerieswizard.models.IngredientModel;
 
 import java.util.List;
@@ -20,7 +21,6 @@ public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.In
 
     private final List<IngredientModel> ingredientList;
     private AddInterface addInterface;
-    private IngredientInterface ingredientInterface;
 
     public IngredientAdapter(List<IngredientModel> ingredientList) {
         this.ingredientList = ingredientList;
@@ -57,16 +57,39 @@ public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.In
         this.addInterface = addInterface;
     }
 
-    public void removeIngredient(IngredientModel ingredientModel) {
-        ingredientInterface.removeIngredient(ingredientModel);
+
+    public void changeItem(int position) {
+        notifyItemChanged(position);
     }
+
 
     public void addIngredient(IngredientModel ingredientModel) {
-        ingredientInterface.addIngredient(ingredientModel);
+        ingredientList.add(ingredientModel);
+        notifyItemInserted(ingredientList.size() - 1);
     }
 
-    public void setIngredientInterface(IngredientInterface ingredientInterface) {
-        this.ingredientInterface = ingredientInterface;
+    public void removeIngredient(IngredientModel ingredientModel, Context context) {
+        // Find the position of the recipe in the list
+        int pos = ingredientList.indexOf(ingredientModel);
+
+        // Show a confirmation dialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("Confirm Deletion");
+        builder.setMessage("Are you sure you want to delete " + ingredientModel.getName() + " recipe?");
+        builder.setPositiveButton("Delete", (dialog, which) -> {
+            // User confirmed deletion, remove the recipe and update the RecyclerView
+            ingredientList.remove(ingredientModel);
+            notifyItemRemoved(pos);
+            dialog.dismiss();
+        });
+        builder.setNegativeButton("Cancel", (dialog, which) -> {
+            // User canceled deletion, dismiss the dialog
+            dialog.dismiss();
+        });
+
+        // Create and show the dialog
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
     }
 
 

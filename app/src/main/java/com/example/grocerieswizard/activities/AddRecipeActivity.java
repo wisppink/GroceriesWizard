@@ -27,7 +27,6 @@ import com.example.grocerieswizard.RecipeDatabaseHelper;
 import com.example.grocerieswizard.adapters.IngredientAdapter;
 import com.example.grocerieswizard.adapters.RecipeRecyclerViewAdapter;
 import com.example.grocerieswizard.interfaces.AddInterface;
-import com.example.grocerieswizard.interfaces.IngredientInterface;
 import com.example.grocerieswizard.models.IngredientModel;
 import com.example.grocerieswizard.models.RecipeModel;
 import com.squareup.picasso.Picasso;
@@ -36,7 +35,7 @@ import com.squareup.picasso.Target;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AddRecipeActivity extends AppCompatActivity implements AddInterface, IngredientInterface {
+public class AddRecipeActivity extends AppCompatActivity implements AddInterface {
 
     private EditText editRecipeName;
     private EditText editRecipeHowToPrepare;
@@ -63,7 +62,6 @@ public class AddRecipeActivity extends AppCompatActivity implements AddInterface
         ImageButton dischargeRecipe = findViewById(R.id.discharge_recipe);
 
         ingredientAdapter = new IngredientAdapter(ingredientList);
-        ingredientAdapter.setIngredientInterface(this);
         ingredientAdapter.setRecyclerViewInterface(this);
         RecyclerView ingredientsRecyclerView = findViewById(R.id.recyclerView_ingredients);
         ingredientsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -151,7 +149,7 @@ public class AddRecipeActivity extends AppCompatActivity implements AddInterface
 
             RecipeModel editedRecipe = new RecipeModel(recipeName, ingredientList, howToPrepare, selectedImageBitmap);
             recipe = recipeAdapter.editRecipe(position, editedRecipe);
-            ingredientAdapter.notifyItemChanged(position);
+            ingredientAdapter.changeItem(position);
             addImage.setImageBitmap(selectedImageBitmap);
         } else {
             addImage.setImageURI(defaultImageUri);
@@ -221,6 +219,7 @@ public class AddRecipeActivity extends AppCompatActivity implements AddInterface
             ingredientModel.setUnit(unit);
             ingredientModel.setQuantity(quantity);
             ingredientAdapter.addIngredient(ingredientModel);
+            recipeDatabaseHelper.insertIngredient(ingredientModel, ingredientModel.getRecipeId());
 
         });
         builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
@@ -256,7 +255,8 @@ public class AddRecipeActivity extends AppCompatActivity implements AddInterface
     @Override
     public void onItemDelete(IngredientModel ingredientModel) {
         if (ingredientModel != null) {
-            ingredientAdapter.removeIngredient(ingredientModel);
+            recipeDatabaseHelper.deleteIngredient(ingredientModel.getId());
+            ingredientAdapter.removeIngredient(ingredientModel, this);
         }
 
     }
@@ -306,7 +306,7 @@ public class AddRecipeActivity extends AppCompatActivity implements AddInterface
 
             // Check if the position was found and update the adapter if needed
             if (position != -1) {
-                ingredientAdapter.notifyItemChanged(position);
+                ingredientAdapter.changeItem(position);
             }
 
             dialog.dismiss(); // Dismiss the dialog after saving
@@ -319,36 +319,4 @@ public class AddRecipeActivity extends AppCompatActivity implements AddInterface
         dialog.show();
     }
 
-    @Override
-    public void addIngredient(IngredientModel ingredientModel) {
-        ingredientList.add(ingredientModel);
-        ingredientAdapter.notifyItemInserted(ingredientList.size() - 1);
-        recipeDatabaseHelper.insertIngredient(ingredientModel, ingredientModel.getRecipeId());
-    }
-
-    @Override
-    public void removeIngredient(IngredientModel ingredientModel) {
-        // Find the position of the recipe in the list
-        int pos = ingredientList.indexOf(ingredientModel);
-
-        // Show a confirmation dialog
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Confirm Deletion");
-        builder.setMessage("Are you sure you want to delete " + ingredientModel.getName() + " recipe?");
-        builder.setPositiveButton("Delete", (dialog, which) -> {
-            // User confirmed deletion, remove the recipe and update the RecyclerView
-            ingredientList.remove(ingredientModel);
-            recipeDatabaseHelper.deleteIngredient(ingredientModel.getId());
-            ingredientAdapter.notifyItemRemoved(pos);
-            dialog.dismiss();
-        });
-        builder.setNegativeButton("Cancel", (dialog, which) -> {
-            // User canceled deletion, dismiss the dialog
-            dialog.dismiss();
-        });
-
-        // Create and show the dialog
-        AlertDialog alertDialog = builder.create();
-        alertDialog.show();
-    }
 }

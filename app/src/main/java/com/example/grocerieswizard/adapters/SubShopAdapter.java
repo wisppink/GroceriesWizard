@@ -15,6 +15,7 @@ import com.example.grocerieswizard.models.ShoppingItem;
 import com.example.grocerieswizard.models.SubShoppingItem;
 
 import java.util.ArrayList;
+import java.util.Set;
 
 public class SubShopAdapter extends RecyclerView.Adapter<SubShopAdapter.ViewHolder> {
 
@@ -50,16 +51,20 @@ public class SubShopAdapter extends RecyclerView.Adapter<SubShopAdapter.ViewHold
     }
 
     public void checkAllSubItems(boolean isChecked) {
-        for (SubShoppingItem subItem : shoppingItems) {
+        for (int i = 0; i < shoppingItems.size(); i++) {
+            SubShoppingItem subItem = shoppingItems.get(i);
             subItem.setChecked(isChecked);
+            notifyItemChanged(i);
         }
-        notifyDataSetChanged();
     }
 
 
     public void setShoppingItems(ShoppingItem shoppingItem) {
-        this.shoppingItems.addAll(shoppingItem.getSubShoppingItems().keySet());
-        notifyDataSetChanged();
+        Set<SubShoppingItem> tempList = shoppingItem.getSubShoppingItems().keySet();
+        for (SubShoppingItem subShoppingItem : tempList) {
+            shoppingItems.add(subShoppingItem);
+            notifyItemInserted(shoppingItems.size() - 1);
+        }
     }
 
     public SubShoppingItem getSubItem() {

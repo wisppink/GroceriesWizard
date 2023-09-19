@@ -48,8 +48,6 @@ public class MainActivity extends AppCompatActivity implements RecipeInterface {
             if (recipe != null) {
                 recipe.setSwiped(false);
                 adapter.addRecipe(recipe);
-                int position = adapter.getItemCount() - 1; // Get the position of the newly added item
-                adapter.notifyItemInserted(position);
             }
         }
         // Check if a new recipe was added
@@ -61,7 +59,6 @@ public class MainActivity extends AppCompatActivity implements RecipeInterface {
                 recipe.setSwiped(false);
                 adapter.addRecipe(recipe);
                 adapter.removeRecipeAtPosition(position);
-                adapter.notifyItemInserted(adapter.getItemCount() - 1);
             }
         }
     });
@@ -81,7 +78,6 @@ public class MainActivity extends AppCompatActivity implements RecipeInterface {
 
         ArrayList<RecipeModel> recipes = recipeDatabaseHelper.getAllRecipesFromDB();
         adapter.setRecipeList(recipes);
-        adapter.notifyDataSetChanged();
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -125,11 +121,11 @@ public class MainActivity extends AppCompatActivity implements RecipeInterface {
                 if (direction == ItemTouchHelper.LEFT && !myModel.isSwiped()) {
                     //show menu
                     myModel.setSwiped(true);
-                    adapter.notifyItemChanged(position);
+                    adapter.itemChanged(position);
                 } else if (direction == ItemTouchHelper.LEFT && myModel.isSwiped()) {
                     //swiped, get back to default
                     myModel.setSwiped(false);
-                    adapter.notifyItemChanged(position);
+                    adapter.itemChanged(position);
                 }
 
             }
@@ -158,7 +154,7 @@ public class MainActivity extends AppCompatActivity implements RecipeInterface {
         if (recipeModel != null) {
             if (!recipeModel.isSwiped()) {
                 recipeModel.setSwiped(false);
-                adapter.notifyDataSetChanged();
+                adapter.itemChanged(position);
                 Intent intent = new Intent(this, DetailActivity.class);
                 intent.putExtra("MyRecipe", recipeModel);
                 startActivity(intent);
@@ -180,14 +176,12 @@ public class MainActivity extends AppCompatActivity implements RecipeInterface {
             builder.setPositiveButton("Delete", (dialog, which) -> {
                 // User confirmed deletion, remove the recipe and update the RecyclerView
                 adapter.removeRecipe(recipeModel);
-                recipeModel.setSwiped(false);
-                adapter.notifyItemChanged(position);
                 Toast.makeText(this, "Recipe deleted: " + recipeModel.getRecipeName(), Toast.LENGTH_SHORT).show();
                 dialog.dismiss();
             });
             builder.setNegativeButton("Cancel", (dialog, which) -> {
                 recipeModel.setSwiped(false);
-                adapter.notifyItemChanged(position);
+                adapter.itemChanged(position);
                 dialog.dismiss();
             });
             // Create and show the dialog
@@ -198,17 +192,13 @@ public class MainActivity extends AppCompatActivity implements RecipeInterface {
 
     // Handle item edit and start AddRecipe activity for editing
     @Override
-    public void onItemEdit(int position) {
-        RecipeModel recipeModel = adapter.getItemAtPosition(position);
-        if (recipeModel != null) {
-            recipeModel.setSwiped(false);
-            adapter.notifyItemChanged(position);
-            Intent editIntent = new Intent(this, AddRecipeActivity.class);
-            editIntent.putExtra("editRecipe", true);
-            editIntent.putExtra("recipeModel", recipeModel);
-            editIntent.putExtra("position", position);
-            launcher.launch(editIntent);
-        }
+    public void onItemEdit(RecipeModel recipeModel, int position) {
+        Intent editIntent = new Intent(this, AddRecipeActivity.class);
+        editIntent.putExtra("editRecipe", true);
+        editIntent.putExtra("recipeModel", recipeModel);
+        editIntent.putExtra("position", position);
+        launcher.launch(editIntent);
+
     }
 
     @Override
@@ -263,10 +253,8 @@ public class MainActivity extends AppCompatActivity implements RecipeInterface {
 
         if (requestCode == FAV_ACTIVITY_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
-                adapter.notifyDataSetChanged();
+                adapter.updateList();
             }
         }
     }
-
-
 }

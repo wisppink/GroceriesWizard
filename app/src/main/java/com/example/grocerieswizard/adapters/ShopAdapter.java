@@ -24,7 +24,7 @@ import java.util.Map;
 public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ShoppingViewHolder> {
     private static final String TAG = "ShopAdapter";
     private final Context context;
-    private ArrayList<ShoppingItem> shoppingItems = new ArrayList<>();
+    private final ArrayList<ShoppingItem> shoppingItems = new ArrayList<>();
     private ShopInterface shopInterface;
 
 
@@ -53,7 +53,11 @@ public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ShoppingViewHo
     }
 
     public void setSelectedRecipeList(ArrayList<RecipeModel> selectedRecipeList) {
-        shoppingItems = shopInterface.generateShoppingItems(selectedRecipeList);
+        ArrayList<ShoppingItem> tempList = shopInterface.generateShoppingItems(selectedRecipeList);
+        for (ShoppingItem shoppingItem : tempList) {
+            shoppingItems.add(shoppingItem);
+            notifyItemInserted(shoppingItems.size()-1);
+        }
     }
 
     public void setShopInterface(ShopInterface shopInterface) {

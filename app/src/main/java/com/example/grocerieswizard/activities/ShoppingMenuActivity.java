@@ -42,7 +42,6 @@ public class ShoppingMenuActivity extends AppCompatActivity implements ShopInter
             recipes = dbHelper.getSelectedRecipes();
         }
         adapter.setSelectedRecipeList(recipes);
-        adapter.notifyDataSetChanged();
     }
 
     @Override

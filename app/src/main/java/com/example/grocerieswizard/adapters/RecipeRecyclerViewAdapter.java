@@ -22,7 +22,7 @@ import java.util.ArrayList;
 
 public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecyclerViewAdapter.RecipeViewHolder> {
 
-    private ArrayList<RecipeModel> recipeList = new ArrayList<>();
+    private final ArrayList<RecipeModel> recipeList = new ArrayList<>();
     private RecipeInterface recipeInterface;
     private final Context context;
     private final String TAG = "RecipeAdapter";
@@ -58,8 +58,7 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
         if (recipeInterface.isRecipeSelected(recipeModel.getId())) {
             holder.itemView.setBackgroundColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.gray));
             recipeModel.setSelected(true);
-        }
-        else{
+        } else {
             holder.itemView.setBackgroundColor(ContextCompat.getColor(holder.itemView.getContext(), android.R.color.transparent));
             recipeModel.setSelected(false);
         }
@@ -101,6 +100,7 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
         recipeList.add(recipe);
         notifyItemInserted(recipeList.size() - 1);
         recipeInterface.insertRecipe(recipe);
+
     }
 
     public RecipeModel getItemAtPosition(int position) {
@@ -113,7 +113,9 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
     // Remove a recipe from the list and notify the adapter
     public void removeRecipe(RecipeModel recipeModel) {
         // Find the position of the recipe in the list
+        recipeModel.setSwiped(false);
         int pos = recipeList.indexOf(recipeModel);
+        notifyItemChanged(pos);
         recipeList.remove(pos);
         notifyItemRemoved(pos);
         recipeInterface.deleteRecipe(recipeModel.getId());
@@ -138,8 +140,20 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
         this.recipeInterface = recipeInterface;
     }
 
-    public void setRecipeList(ArrayList<RecipeModel> recipeList) {
-        this.recipeList = recipeList;
+    public void setRecipeList(ArrayList<RecipeModel> rList) {
+        for (RecipeModel recipeModel : rList) {
+            recipeList.add(recipeModel);
+            notifyItemInserted(recipeList.size()-1);
+        }
+
+    }
+
+    public void itemChanged(int position) {
+        notifyItemChanged(position);
+    }
+
+    public void updateList() {
+        notifyDataSetChanged();
     }
 
     public class RecipeViewHolder extends RecyclerView.ViewHolder {
@@ -189,7 +203,7 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
                 itemView.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), android.R.color.transparent));
             }
 
-            editIcon.setOnClickListener(v -> recipeInterface.onItemEdit(getAdapterPosition()));
+            editIcon.setOnClickListener(v -> editItem(getAdapterPosition()));
 
             shareIcon.setOnClickListener(v -> { // TODO: Handle share icon click
                 Toast.makeText(itemView.getContext(), "Share icon clicked", Toast.LENGTH_SHORT).show();
@@ -247,5 +261,12 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
             });
 
         }
+    }
+
+    private void editItem(int position) {
+        RecipeModel recipeModel = getItemAtPosition(position);
+        recipeModel.setSwiped(false);
+        notifyItemChanged(position);
+        recipeInterface.onItemEdit(recipeModel,position);
     }
 }

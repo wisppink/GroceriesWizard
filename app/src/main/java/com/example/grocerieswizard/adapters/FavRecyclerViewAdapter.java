@@ -22,9 +22,10 @@ import java.util.ArrayList;
 
 public class FavRecyclerViewAdapter extends RecyclerView.Adapter<FavRecyclerViewAdapter.FavViewHolder> {
     private static final String TAG = "FavRecyclerViewAdapter";
-    public ArrayList<RecipeModel> favList = new ArrayList<>();
-    private FavInterface favInterface;
 
+    public ArrayList<RecipeModel> favList = new ArrayList<>();
+
+    private FavInterface favInterface;
     public FavRecyclerViewAdapter() {
     }
 
@@ -46,12 +47,24 @@ public class FavRecyclerViewAdapter extends RecyclerView.Adapter<FavRecyclerView
         return favList.size();
     }
 
+    public ArrayList<RecipeModel> getFavList() {
+        return favList;
+    }
+
     public void setFavList(ArrayList<RecipeModel> recipes) {
-        this.favList = recipes;
+        for (RecipeModel recipe : recipes) {
+            favList.add(recipe);
+            notifyItemInserted(favList.size()-1);
+        }
     }
 
     public void setFavInterface(FavInterface favInterface) {
         this.favInterface = favInterface;
+    }
+
+    public void removeItem(int pos) {
+        favList.remove(favList.get(pos));
+        notifyItemRemoved(pos);
     }
 
     public class FavViewHolder extends RecyclerView.ViewHolder {

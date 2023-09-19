@@ -8,7 +8,7 @@ public interface RecipeInterface {
 
     void onItemDelete(int position);
 
-    void onItemEdit(int position);
+    void onItemEdit(RecipeModel recipeModel,int position);
     Boolean isRecipeSelected(int id);
 
     int updateRecipe(RecipeModel oldRecipe);
