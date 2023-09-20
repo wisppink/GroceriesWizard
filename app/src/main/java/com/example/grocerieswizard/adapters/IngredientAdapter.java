@@ -12,6 +12,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.grocerieswizard.R;
+import com.example.grocerieswizard.databinding.ItemIngredientBinding;
 import com.example.grocerieswizard.interfaces.AddInterface;
 import com.example.grocerieswizard.models.IngredientModel;
 
@@ -19,6 +20,7 @@ import java.util.List;
 
 public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.IngredientViewHolder> {
 
+    ItemIngredientBinding binding;
     private final List<IngredientModel> ingredientList;
     private AddInterface addInterface;
 
@@ -30,7 +32,8 @@ public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.In
     @NonNull
     @Override
     public IngredientAdapter.IngredientViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_ingredient, parent, false);
+        binding = ItemIngredientBinding.inflate(LayoutInflater.from(parent.getContext()),parent,false);
+        View view =binding.getRoot();
         return new IngredientViewHolder(view);
     }
 
@@ -101,9 +104,9 @@ public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.In
 
         public IngredientViewHolder(@NonNull View itemView) {
             super(itemView);
-            ingredientName = itemView.findViewById(R.id.ingredientName);
-            quantity = itemView.findViewById(R.id.quantity);
-            unit = itemView.findViewById(R.id.unit);
+            ingredientName = binding.ingredientName;
+            quantity = binding.quantity;
+            unit = binding.unit;
 
             itemView.setOnLongClickListener(v -> {
                 showPopUpMenu(v, getItemAtPosition(getAdapterPosition()));

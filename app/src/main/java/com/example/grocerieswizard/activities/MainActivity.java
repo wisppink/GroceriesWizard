@@ -4,8 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.Button;
-import android.widget.ImageView;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -13,17 +12,15 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.grocerieswizard.R;
 import com.example.grocerieswizard.RecipeDatabaseHelper;
 import com.example.grocerieswizard.adapters.RecipeRecyclerViewAdapter;
+import com.example.grocerieswizard.databinding.ActivityMainBinding;
 import com.example.grocerieswizard.interfaces.RecipeInterface;
 import com.example.grocerieswizard.models.RecipeModel;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 
@@ -32,6 +29,7 @@ public class MainActivity extends AppCompatActivity implements RecipeInterface {
     private RecipeRecyclerViewAdapter adapter;
     Context context;
     RecipeDatabaseHelper recipeDatabaseHelper;
+    ActivityMainBinding binding;
 
     // List to hold recipes for shopping cart
     private final ArrayList<RecipeModel> shopList = new ArrayList<>();
@@ -67,35 +65,33 @@ public class MainActivity extends AppCompatActivity implements RecipeInterface {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        View view = binding.getRoot();
+        setContentView(view);
+
         recipeDatabaseHelper = new RecipeDatabaseHelper(this);
 
-        RecyclerView recyclerView = findViewById(R.id.mRecyclerView);
         adapter = new RecipeRecyclerViewAdapter(this);
-        recyclerView.setAdapter(adapter);
+        binding.mRecyclerView.setAdapter(adapter);
+        binding.mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter.setRecyclerViewInterface(this);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         ArrayList<RecipeModel> recipes = recipeDatabaseHelper.getAllRecipesFromDB();
         adapter.setRecipeList(recipes);
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        setSupportActionBar(binding.toolbar);
 
-        ImageView open_fav = findViewById(R.id.fav_icon);
-        open_fav.setOnClickListener(v -> {
+
+        binding.favIcon.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, FavActivity.class);
             favLauncher.launch(intent);
         });
 
-        ImageView open_menu = findViewById(R.id.open_menu);
-        open_menu.setOnClickListener(v -> Toast.makeText(MainActivity.this, "open_menu icon clicked!", Toast.LENGTH_SHORT).show());
+        binding.openMenu.setOnClickListener(v -> Toast.makeText(MainActivity.this, "open_menu icon clicked!", Toast.LENGTH_SHORT).show());
 
         context = this;
 
-
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(v -> {
+        binding.fab.setOnClickListener(v -> {
             // Launch the AddRecipe activity to add a new recipe
             Intent intent = new Intent(MainActivity.this, AddRecipeActivity.class);
             launcher.launch(intent);
@@ -126,11 +122,10 @@ public class MainActivity extends AppCompatActivity implements RecipeInterface {
 
             }
         };
-        new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recyclerView);
+        new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(binding.mRecyclerView);
 
         // Set up shopping cart button
-        Button shoppingCart = findViewById(R.id.shopping_cart);
-        shoppingCart.setOnClickListener(v -> {
+        binding.shoppingCart.setOnClickListener(v -> {
             shopList.clear();
             shopList.addAll(recipeDatabaseHelper.getSelectedRecipes());
             Log.d("Main get selected list: ", shopList.toString());

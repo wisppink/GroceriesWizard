@@ -25,4 +25,7 @@
     <string name="yes">yes</string>
     <string name="unfav_recipe_dialog_ask">Do you want to remove this recipe from favorites?</string>
     <string name="not_available">not available</string>
+    <string name="add_image">add image</string>
+    <string name="discharge">discharge</string>
+    <string name="recipe_name">Recipe Name</string>
 </resources>

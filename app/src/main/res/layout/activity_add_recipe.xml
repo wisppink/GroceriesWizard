@@ -14,7 +14,8 @@
         android:layout_alignParentTop="true"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:src="@drawable/recipe_image_default"/>
+        android:src="@drawable/recipe_image_default"
+        android:contentDescription="@string/add_image" />
 
 
     <TextView
@@ -29,7 +30,7 @@
         android:layout_marginBottom="16dp"
         android:layout_toStartOf="@+id/edit_recipe_name"
         android:layout_toEndOf="@+id/add_image"
-        android:gravity="left"
+        android:gravity="start"
         android:text="@string/ask_recipe_name"
         android:textSize="15sp" />
 
@@ -43,8 +44,8 @@
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
         android:layout_toEndOf="@+id/add_image"
-        android:hint="Recipe Name"
-        android:textSize="20dp" />
+        android:hint="@string/recipe_name"
+        android:textSize="20sp" />
 
 
     <ImageButton
@@ -56,7 +57,8 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:background="@android:color/transparent"
-        app:srcCompat="@android:drawable/ic_delete" />
+        app:srcCompat="@android:drawable/ic_delete"
+        android:contentDescription="@string/discharge" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView_ingredients"
@@ -91,7 +93,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:gravity="left"
+        android:gravity="start"
         android:hint="@string/hint_how_to_prepare" />
 
     <Button

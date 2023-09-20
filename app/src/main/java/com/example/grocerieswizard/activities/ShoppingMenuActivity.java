@@ -2,14 +2,14 @@ package com.example.grocerieswizard.activities;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.grocerieswizard.R;
 import com.example.grocerieswizard.RecipeDatabaseHelper;
 import com.example.grocerieswizard.adapters.ShopAdapter;
+import com.example.grocerieswizard.databinding.ActivityShoppingMenuBinding;
 import com.example.grocerieswizard.interfaces.ShopInterface;
 import com.example.grocerieswizard.models.IngredientModel;
 import com.example.grocerieswizard.models.RecipeModel;
@@ -24,21 +24,24 @@ import java.util.Objects;
 public class ShoppingMenuActivity extends AppCompatActivity implements ShopInterface {
 
     private static final String TAG = "ShoppingMenuActivity";
+    ActivityShoppingMenuBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.shopping_menu);
+        binding = ActivityShoppingMenuBinding.inflate(getLayoutInflater());
+        View view = binding.getRoot();
+        setContentView(view);
+
         ArrayList<RecipeModel> recipes;
         ShopAdapter adapter;
         try (RecipeDatabaseHelper dbHelper = new RecipeDatabaseHelper(this)) {
 
-            RecyclerView shoppingRecyclerView = findViewById(R.id.shopping_cart);
             adapter = new ShopAdapter(this);
-            adapter.setShopInterface(this);
-            shoppingRecyclerView.setAdapter(adapter);
-            shoppingRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+            binding.shoppingCart.setAdapter(adapter);
+            binding.shoppingCart.setLayoutManager(new LinearLayoutManager(this));
 
+            adapter.setShopInterface(this);
             recipes = dbHelper.getSelectedRecipes();
         }
         adapter.setSelectedRecipeList(recipes);
@@ -97,7 +100,7 @@ public class ShoppingMenuActivity extends AppCompatActivity implements ShopInter
                     Log.d(TAG, "generateTotal: old value " + oldValue);
                     Double quantity = item.getIngredientQuantity();
                     Log.d(TAG, "generateTotal: quantity " + quantity);
-                    assert oldValue !=null;
+                    assert oldValue != null;
                     Double newValue = oldValue + quantity;
                     Log.d(TAG, "generateTotal: new value " + newValue);
                     unitToQuantity.put(item.getIngredientUnit(), newValue);

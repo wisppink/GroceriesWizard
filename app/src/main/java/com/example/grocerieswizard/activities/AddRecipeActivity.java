@@ -6,12 +6,11 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -26,6 +25,8 @@ import com.example.grocerieswizard.R;
 import com.example.grocerieswizard.RecipeDatabaseHelper;
 import com.example.grocerieswizard.adapters.IngredientAdapter;
 import com.example.grocerieswizard.adapters.RecipeRecyclerViewAdapter;
+import com.example.grocerieswizard.databinding.ActivityAddRecipeBinding;
+import com.example.grocerieswizard.databinding.DialogAddIngredientBinding;
 import com.example.grocerieswizard.interfaces.AddInterface;
 import com.example.grocerieswizard.models.IngredientModel;
 import com.example.grocerieswizard.models.RecipeModel;
@@ -37,8 +38,7 @@ import java.util.List;
 
 public class AddRecipeActivity extends AppCompatActivity implements AddInterface {
 
-    private EditText editRecipeName;
-    private EditText editRecipeHowToPrepare;
+    ActivityAddRecipeBinding binding;
     private ActivityResultLauncher<Intent> pickImageLauncher;
     private IngredientAdapter ingredientAdapter;
     private final List<IngredientModel> ingredientList = new ArrayList<>();
@@ -51,32 +51,32 @@ public class AddRecipeActivity extends AppCompatActivity implements AddInterface
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.add_recipe);
+        binding = ActivityAddRecipeBinding.inflate(getLayoutInflater());
+        View view = binding.getRoot();
+        setContentView(view);
 
         recipeDatabaseHelper = new RecipeDatabaseHelper(this);
 
-        editRecipeName = findViewById(R.id.edit_recipe_name);
-        editRecipeHowToPrepare = findViewById(R.id.edit_recipe_how_to_prepare);
-
-        Button btnSaveRecipe = findViewById(R.id.save_recipe_button);
-        ImageButton dischargeRecipe = findViewById(R.id.discharge_recipe);
 
         ingredientAdapter = new IngredientAdapter(ingredientList);
         ingredientAdapter.setRecyclerViewInterface(this);
-        RecyclerView ingredientsRecyclerView = findViewById(R.id.recyclerView_ingredients);
-        ingredientsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        ingredientsRecyclerView.setAdapter(ingredientAdapter);
+
+        RecyclerView recyclerViewIngredients = binding.recyclerViewIngredients;
+        recyclerViewIngredients.setLayoutManager(new LinearLayoutManager(this));
+        recyclerViewIngredients.setAdapter(ingredientAdapter);
 
         RecipeRecyclerViewAdapter recipeAdapter = new RecipeRecyclerViewAdapter(this);
 
-        Button addIngredientButton = findViewById(R.id.addIngredientButton);
-        addIngredientButton.setOnClickListener(v -> {
+        TextView editRecipeName = binding.editRecipeName;
+        TextView editRecipeHowToPrepare = binding.editRecipeHowToPrepare;
+
+        Button addIngredient = binding.addIngredientButton;
+        addIngredient.setOnClickListener(v -> {
             IngredientModel newIngredient = new IngredientModel(null, 0, null);
             showAddIngredientDialog(newIngredient);
         });
 
 
-        ImageView addImage = findViewById(R.id.add_image);
         Uri defaultImageUri = Uri.parse("android.resource://com.example.grocerieswizard/" + R.drawable.recipe_image_default);
         try {
             defaultImageBitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), defaultImageUri);
@@ -87,6 +87,7 @@ public class AddRecipeActivity extends AppCompatActivity implements AddInterface
         //create an empty recipe
         recipe = new RecipeModel(null, null, null, null);
 
+        ImageView addImage = binding.addImage;
         pickImageLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     if (result.getResultCode() == RESULT_OK && result.getData() != null) {
@@ -155,7 +156,8 @@ public class AddRecipeActivity extends AppCompatActivity implements AddInterface
             addImage.setImageURI(defaultImageUri);
         }
 
-        btnSaveRecipe.setOnClickListener(v -> {
+        Button saveRecipe = binding.saveRecipeButton;
+        saveRecipe.setOnClickListener(v -> {
             String recipeName = editRecipeName.getText().toString();
             String howToPrepare = editRecipeHowToPrepare.getText().toString();
             if (recipeName.isEmpty() || ingredientList.isEmpty() || howToPrepare.isEmpty()) {
@@ -187,8 +189,8 @@ public class AddRecipeActivity extends AppCompatActivity implements AddInterface
 
         });
 
-
-        dischargeRecipe.setOnClickListener(v -> {
+        ImageView discharge = binding.dischargeRecipe;
+        discharge.setOnClickListener(v -> {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Confirm Discharge")
                     .setMessage("Are you sure you want to discharge this recipe?")
@@ -201,13 +203,13 @@ public class AddRecipeActivity extends AppCompatActivity implements AddInterface
 
     private void showAddIngredientDialog(IngredientModel ingredientModel) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        LayoutInflater inflater = getLayoutInflater();
-        View dialogView = inflater.inflate(R.layout.dialog_add_ingredient, null);
+        DialogAddIngredientBinding dialogBinding = DialogAddIngredientBinding.inflate(getLayoutInflater());
+        View dialogView = dialogBinding.getRoot();
         builder.setView(dialogView);
 
-        EditText ingredientNameEditText = dialogView.findViewById(R.id.ingredientNameEditText);
-        EditText ingredientQuantityEditText = dialogView.findViewById(R.id.ingredientQuantityEditText);
-        EditText ingredientUnitEditText = dialogView.findViewById(R.id.ingredientUnitEditText);
+        EditText ingredientNameEditText = dialogBinding.ingredientNameEditText;
+        EditText ingredientQuantityEditText = dialogBinding.ingredientQuantityEditText;
+        EditText ingredientUnitEditText = dialogBinding.ingredientUnitEditText;
 
         builder.setPositiveButton("Add", (dialog, which) -> {
             String name = ingredientNameEditText.getText().toString();
@@ -237,8 +239,8 @@ public class AddRecipeActivity extends AppCompatActivity implements AddInterface
     }
 
     private boolean unsavedChangesExist() {
-        String recipeName = editRecipeName.getText().toString();
-        String howToPrepare = editRecipeHowToPrepare.getText().toString();
+        String recipeName = binding.editRecipeName.getText().toString();
+        String howToPrepare = binding.editRecipeHowToPrepare.getText().toString();
 
         return !recipeName.isEmpty() || !ingredientList.isEmpty() || !howToPrepare.isEmpty();
     }
@@ -270,13 +272,14 @@ public class AddRecipeActivity extends AppCompatActivity implements AddInterface
 
     public void showEditIngredientDialog(IngredientModel ingredientModel) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        LayoutInflater inflater = getLayoutInflater();
-        View dialogView = inflater.inflate(R.layout.dialog_add_ingredient, null);
+        DialogAddIngredientBinding dialogBinding = DialogAddIngredientBinding.inflate(getLayoutInflater());
+        View dialogView = dialogBinding.getRoot();
         builder.setView(dialogView);
 
-        EditText ingredientNameEditText = dialogView.findViewById(R.id.ingredientNameEditText);
-        EditText ingredientQuantityEditText = dialogView.findViewById(R.id.ingredientQuantityEditText);
-        EditText ingredientUnitEditText = dialogView.findViewById(R.id.ingredientUnitEditText);
+
+        EditText ingredientNameEditText = dialogBinding.ingredientNameEditText;
+        EditText ingredientQuantityEditText = dialogBinding.ingredientQuantityEditText;
+        EditText ingredientUnitEditText = dialogBinding.ingredientUnitEditText;
 
         // Pre-fill the dialog's fields with the existing ingredient's information
         ingredientNameEditText.setText(ingredientModel.getName());

@@ -10,7 +10,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.grocerieswizard.R;
+import com.example.grocerieswizard.databinding.SubRecipeBinding;
 import com.example.grocerieswizard.models.ShoppingItem;
 import com.example.grocerieswizard.models.SubShoppingItem;
 
@@ -19,7 +19,7 @@ import java.util.Set;
 
 public class SubShopAdapter extends RecyclerView.Adapter<SubShopAdapter.ViewHolder> {
 
-
+    SubRecipeBinding binding;
     private final ArrayList<SubShoppingItem> shoppingItems;
     private final ShopAdapter parentAdapter;
     private SubShoppingItem checkedSubItem;
@@ -34,7 +34,8 @@ public class SubShopAdapter extends RecyclerView.Adapter<SubShopAdapter.ViewHold
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.sub_recipe, parent, false);
+        binding = SubRecipeBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+        View itemView = binding.getRoot();
         return new ViewHolder(itemView);
     }
 
@@ -83,10 +84,10 @@ public class SubShopAdapter extends RecyclerView.Adapter<SubShopAdapter.ViewHold
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            recipeTitle = itemView.findViewById(R.id.sub_recipe_name);
-            ingredientQuantity = itemView.findViewById(R.id.sub_ingredient_quantity);
-            ingredientUnit = itemView.findViewById(R.id.sub_ingredient_unit);
-            ingredientCB = itemView.findViewById(R.id.sub_ingredient_checkbox);
+            recipeTitle = binding.subRecipeName;
+            ingredientQuantity = binding.subIngredientQuantity;
+            ingredientUnit = binding.subIngredientUnit;
+            ingredientCB = binding.subIngredientCheckbox;
 
         }
 

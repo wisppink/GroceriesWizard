@@ -15,13 +15,15 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.grocerieswizard.R;
+import com.example.grocerieswizard.databinding.RecyclerViewMenuBinding;
+import com.example.grocerieswizard.databinding.RecyclerViewRowBinding;
 import com.example.grocerieswizard.interfaces.RecipeInterface;
 import com.example.grocerieswizard.models.RecipeModel;
 
 import java.util.ArrayList;
 
 public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecyclerViewAdapter.RecipeViewHolder> {
-
+    RecyclerViewRowBinding binding;
     private final ArrayList<RecipeModel> recipeList = new ArrayList<>();
     private RecipeInterface recipeInterface;
     private final Context context;
@@ -35,7 +37,8 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
     @NonNull
     @Override
     public RecipeViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler_view_row, parent, false);
+        binding = RecyclerViewRowBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+        View itemView =binding.getRoot();
         return new RecipeViewHolder(itemView);
     }
 
@@ -44,17 +47,19 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
         RecipeModel recipeModel = recipeList.get(position);
 
         if (recipeModel.isSwiped()) {
-            View swipedView = LayoutInflater.from(holder.itemView.getContext()).inflate(R.layout.recycler_view_menu, (ViewGroup) holder.itemView, false);
+            RecyclerViewMenuBinding swipeBind = RecyclerViewMenuBinding.inflate(LayoutInflater.from(holder.itemView.getContext()), (ViewGroup) holder.itemView, false);
+            View swipeBinding = swipeBind.getRoot();
             ((ViewGroup) holder.itemView).removeAllViews();
-            ((ViewGroup) holder.itemView).addView(swipedView);
-            holder.bindSwipedLayout(recipeModel, swipedView);
+            ((ViewGroup) holder.itemView).addView(swipeBinding);
+            holder.bindSwipedLayout(recipeModel, swipeBind);
         } else {
-            View itemView = LayoutInflater.from(holder.itemView.getContext()).inflate(R.layout.recycler_view_row, (ViewGroup) holder.itemView, false);
+            RecyclerViewRowBinding rowBind = RecyclerViewRowBinding.inflate(LayoutInflater.from(holder.itemView.getContext()), (ViewGroup) holder.itemView, false);
+            View rowBinding = rowBind.getRoot();
             ((ViewGroup) holder.itemView).removeAllViews();
-            ((ViewGroup) holder.itemView).addView(itemView);
-            holder.bind(recipeModel);
-
+            ((ViewGroup) holder.itemView).addView(rowBinding);
+            holder.bind(recipeModel,rowBind);
         }
+
         if (recipeInterface.isRecipeSelected(recipeModel.getId())) {
             holder.itemView.setBackgroundColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.gray));
             recipeModel.setSelected(true);
@@ -62,9 +67,8 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
             holder.itemView.setBackgroundColor(ContextCompat.getColor(holder.itemView.getContext(), android.R.color.transparent));
             recipeModel.setSelected(false);
         }
-
-
     }
+
 
     @Override
     public int getItemCount() {
@@ -193,11 +197,11 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
         }
 
 
-        public void bindSwipedLayout(RecipeModel recipeModel, View swipedView) {
+        public void bindSwipedLayout(RecipeModel recipeModel, RecyclerViewMenuBinding swipeBinding) {
 
-            ImageView editIcon = swipedView.findViewById(R.id.edit_icon);
-            ImageView shareIcon = swipedView.findViewById(R.id.share_icon);
-            ImageView deleteIcon = swipedView.findViewById(R.id.delete_icon);
+            ImageView editIcon = swipeBinding.editIcon;
+            ImageView shareIcon = swipeBinding.shareIcon;
+            ImageView deleteIcon = swipeBinding.deleteIcon;
 
             if (!recipeModel.isSelected()) {
                 itemView.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), android.R.color.transparent));
@@ -212,15 +216,15 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
             deleteIcon.setOnClickListener(v -> recipeInterface.onItemDelete(getAdapterPosition()));
 
             ((ViewGroup) itemView).removeAllViews();
-            ((ViewGroup) itemView).addView(swipedView);
+            ((ViewGroup) itemView).addView(swipeBinding.getRoot());
 
         }
 
 
-        public void bind(RecipeModel recipeModel) {
-            favButton = itemView.findViewById(R.id.fav_icon);
-            ImageView resImage = itemView.findViewById(R.id.default_card_recipe_image);
-            TextView title = itemView.findViewById(R.id.textView);
+        public void bind(RecipeModel recipeModel, RecyclerViewRowBinding rowBind) {
+            favButton = rowBind.favIcon;
+            ImageView resImage = rowBind.defaultCardRecipeImage;
+            TextView title = rowBind.textView;
 
             title.setText(recipeModel.getRecipeName());
 

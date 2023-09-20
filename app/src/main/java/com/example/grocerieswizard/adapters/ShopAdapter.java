@@ -12,7 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.grocerieswizard.R;
+import com.example.grocerieswizard.databinding.ShoppingItemRowBinding;
 import com.example.grocerieswizard.interfaces.ShopInterface;
 import com.example.grocerieswizard.models.RecipeModel;
 import com.example.grocerieswizard.models.ShoppingItem;
@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Map;
 
 public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ShoppingViewHolder> {
+    ShoppingItemRowBinding binding;
     private static final String TAG = "ShopAdapter";
     private final Context context;
     private final ArrayList<ShoppingItem> shoppingItems = new ArrayList<>();
@@ -35,7 +36,8 @@ public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ShoppingViewHo
     @NonNull
     @Override
     public ShoppingViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.shopping_item_row, parent, false);
+        binding = ShoppingItemRowBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+        View itemView = binding.getRoot();
         return new ShoppingViewHolder(itemView);
     }
 
@@ -56,7 +58,7 @@ public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ShoppingViewHo
         ArrayList<ShoppingItem> tempList = shopInterface.generateShoppingItems(selectedRecipeList);
         for (ShoppingItem shoppingItem : tempList) {
             shoppingItems.add(shoppingItem);
-            notifyItemInserted(shoppingItems.size()-1);
+            notifyItemInserted(shoppingItems.size() - 1);
         }
     }
 
@@ -84,10 +86,10 @@ public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ShoppingViewHo
 
         public ShoppingViewHolder(@NonNull View itemView) {
             super(itemView);
-            ingredient_name = itemView.findViewById(R.id.shopping_cart_ingredient_name);
-            subRecipe = itemView.findViewById(R.id.sub_recipe_recycler);
-            totalTV = itemView.findViewById(R.id.total);
-            checkBox = itemView.findViewById(R.id.is_finished);
+            ingredient_name = binding.shoppingCartIngredientName;
+            subRecipe = binding.subRecipeRecycler;
+            totalTV = binding.total;
+            checkBox = binding.isFinished;
         }
 
         public void bind(ShoppingItem shoppingItem) {

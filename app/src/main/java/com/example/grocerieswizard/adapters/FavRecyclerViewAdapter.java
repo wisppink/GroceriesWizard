@@ -15,6 +15,7 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.grocerieswizard.R;
+import com.example.grocerieswizard.databinding.FavItemRowBinding;
 import com.example.grocerieswizard.interfaces.FavInterface;
 import com.example.grocerieswizard.models.RecipeModel;
 
@@ -24,7 +25,7 @@ public class FavRecyclerViewAdapter extends RecyclerView.Adapter<FavRecyclerView
     private static final String TAG = "FavRecyclerViewAdapter";
 
     public ArrayList<RecipeModel> favList = new ArrayList<>();
-
+    FavItemRowBinding binding;
     private FavInterface favInterface;
     public FavRecyclerViewAdapter() {
     }
@@ -32,7 +33,8 @@ public class FavRecyclerViewAdapter extends RecyclerView.Adapter<FavRecyclerView
     @NonNull
     @Override
     public FavViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fav_item_row, parent, false);
+        binding = FavItemRowBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+        View view = binding.getRoot();
         return new FavViewHolder(view);
     }
 
@@ -74,9 +76,9 @@ public class FavRecyclerViewAdapter extends RecyclerView.Adapter<FavRecyclerView
 
         public FavViewHolder(@NonNull View itemView) {
             super(itemView);
-            title = itemView.findViewById(R.id.fav_recipe_title);
-            ImageView favButton = itemView.findViewById(R.id.unFav);
-            background = itemView.findViewById(R.id.cardView);
+            title = binding.favRecipeTitle;
+            ImageView favButton = binding.unFav;
+            background = binding.cardView;
 
             favButton.setOnClickListener(v -> {
                 AlertDialog.Builder builder = new AlertDialog.Builder(itemView.getContext());
