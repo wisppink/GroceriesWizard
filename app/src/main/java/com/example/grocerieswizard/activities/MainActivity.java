@@ -11,7 +11,6 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -33,7 +32,6 @@ public class MainActivity extends AppCompatActivity implements RecipeInterface {
     private RecipeRecyclerViewAdapter adapter;
     Context context;
     RecipeDatabaseHelper recipeDatabaseHelper;
-    private static final int FAV_ACTIVITY_REQUEST_CODE = 1;
 
     // List to hold recipes for shopping cart
     private final ArrayList<RecipeModel> shopList = new ArrayList<>();
@@ -63,6 +61,8 @@ public class MainActivity extends AppCompatActivity implements RecipeInterface {
         }
     });
 
+    ActivityResultLauncher<Intent> favLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> adapter.updateList());
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,11 +83,9 @@ public class MainActivity extends AppCompatActivity implements RecipeInterface {
         setSupportActionBar(toolbar);
 
         ImageView open_fav = findViewById(R.id.fav_icon);
-        open_fav.setOnClickListener(v ->
-        {
+        open_fav.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, FavActivity.class);
-            // Start FavActivity with the specified request code
-            startActivityForResult(intent, FAV_ACTIVITY_REQUEST_CODE);
+            favLauncher.launch(intent);
         });
 
         ImageView open_menu = findViewById(R.id.open_menu);
@@ -105,9 +103,7 @@ public class MainActivity extends AppCompatActivity implements RecipeInterface {
         });
 
         // Set up ItemTouchHelper for swipe gestures
-        ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new ItemTouchHelper.SimpleCallback(
-                0, ItemTouchHelper.LEFT
-        ) {
+        ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
             @Override
             public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
                 return false; // We're not interested in moving items in this case
@@ -245,16 +241,5 @@ public class MainActivity extends AppCompatActivity implements RecipeInterface {
     public void deleteRecipeFav(int recipeId) {
         recipeDatabaseHelper.deleteRecipeFav(recipeId);
 
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == FAV_ACTIVITY_REQUEST_CODE) {
-            if (resultCode == RESULT_OK) {
-                adapter.updateList();
-            }
-        }
     }
 }
