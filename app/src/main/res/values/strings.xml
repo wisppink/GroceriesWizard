@@ -28,4 +28,7 @@
     <string name="add_image">add image</string>
     <string name="discharge">discharge</string>
     <string name="recipe_name">Recipe Name</string>
+    <string name="TitleFoundRecipe">Recipe Found</string>
+    <string name="MessageFoundRecipe">We found a recipe in the database.\nWould you like to automatically get its ingredients?</string>
+    <string name="add">add</string>
 </resources>
