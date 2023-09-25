@@ -6,6 +6,9 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 
+import com.example.grocerieswizard.adapters.FavRecyclerViewAdapter;
+import com.example.grocerieswizard.interfaces.FavInterface;
+
 import java.util.List;
 
 public class RecipeModel implements Parcelable {
@@ -19,6 +22,8 @@ public class RecipeModel implements Parcelable {
     private boolean isSelected;
 
     private final String TAG = "RecipeModel";
+    private FavInterface favInterface;
+    private FavRecyclerViewAdapter favAdapter;
 
     public RecipeModel(String recipeName, List<IngredientModel> ingredients, String instructions, Bitmap imageBitmap) {
         this.recipeName = recipeName;
@@ -68,9 +73,8 @@ public class RecipeModel implements Parcelable {
 
     public Bitmap getImageBitmap() {
         if (imageBitmap != null) {
-            Log.d(TAG,"getImageBitmap: " + imageBitmap);
-        }
-        else{
+            Log.d(TAG, "getImageBitmap: " + imageBitmap);
+        } else {
             Log.d(TAG, "getImageBitmap:  null");
         }
         return imageBitmap;
@@ -126,4 +130,19 @@ public class RecipeModel implements Parcelable {
         isSelected = selected;
     }
 
+    public FavInterface getFavInterface() {
+        return favInterface;
+    }
+
+    public void setFavInterface(FavInterface favInterface) {
+        this.favInterface = favInterface;
+    }
+
+    public FavRecyclerViewAdapter getFavAdapter() {
+        return favAdapter;
+    }
+
+    public void setFavAdapter(FavRecyclerViewAdapter favAdapter) {
+        this.favAdapter = favAdapter;
+    }
 }
