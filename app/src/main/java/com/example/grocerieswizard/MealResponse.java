@@ -1,7 +1,7 @@
 package com.example.grocerieswizard;
 
 import com.example.grocerieswizard.models.Meal;
-
+@SuppressWarnings("unused")
 public class MealResponse {
     private Meal[] meals;
 
@@ -16,8 +16,5 @@ public class MealResponse {
         }
     }
 
-    public void setMeals(Meal[] meals) {
-        this.meals = meals;
-    }
 }
 
