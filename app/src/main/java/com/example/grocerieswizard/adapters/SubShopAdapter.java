@@ -2,7 +2,6 @@ package com.example.grocerieswizard.adapters;
 
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.TextView;
@@ -17,11 +16,12 @@ import com.example.grocerieswizard.models.SubShoppingItem;
 import java.util.ArrayList;
 import java.util.Set;
 
-public class SubShopAdapter extends RecyclerView.Adapter<SubShopAdapter.ViewHolder> {
+public class SubShopAdapter extends RecyclerView.Adapter<SubShopAdapter.SubShopViewHolder> {
 
     SubRecipeBinding binding;
     private final ArrayList<SubShoppingItem> shoppingItems;
     private final ShopAdapter parentAdapter;
+
     private SubShoppingItem checkedSubItem;
     private static final String TAG = "SubShopAdapter";
 
@@ -33,18 +33,19 @@ public class SubShopAdapter extends RecyclerView.Adapter<SubShopAdapter.ViewHold
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public SubShopViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         binding = SubRecipeBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
-        View itemView = binding.getRoot();
-        return new ViewHolder(itemView);
+        return new SubShopViewHolder(binding);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull SubShopViewHolder holder, int position) {
         SubShoppingItem subShoppingItem = shoppingItems.get(position);
         holder.bind(subShoppingItem);
+        setCheckedSubItem(subShoppingItem);
 
     }
+
 
     @Override
     public int getItemCount() {
@@ -64,6 +65,7 @@ public class SubShopAdapter extends RecyclerView.Adapter<SubShopAdapter.ViewHold
         Set<SubShoppingItem> tempList = shoppingItem.getSubShoppingItems().keySet();
         for (SubShoppingItem subShoppingItem : tempList) {
             shoppingItems.add(subShoppingItem);
+            subShoppingItem.setParentAdapter(parentAdapter);
             notifyItemInserted(shoppingItems.size() - 1);
         }
     }
@@ -76,14 +78,14 @@ public class SubShopAdapter extends RecyclerView.Adapter<SubShopAdapter.ViewHold
         this.checkedSubItem = checkedSubItem;
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public static class SubShopViewHolder extends RecyclerView.ViewHolder {
         TextView recipeTitle;
         TextView ingredientQuantity;
         TextView ingredientUnit;
         CheckBox ingredientCB;
 
-        public ViewHolder(@NonNull View itemView) {
-            super(itemView);
+        public SubShopViewHolder(SubRecipeBinding binding) {
+            super(binding.getRoot());
             recipeTitle = binding.subRecipeName;
             ingredientQuantity = binding.subIngredientQuantity;
             ingredientUnit = binding.subIngredientUnit;
@@ -95,15 +97,12 @@ public class SubShopAdapter extends RecyclerView.Adapter<SubShopAdapter.ViewHold
             recipeTitle.setText(subShoppingItem.getRecipeName());
             ingredientUnit.setText(subShoppingItem.getIngredientUnit());
             ingredientQuantity.setText(String.format(String.valueOf(subShoppingItem.getIngredientQuantity())));
-
             ingredientCB.setOnCheckedChangeListener(null);
-
             ingredientCB.setChecked(subShoppingItem.getChecked());
             Log.d(TAG, "bind: setCheckedSubItem: " + subShoppingItem.getRecipeName());
-            setCheckedSubItem(subShoppingItem);
             ingredientCB.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 subShoppingItem.setChecked(isChecked);
-                parentAdapter.notifySubItemStateChanged(subShoppingItem);
+                subShoppingItem.getParentAdapter().notifySubItemStateChanged(subShoppingItem);
 
             });
         }
