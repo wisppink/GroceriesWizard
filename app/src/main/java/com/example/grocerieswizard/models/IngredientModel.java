@@ -5,12 +5,15 @@ import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 
+import com.example.grocerieswizard.interfaces.AddInterface;
+
 public class IngredientModel implements Parcelable {
     private String name;
     private double quantity;
     private String unit;
     private int id;
     private long recipeId;
+    private AddInterface addinterface;
 
     public IngredientModel(String name, double quantity, String unit) {
         this.name = name;
@@ -92,5 +95,13 @@ public class IngredientModel implements Parcelable {
 
     public void setRecipeId(long recipeId) {
         this.recipeId = recipeId;
+    }
+
+    public AddInterface getInterface() {
+        return addinterface;
+    }
+
+    public void setInterface(AddInterface addInterface) {
+        this.addinterface = addInterface;
     }
 }

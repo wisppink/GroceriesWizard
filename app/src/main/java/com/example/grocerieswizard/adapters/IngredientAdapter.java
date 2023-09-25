@@ -21,11 +21,11 @@ import java.util.List;
 public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.IngredientViewHolder> {
 
     ItemIngredientBinding binding;
-    private final List<IngredientModel> ingredientList;
+    private static List<IngredientModel> ingredientList;
     private AddInterface addInterface;
 
     public IngredientAdapter(List<IngredientModel> ingredientList) {
-        this.ingredientList = ingredientList;
+        IngredientAdapter.ingredientList = ingredientList;
     }
 
 
@@ -33,14 +33,14 @@ public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.In
     @Override
     public IngredientAdapter.IngredientViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         binding = ItemIngredientBinding.inflate(LayoutInflater.from(parent.getContext()),parent,false);
-        View view =binding.getRoot();
-        return new IngredientViewHolder(view);
+        return new IngredientViewHolder(binding);
     }
 
     @Override
     public void onBindViewHolder(@NonNull IngredientAdapter.IngredientViewHolder holder, int position) {
         IngredientModel ingredient = ingredientList.get(position);
-        holder.bindIngredient(ingredient);
+        ingredient.setInterface(addInterface);
+        holder.bind(ingredient);
     }
 
     @Override
@@ -48,7 +48,7 @@ public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.In
         return ingredientList.size();
     }
 
-    public IngredientModel getItemAtPosition(int position) {
+    public static IngredientModel getItemAtPosition(int position) {
         if (position >= 0 && position < ingredientList.size()) {
             return ingredientList.get(position);
         }
@@ -96,14 +96,14 @@ public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.In
     }
 
 
-    public class IngredientViewHolder extends RecyclerView.ViewHolder {
+    public static class IngredientViewHolder extends RecyclerView.ViewHolder {
 
         TextView ingredientName;
         TextView quantity;
         TextView unit;
 
-        public IngredientViewHolder(@NonNull View itemView) {
-            super(itemView);
+        public IngredientViewHolder(ItemIngredientBinding binding) {
+            super(binding.getRoot());
             ingredientName = binding.ingredientName;
             quantity = binding.quantity;
             unit = binding.unit;
@@ -117,19 +117,18 @@ public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.In
         private void showPopUpMenu(View v, IngredientModel ingredientModel) {
             PopupMenu popupMenu = new PopupMenu(itemView.getContext(), v);
             popupMenu.inflate(R.menu.popup_menu_ingredient); // Create a menu resource file
-
             // Set click listeners for menu items
             popupMenu.setOnMenuItemClickListener(item -> {
                 int itemId = item.getItemId();
                 if (itemId == R.id.menu_edit) {// Implement the edit action here
-                    if (addInterface != null) {
-                        addInterface.onItemEdit(ingredientModel);
+                    if (ingredientModel.getInterface() != null) {
+                        ingredientModel.getInterface().onItemEdit(ingredientModel);
                         popupMenu.dismiss();
                     }
                     return true;
                 } else if (itemId == R.id.menu_delete) {// Implement the delete action here
-                    if (addInterface != null) {
-                        addInterface.onItemDelete(ingredientModel);
+                    if (ingredientModel.getInterface() != null) {
+                        ingredientModel.getInterface().onItemDelete(ingredientModel);
                         popupMenu.dismiss();
                     }
                     return true;
@@ -140,7 +139,7 @@ public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.In
             popupMenu.show();
         }
 
-        public void bindIngredient(IngredientModel ingredient) {
+        public void bind(IngredientModel ingredient) {
             ingredientName.setText(ingredient.getName());
             quantity.setText(String.valueOf(ingredient.getQuantity()));
             unit.setText(ingredient.getUnit());
