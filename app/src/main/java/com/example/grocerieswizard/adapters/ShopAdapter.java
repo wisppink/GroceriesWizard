@@ -3,7 +3,6 @@ package com.example.grocerieswizard.adapters;
 import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.TextView;
@@ -24,10 +23,9 @@ import java.util.Map;
 public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ShoppingViewHolder> {
     ShoppingItemRowBinding binding;
     private static final String TAG = "ShopAdapter";
-    private final Context context;
     private final ArrayList<ShoppingItem> shoppingItems = new ArrayList<>();
     private ShopInterface shopInterface;
-
+    Context context;
 
     public ShopAdapter(Context context) {
         this.context = context;
@@ -37,8 +35,7 @@ public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ShoppingViewHo
     @Override
     public ShoppingViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         binding = ShoppingItemRowBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
-        View itemView = binding.getRoot();
-        return new ShoppingViewHolder(itemView);
+        return new ShoppingViewHolder(binding);
     }
 
 
@@ -57,6 +54,8 @@ public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ShoppingViewHo
     public void setSelectedRecipeList(ArrayList<RecipeModel> selectedRecipeList) {
         ArrayList<ShoppingItem> tempList = shopInterface.generateShoppingItems(selectedRecipeList);
         for (ShoppingItem shoppingItem : tempList) {
+            shoppingItem.setAdapter(this);
+            shoppingItem.setShopInterface(shopInterface);
             shoppingItems.add(shoppingItem);
             notifyItemInserted(shoppingItems.size() - 1);
         }
@@ -78,18 +77,20 @@ public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ShoppingViewHo
     }
 
 
-    public class ShoppingViewHolder extends RecyclerView.ViewHolder {
+    public static class ShoppingViewHolder extends RecyclerView.ViewHolder {
         private final CheckBox checkBox;
         private final TextView ingredient_name;
         private final RecyclerView subRecipe;
         private final TextView totalTV;
+        Context context;
 
-        public ShoppingViewHolder(@NonNull View itemView) {
-            super(itemView);
+        public ShoppingViewHolder(ShoppingItemRowBinding binding) {
+            super(binding.getRoot());
             ingredient_name = binding.shoppingCartIngredientName;
             subRecipe = binding.subRecipeRecycler;
             totalTV = binding.total;
             checkBox = binding.isFinished;
+            context = binding.getRoot().getContext();
         }
 
         public void bind(ShoppingItem shoppingItem) {
@@ -97,7 +98,7 @@ public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ShoppingViewHo
             Log.d(TAG, "bind: every shop Item has sub item Map: " + subShoppingItemBooleanMap);
             ingredient_name.setText(shoppingItem.getIngredientName());
 
-            SubShopAdapter subShopAdapter = new SubShopAdapter(ShopAdapter.this);
+            SubShopAdapter subShopAdapter = new SubShopAdapter(shoppingItem.getAdapter());
             subRecipe.setAdapter(subShopAdapter);
             subShopAdapter.setShoppingItems(shoppingItem);
             subRecipe.setLayoutManager(new LinearLayoutManager(context));
@@ -117,7 +118,7 @@ public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ShoppingViewHo
                 for (Map.Entry<SubShoppingItem, Boolean> entry : subShoppingItemBooleanMap.entrySet()) {
                     entry.setValue(checkBox.isChecked());
                 }
-                totalTV.setText(shopInterface.generateTotal(subShoppingItemBooleanMap));
+                totalTV.setText(shoppingItem.getTotal(subShoppingItemBooleanMap));
             });
 
             SubShoppingItem subShoppingItem = subShopAdapter.getSubItem();
@@ -126,7 +127,7 @@ public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ShoppingViewHo
                 subShoppingItemBooleanMap.put(subShoppingItem, subShoppingItem.getChecked());
                 subShopAdapter.checkAllSubItems(checkBox.isChecked());
             }
-            totalTV.setText(shopInterface.generateTotal(subShoppingItemBooleanMap));
+            totalTV.setText(shoppingItem.getTotal(subShoppingItemBooleanMap));
         }
 
 
