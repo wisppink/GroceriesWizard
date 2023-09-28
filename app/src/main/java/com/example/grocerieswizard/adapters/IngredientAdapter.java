@@ -5,7 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.PopupMenu;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -32,7 +31,7 @@ public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.In
     @NonNull
     @Override
     public IngredientAdapter.IngredientViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        binding = ItemIngredientBinding.inflate(LayoutInflater.from(parent.getContext()),parent,false);
+        binding = ItemIngredientBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
         return new IngredientViewHolder(binding);
     }
 
@@ -97,21 +96,20 @@ public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.In
 
 
     public static class IngredientViewHolder extends RecyclerView.ViewHolder {
-
-        TextView ingredientName;
-        TextView quantity;
-        TextView unit;
+        private ItemIngredientBinding binding;
 
         public IngredientViewHolder(ItemIngredientBinding binding) {
             super(binding.getRoot());
-            ingredientName = binding.ingredientName;
-            quantity = binding.quantity;
-            unit = binding.unit;
+            setBinding(binding);
 
             itemView.setOnLongClickListener(v -> {
                 showPopUpMenu(v, getItemAtPosition(getAdapterPosition()));
                 return false;
             });
+        }
+
+        private void setBinding(ItemIngredientBinding binding) {
+            this.binding = binding;
         }
 
         private void showPopUpMenu(View v, IngredientModel ingredientModel) {
@@ -140,9 +138,9 @@ public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.In
         }
 
         public void bind(IngredientModel ingredient) {
-            ingredientName.setText(ingredient.getName());
-            quantity.setText(String.valueOf(ingredient.getQuantity()));
-            unit.setText(ingredient.getUnit());
+            binding.ingredientName.setText(ingredient.getName());
+            binding.quantity.setText(String.valueOf(ingredient.getQuantity()));
+            binding.unit.setText(ingredient.getUnit());
         }
     }
 }

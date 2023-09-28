@@ -3,8 +3,6 @@ package com.example.grocerieswizard.adapters;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -79,32 +77,30 @@ public class SubShopAdapter extends RecyclerView.Adapter<SubShopAdapter.SubShopV
     }
 
     public static class SubShopViewHolder extends RecyclerView.ViewHolder {
-        TextView recipeTitle;
-        TextView ingredientQuantity;
-        TextView ingredientUnit;
-        CheckBox ingredientCB;
+        private SubRecipeBinding binding;
 
         public SubShopViewHolder(SubRecipeBinding binding) {
             super(binding.getRoot());
-            recipeTitle = binding.subRecipeName;
-            ingredientQuantity = binding.subIngredientQuantity;
-            ingredientUnit = binding.subIngredientUnit;
-            ingredientCB = binding.subIngredientCheckbox;
+            setBinding(binding);
 
         }
 
         public void bind(SubShoppingItem subShoppingItem) {
-            recipeTitle.setText(subShoppingItem.getRecipeName());
-            ingredientUnit.setText(subShoppingItem.getIngredientUnit());
-            ingredientQuantity.setText(String.format(String.valueOf(subShoppingItem.getIngredientQuantity())));
-            ingredientCB.setOnCheckedChangeListener(null);
-            ingredientCB.setChecked(subShoppingItem.getChecked());
+            binding.subRecipeName.setText(subShoppingItem.getRecipeName());
+            binding.subIngredientUnit.setText(subShoppingItem.getIngredientUnit());
+            binding.subIngredientQuantity.setText(String.format(String.valueOf(subShoppingItem.getIngredientQuantity())));
+            binding.subIngredientCheckbox.setOnCheckedChangeListener(null);
+            binding.subIngredientCheckbox.setChecked(subShoppingItem.getChecked());
             Log.d(TAG, "bind: setCheckedSubItem: " + subShoppingItem.getRecipeName());
-            ingredientCB.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            binding.subIngredientCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 subShoppingItem.setChecked(isChecked);
                 subShoppingItem.getParentAdapter().notifySubItemStateChanged(subShoppingItem);
 
             });
+        }
+
+        public void setBinding(SubRecipeBinding binding) {
+            this.binding = binding;
         }
 
 

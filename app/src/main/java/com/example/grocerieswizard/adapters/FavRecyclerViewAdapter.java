@@ -4,12 +4,9 @@ import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
-import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -71,25 +68,19 @@ public class FavRecyclerViewAdapter extends RecyclerView.Adapter<FavRecyclerView
     }
 
     public static class FavViewHolder extends RecyclerView.ViewHolder {
-
-        private final TextView title;
-        private final CardView background;
         RecipeModel recipeModel;
+        private FavItemRowBinding favItemRowBinding;
 
         public FavViewHolder(FavItemRowBinding binding) {
             super(binding.getRoot());
-
-            title = binding.favRecipeTitle;
-            ImageView favButton = binding.unFav;
-            background = binding.cardView;
-
-            favButton.setOnClickListener(v -> {
+            setFavItemRowBinding(binding);
+            binding.unFav.setOnClickListener(v -> {
                 AlertDialog.Builder builder = new AlertDialog.Builder(itemView.getContext());
                 builder.setMessage(R.string.unfav_recipe_dialog_ask)
                         .setPositiveButton(R.string.yes, (dialog, which) -> {
                             int adapterPosition = getAdapterPosition();
                             if (adapterPosition != RecyclerView.NO_POSITION) {
-                              recipeModel.getFavInterface().onRemoveFromFavorites(recipeModel);
+                                recipeModel.getFavInterface().onRemoveFromFavorites(recipeModel);
                             }
                         })
                         .setNegativeButton(R.string.no, (dialog, which) -> dialog.dismiss());
@@ -102,19 +93,19 @@ public class FavRecyclerViewAdapter extends RecyclerView.Adapter<FavRecyclerView
         }
 
         public void bind(RecipeModel recipeModel) {
-            title.setText(recipeModel.getRecipeName());
+            favItemRowBinding.favRecipeTitle.setText(recipeModel.getRecipeName());
             if (recipeModel.getFavInterface().isRecipeSelected(recipeModel.getId())) {
                 recipeModel.setSelected(true);
-                background.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), R.color.gray));
+                favItemRowBinding.cardView.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), R.color.gray));
             } else {
-                background.setBackgroundColor(Color.TRANSPARENT);
+                favItemRowBinding.cardView.setBackgroundColor(Color.TRANSPARENT);
             }
 
             itemView.setOnClickListener(v -> {
                 Log.d(TAG, "bind: clicked!");
                 if (!recipeModel.isSelected()) {
                     recipeModel.setSelected(true);
-                    background.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), R.color.gray));
+                    favItemRowBinding.cardView.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), R.color.gray));
                     recipeModel.getFavInterface().insertSelectedRecipe(recipeModel.getId());
                 } else {
                     recipeModel.setSelected(false);
@@ -124,6 +115,10 @@ public class FavRecyclerViewAdapter extends RecyclerView.Adapter<FavRecyclerView
                 recipeModel.getFavAdapter().notifyItemChanged(getAdapterPosition());
             });
             this.recipeModel = recipeModel;
+        }
+
+        public void setFavItemRowBinding(FavItemRowBinding favItemRowBinding) {
+            this.favItemRowBinding = favItemRowBinding;
         }
     }
 }
