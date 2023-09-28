@@ -5,9 +5,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -23,7 +20,10 @@ import com.example.grocerieswizard.models.RecipeModel;
 import java.util.ArrayList;
 
 public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecyclerViewAdapter.RecipeViewHolder> {
-    RecyclerViewRowBinding binding;
+    private static final int VIEW_TYPE_SWIPE = 1;
+    private static final int VIEW_TYPE_ROW = 0;
+    RecyclerViewRowBinding rowBinding;
+    RecyclerViewMenuBinding menuBinding;
     private final ArrayList<RecipeModel> recipeList = new ArrayList<>();
     private RecipeInterface recipeInterface;
     private final Context context;
@@ -34,12 +34,26 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
         this.context = context;
     }
 
+    @Override
+    public int getItemViewType(int position) {
+        RecipeModel recipeModel = recipeList.get(position);
+        return recipeModel.isSwiped() ? VIEW_TYPE_SWIPE : VIEW_TYPE_ROW;
+    }
+
     @NonNull
     @Override
     public RecipeViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        binding = RecyclerViewRowBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
-        View itemView =binding.getRoot();
-        return new RecipeViewHolder(itemView);
+        rowBinding = RecyclerViewRowBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+        menuBinding = RecyclerViewMenuBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+
+        View view;
+        if (viewType == VIEW_TYPE_SWIPE) {
+            view = menuBinding.getRoot();
+        } else {
+            view = rowBinding.getRoot();
+        }
+
+        return new RecipeViewHolder(view);
     }
 
     @Override
@@ -47,17 +61,9 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
         RecipeModel recipeModel = recipeList.get(position);
 
         if (recipeModel.isSwiped()) {
-            RecyclerViewMenuBinding swipeBind = RecyclerViewMenuBinding.inflate(LayoutInflater.from(holder.itemView.getContext()), (ViewGroup) holder.itemView, false);
-            View swipeBinding = swipeBind.getRoot();
-            ((ViewGroup) holder.itemView).removeAllViews();
-            ((ViewGroup) holder.itemView).addView(swipeBinding);
-            holder.bindSwipedLayout(recipeModel, swipeBind);
+            holder.bindSwipedLayout(recipeModel);
         } else {
-            RecyclerViewRowBinding rowBind = RecyclerViewRowBinding.inflate(LayoutInflater.from(holder.itemView.getContext()), (ViewGroup) holder.itemView, false);
-            View rowBinding = rowBind.getRoot();
-            ((ViewGroup) holder.itemView).removeAllViews();
-            ((ViewGroup) holder.itemView).addView(rowBinding);
-            holder.bind(recipeModel,rowBind);
+            holder.bind(recipeModel);
         }
 
         if (recipeInterface.isRecipeSelected(recipeModel.getId())) {
@@ -147,7 +153,7 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
     public void setRecipeList(ArrayList<RecipeModel> rList) {
         for (RecipeModel recipeModel : rList) {
             recipeList.add(recipeModel);
-            notifyItemInserted(recipeList.size()-1);
+            notifyItemInserted(recipeList.size() - 1);
         }
 
     }
@@ -161,8 +167,6 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
     }
 
     public class RecipeViewHolder extends RecyclerView.ViewHolder {
-
-        private ImageButton favButton;
 
         public RecipeViewHolder(View itemView) {
             super(itemView);
@@ -197,67 +201,58 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
         }
 
 
-        public void bindSwipedLayout(RecipeModel recipeModel, RecyclerViewMenuBinding swipeBinding) {
+        public void bindSwipedLayout(RecipeModel recipeModel) {
 
-            ImageView editIcon = swipeBinding.editIcon;
-            ImageView shareIcon = swipeBinding.shareIcon;
-            ImageView deleteIcon = swipeBinding.deleteIcon;
 
             if (!recipeModel.isSelected()) {
                 itemView.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), android.R.color.transparent));
             }
 
-            editIcon.setOnClickListener(v -> editItem(getAdapterPosition()));
+            menuBinding.editIcon.setOnClickListener(v -> editItem(getAdapterPosition()));
 
-            shareIcon.setOnClickListener(v -> { // TODO: Handle share icon click
+            menuBinding.shareIcon.setOnClickListener(v -> { // TODO: Handle share icon click
                 Toast.makeText(itemView.getContext(), "Share icon clicked", Toast.LENGTH_SHORT).show();
             });
 
-            deleteIcon.setOnClickListener(v -> recipeInterface.onItemDelete(getAdapterPosition()));
-
-            ((ViewGroup) itemView).removeAllViews();
-            ((ViewGroup) itemView).addView(swipeBinding.getRoot());
+            menuBinding.deleteIcon.setOnClickListener(v -> recipeInterface.onItemDelete(getAdapterPosition()));
 
         }
 
 
-        public void bind(RecipeModel recipeModel, RecyclerViewRowBinding rowBind) {
-            favButton = rowBind.favIcon;
-            ImageView resImage = rowBind.defaultCardRecipeImage;
-            TextView title = rowBind.textView;
+        public void bind(RecipeModel recipeModel) {
 
-            title.setText(recipeModel.getRecipeName());
+            rowBinding.textView.setText(recipeModel.getRecipeName());
 
             if (recipeModel.getImageBitmap() != null) {
-                resImage.setImageBitmap(recipeModel.getImageBitmap());
+                rowBinding.defaultCardRecipeImage.setImageBitmap(recipeModel.getImageBitmap());
             } else {
-                resImage.setImageResource(R.drawable.recipe_image_default);
+                rowBinding.defaultCardRecipeImage.setImageResource(R.drawable.recipe_image_default);
             }
 
             boolean isFavorite = recipeInterface.isRecipeFavorite(recipeModel.getId());
             if (isFavorite) {
                 // Set the favorite icon if it is favorite
-                favButton.setImageResource(R.drawable.baseline_favorite_24);
+                rowBinding.favIcon.setImageResource(R.drawable.baseline_favorite_24);
             } else {
                 // Set the non-favorite icon if it is not favorite
-                favButton.setImageResource(R.drawable.baseline_unfavorite_border_24);
+                rowBinding.favIcon.setImageResource(R.drawable.baseline_unfavorite_border_24);
             }
             if (!recipeModel.isSelected()) {
                 itemView.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), android.R.color.transparent));
             }
 
-            favButton.setOnClickListener(v -> {
+            rowBinding.favIcon.setOnClickListener(v -> {
                 int recipeId = recipeModel.getId();
                 // Toggle the favorite state (add/remove from favorites)
                 boolean isCurrentlyFavorite = recipeInterface.isRecipeFavorite(recipeModel.getId());
 
                 // Update the UI and database based on the new favorite state
                 if (!isCurrentlyFavorite) {
-                    favButton.setImageResource(R.drawable.baseline_favorite_24);
+                    rowBinding.favIcon.setImageResource(R.drawable.baseline_favorite_24);
                     Toast.makeText(itemView.getContext(), "Added to Favorites", Toast.LENGTH_SHORT).show();
                     recipeInterface.insertRecipeFav(recipeId);
                 } else {
-                    favButton.setImageResource(R.drawable.baseline_unfavorite_border_24);
+                    rowBinding.favIcon.setImageResource(R.drawable.baseline_unfavorite_border_24);
                     Toast.makeText(itemView.getContext(), "Removed from Favorites", Toast.LENGTH_SHORT).show();
                     recipeInterface.deleteRecipeFav(recipeId);
                 }
@@ -271,6 +266,6 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
         RecipeModel recipeModel = getItemAtPosition(position);
         recipeModel.setSwiped(false);
         notifyItemChanged(position);
-        recipeInterface.onItemEdit(recipeModel,position);
+        recipeInterface.onItemEdit(recipeModel, position);
     }
 }
