@@ -19,7 +19,7 @@
             android:name=".activities.FavActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.ShoppingMenuActivity"
+            android:name=".shop.ShoppingMenuActivity"
             android:exported="false" />
         <activity
             android:name=".activities.MainActivity"
