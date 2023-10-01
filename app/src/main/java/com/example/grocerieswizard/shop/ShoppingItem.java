@@ -1,7 +1,6 @@
-package com.example.grocerieswizard.models;
+package com.example.grocerieswizard.shop;
 
-import com.example.grocerieswizard.adapters.ShopAdapter;
-import com.example.grocerieswizard.interfaces.ShopInterface;
+import com.example.grocerieswizard.shop.subshop.SubShoppingItem;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,8 +9,6 @@ public class ShoppingItem {
     private final String ingredientName;
 
     private final Map<SubShoppingItem, Boolean> subShoppingItems = new HashMap<>();
-    private ShopAdapter shopAdapter;
-    private ShopInterface shopInterface;
 
     public ShoppingItem(String ingredientName) {
         this.ingredientName = ingredientName;
@@ -28,22 +25,6 @@ public class ShoppingItem {
     public void addSubItem(SubShoppingItem subItem, boolean isChecked) {
         subShoppingItems.put(subItem, isChecked);
 
-    }
-
-    public void setAdapter(ShopAdapter shopAdapter) {
-        this.shopAdapter = shopAdapter;
-    }
-
-    public ShopAdapter getAdapter() {
-        return shopAdapter;
-    }
-
-    public String getTotal(Map<SubShoppingItem, Boolean> subShoppingItemBooleanMap) {
-        return shopInterface.generateTotal(subShoppingItemBooleanMap);
-    }
-
-    public void setShopInterface(ShopInterface shopInterface) {
-        this.shopInterface = shopInterface;
     }
 
     public Boolean ControlAllValuesTrue(){

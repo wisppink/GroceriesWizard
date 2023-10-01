@@ -1,13 +1,12 @@
-package com.example.grocerieswizard.interfaces;
+package com.example.grocerieswizard.shop;
 
 import com.example.grocerieswizard.models.RecipeModel;
-import com.example.grocerieswizard.models.ShoppingItem;
-import com.example.grocerieswizard.models.SubShoppingItem;
+import com.example.grocerieswizard.shop.subshop.SubShoppingItem;
 
 import java.util.ArrayList;
 import java.util.Map;
 
-public interface ShopInterface {
+public interface ShopHelper {
 
     ArrayList<ShoppingItem> generateShoppingItems(ArrayList<RecipeModel> recipes);
 

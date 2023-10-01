@@ -1,13 +1,12 @@
-package com.example.grocerieswizard.models;
+package com.example.grocerieswizard.shop.subshop;
 
-import com.example.grocerieswizard.adapters.ShopAdapter;
+import com.example.grocerieswizard.shop.ShopAdapter;
 
 public class SubShoppingItem {
     private final String recipeName;
     private final String ingredientUnit;
     private final Double ingredientQuantity;
     private Boolean isChecked;
-    private ShopAdapter parentAdapter;
 
     public SubShoppingItem(String recipeName, String ingredientUnit, Double ingredientQuantity) {
         this.recipeName = recipeName;
@@ -32,14 +31,6 @@ public class SubShoppingItem {
     }
     public void setChecked(Boolean checked){
         isChecked = checked;
-    }
-
-    public ShopAdapter getParentAdapter() {
-        return parentAdapter;
-    }
-
-    public void setParentAdapter(ShopAdapter parentAdapter) {
-        this.parentAdapter = parentAdapter;
     }
 }
 

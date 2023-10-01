@@ -1,51 +1,19 @@
-package com.example.grocerieswizard.activities;
+package com.example.grocerieswizard.shop;
 
-import android.os.Bundle;
+import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
+
 import android.util.Log;
-import android.view.View;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-
-import com.example.grocerieswizard.RecipeDatabaseHelper;
-import com.example.grocerieswizard.adapters.ShopAdapter;
-import com.example.grocerieswizard.databinding.ActivityShoppingMenuBinding;
-import com.example.grocerieswizard.interfaces.ShopInterface;
 import com.example.grocerieswizard.models.IngredientModel;
 import com.example.grocerieswizard.models.RecipeModel;
-import com.example.grocerieswizard.models.ShoppingItem;
-import com.example.grocerieswizard.models.SubShoppingItem;
+import com.example.grocerieswizard.shop.subshop.SubShoppingItem;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class ShoppingMenuActivity extends AppCompatActivity implements ShopInterface {
-
-    private static final String TAG = "ShoppingMenuActivity";
-    ActivityShoppingMenuBinding binding;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        binding = ActivityShoppingMenuBinding.inflate(getLayoutInflater());
-        View view = binding.getRoot();
-        setContentView(view);
-
-        ArrayList<RecipeModel> recipes;
-        ShopAdapter adapter;
-        try (RecipeDatabaseHelper dbHelper = new RecipeDatabaseHelper(this)) {
-
-            adapter = new ShopAdapter(this);
-            binding.shoppingCart.setAdapter(adapter);
-            binding.shoppingCart.setLayoutManager(new LinearLayoutManager(this));
-
-            adapter.setShopInterface(this);
-            recipes = dbHelper.getSelectedRecipes();
-        }
-        adapter.setSelectedRecipeList(recipes);
-    }
+public class ShopHelperImpl implements ShopHelper {
 
     @Override
     public ArrayList<ShoppingItem> generateShoppingItems(ArrayList<RecipeModel> recipes) {
@@ -81,12 +49,10 @@ public class ShoppingMenuActivity extends AppCompatActivity implements ShopInter
         }
 
         return shoppingItems;
-
     }
 
     @Override
     public String generateTotal(Map<SubShoppingItem, Boolean> subShoppingItems) {
-
         Map<String, Double> unitToQuantity = new HashMap<>();
 
         subShoppingItems.forEach((item, isChecked) -> {
@@ -120,6 +86,4 @@ public class ShoppingMenuActivity extends AppCompatActivity implements ShopInter
         Log.d(TAG, "generateTotal: result: " + result);
         return result;
     }
-
-
 }

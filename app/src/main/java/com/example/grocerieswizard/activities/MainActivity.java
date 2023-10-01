@@ -21,6 +21,7 @@ import com.example.grocerieswizard.adapters.RecipeRecyclerViewAdapter;
 import com.example.grocerieswizard.databinding.ActivityMainBinding;
 import com.example.grocerieswizard.interfaces.RecipeInterface;
 import com.example.grocerieswizard.models.RecipeModel;
+import com.example.grocerieswizard.shop.ShoppingMenuActivity;
 
 import java.util.ArrayList;
 
