@@ -16,7 +16,6 @@ import com.example.grocerieswizard.models.ShoppingItem;
 import com.example.grocerieswizard.models.SubShoppingItem;
 
 import java.util.ArrayList;
-import java.util.Map;
 
 public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ShoppingViewHolder> {
     ShoppingItemRowBinding binding;
@@ -87,40 +86,31 @@ public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ShoppingViewHo
         }
 
         public void bind(ShoppingItem shoppingItem) {
-            Map<SubShoppingItem, Boolean> subShoppingItemBooleanMap = shoppingItem.getSubShoppingItems();
-            Log.d(TAG, "bind: every shop Item has sub item Map: " + subShoppingItemBooleanMap);
+            //show ingredient name
             binding.shoppingCartIngredientName.setText(shoppingItem.getIngredientName());
-
+            Log.d(TAG, "bind: name " + shoppingItem.getIngredientName());
+            //subAdapter
             SubShopAdapter subShopAdapter = new SubShopAdapter(shoppingItem.getAdapter());
             binding.subRecipeRecycler.setAdapter(subShopAdapter);
             subShopAdapter.setShoppingItems(shoppingItem);
             binding.subRecipeRecycler.setLayoutManager(new LinearLayoutManager(context));
 
-            boolean allValuesTrue = true;
-            for (Boolean value : subShoppingItemBooleanMap.values()) {
-                if (!value) {
-                    allValuesTrue = false;
-                    break;
-                }
-            }
-            binding.isFinished.setChecked(allValuesTrue);
-            binding.isFinished.setOnClickListener(v -> {
-                Log.d(TAG, "CheckBox clicked");
-                subShopAdapter.checkAllSubItems(binding.isFinished.isChecked());
+            binding.isFinished.setChecked(shoppingItem.ControlAllValuesTrue());
 
-                for (Map.Entry<SubShoppingItem, Boolean> entry : subShoppingItemBooleanMap.entrySet()) {
-                    entry.setValue(binding.isFinished.isChecked());
-                }
-                binding.total.setText(shoppingItem.getTotal(subShoppingItemBooleanMap));
+            binding.isFinished.setOnClickListener(v -> {
+                subShopAdapter.checkAllSubItems(binding.isFinished.isChecked());
+                shoppingItem.setEverySubValue(binding.isFinished.isChecked());
+                binding.total.setText(shoppingItem.getTotal(shoppingItem.getSubShoppingItems()));
             });
 
             SubShoppingItem subShoppingItem = subShopAdapter.getSubItem();
-
+            //control item check
             if (subShoppingItem != null) {
-                subShoppingItemBooleanMap.put(subShoppingItem, subShoppingItem.getChecked());
+                shoppingItem.getSubShoppingItems().put(subShoppingItem, subShoppingItem.getChecked());
                 subShopAdapter.checkAllSubItems(binding.isFinished.isChecked());
             }
-            binding.total.setText(shoppingItem.getTotal(subShoppingItemBooleanMap));
+
+            binding.total.setText(shoppingItem.getTotal(shoppingItem.getSubShoppingItems()));
         }
 
         public void setBinding(ShoppingItemRowBinding binding) {

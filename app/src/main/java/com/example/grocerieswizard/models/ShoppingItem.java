@@ -45,4 +45,19 @@ public class ShoppingItem {
     public void setShopInterface(ShopInterface shopInterface) {
         this.shopInterface = shopInterface;
     }
+
+    public Boolean ControlAllValuesTrue(){
+        for (Boolean value : getSubShoppingItems().values()) {
+            if (!value) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public void setEverySubValue(boolean b){
+        for (Map.Entry<SubShoppingItem, Boolean> entry : getSubShoppingItems().entrySet()) {
+            entry.setValue(b);
+        }
+    }
 }
