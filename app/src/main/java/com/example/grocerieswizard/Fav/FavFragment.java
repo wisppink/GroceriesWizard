@@ -1,51 +1,46 @@
-package com.example.grocerieswizard.activities;
+package com.example.grocerieswizard.Fav;
 
-import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.grocerieswizard.RecipeDatabaseHelper;
-import com.example.grocerieswizard.adapters.FavRecyclerViewAdapter;
-import com.example.grocerieswizard.databinding.ActivityFavBinding;
-import com.example.grocerieswizard.interfaces.FavInterface;
+import com.example.grocerieswizard.databinding.FragmentFavBinding;
 import com.example.grocerieswizard.models.RecipeModel;
 
 import java.util.ArrayList;
 
-public class FavActivity extends AppCompatActivity implements FavInterface {
-
+public class FavFragment extends Fragment implements FavInterface {
     RecipeDatabaseHelper dbHelper;
     private FavRecyclerViewAdapter adapter;
-    ActivityFavBinding binding;
+    FragmentFavBinding binding;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        binding = ActivityFavBinding.inflate(getLayoutInflater());
-        View view = binding.getRoot();
-        setContentView(view);
-
-        dbHelper = new RecipeDatabaseHelper(this);
+        dbHelper = new RecipeDatabaseHelper(getContext());
         adapter = new FavRecyclerViewAdapter();
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        binding = FragmentFavBinding.inflate(inflater, container, false);
         adapter.setFavInterface(this);
 
         binding.FavRecyclerView.setAdapter(adapter);
-        binding.FavRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        binding.FavRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         ArrayList<RecipeModel> recipes = dbHelper.getRecipesFav();
         adapter.setFavList(recipes);
-    }
 
-
-    @Override
-    public void onBackPressed() {
-        Intent resultIntent = new Intent();
-        setResult(RESULT_OK, resultIntent);
-        super.onBackPressed();
+        return binding.getRoot();
     }
 
     @Override

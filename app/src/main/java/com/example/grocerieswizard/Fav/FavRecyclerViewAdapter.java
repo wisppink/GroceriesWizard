@@ -1,4 +1,4 @@
-package com.example.grocerieswizard.adapters;
+package com.example.grocerieswizard.Fav;
 
 import android.graphics.Color;
 import android.util.Log;
@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.grocerieswizard.R;
 import com.example.grocerieswizard.databinding.FavItemRowBinding;
-import com.example.grocerieswizard.interfaces.FavInterface;
 import com.example.grocerieswizard.models.RecipeModel;
 
 import java.util.ArrayList;

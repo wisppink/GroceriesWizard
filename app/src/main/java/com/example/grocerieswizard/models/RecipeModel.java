@@ -6,8 +6,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 
-import com.example.grocerieswizard.adapters.FavRecyclerViewAdapter;
-import com.example.grocerieswizard.interfaces.FavInterface;
+import com.example.grocerieswizard.Fav.FavRecyclerViewAdapter;
+import com.example.grocerieswizard.Fav.FavInterface;
 
 import java.util.List;
 

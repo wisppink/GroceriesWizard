@@ -1,4 +1,4 @@
-package com.example.grocerieswizard.adapters;
+package com.example.grocerieswizard.home;
 
 import android.content.Context;
 import android.util.Log;
@@ -14,7 +14,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.grocerieswizard.R;
 import com.example.grocerieswizard.databinding.RecyclerViewMenuBinding;
 import com.example.grocerieswizard.databinding.RecyclerViewRowBinding;
-import com.example.grocerieswizard.interfaces.RecipeInterface;
 import com.example.grocerieswizard.models.RecipeModel;
 
 import java.util.ArrayList;
@@ -162,10 +161,6 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
         notifyItemChanged(position);
     }
 
-    public void updateList() {
-        notifyDataSetChanged();
-    }
-
     public class RecipeViewHolder extends RecyclerView.ViewHolder {
 
         public RecipeViewHolder(View itemView) {
@@ -249,11 +244,11 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
                 // Update the UI and database based on the new favorite state
                 if (!isCurrentlyFavorite) {
                     rowBinding.favIcon.setImageResource(R.drawable.baseline_favorite_24);
-                    Toast.makeText(itemView.getContext(), "Added to Favorites", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(itemView.getContext(), "Added to Favorites " + recipeId, Toast.LENGTH_SHORT).show();
                     recipeInterface.insertRecipeFav(recipeId);
                 } else {
                     rowBinding.favIcon.setImageResource(R.drawable.baseline_unfavorite_border_24);
-                    Toast.makeText(itemView.getContext(), "Removed from Favorites", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(itemView.getContext(), "Removed from Favorites "+ recipeId, Toast.LENGTH_SHORT).show();
                     recipeInterface.deleteRecipeFav(recipeId);
                 }
                 Log.d(TAG, "Recipe " + recipeModel.getRecipeName() + " isFavorite: " + !isCurrentlyFavorite);

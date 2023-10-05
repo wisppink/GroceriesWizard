@@ -1,4 +1,4 @@
-package com.example.grocerieswizard.interfaces;
+package com.example.grocerieswizard.Fav;
 
 import com.example.grocerieswizard.models.RecipeModel;
 

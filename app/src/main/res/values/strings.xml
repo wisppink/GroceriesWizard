@@ -31,4 +31,10 @@
     <string name="TitleFoundRecipe">Recipe Found</string>
     <string name="MessageFoundRecipe">We found a recipe in the database.\nWould you like to automatically get its ingredients?</string>
     <string name="add">add</string>
+    <string name="home">Home</string>
+    <string name="fav">Favorites</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="fab_description">Click here to add Recipe</string>
+    <string name="open_menu_description">Click here to see menu</string>
 </resources>

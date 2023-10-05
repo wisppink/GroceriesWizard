@@ -30,7 +30,7 @@ import com.example.grocerieswizard.MealResponse;
 import com.example.grocerieswizard.R;
 import com.example.grocerieswizard.RecipeDatabaseHelper;
 import com.example.grocerieswizard.adapters.IngredientAdapter;
-import com.example.grocerieswizard.adapters.RecipeRecyclerViewAdapter;
+import com.example.grocerieswizard.home.RecipeRecyclerViewAdapter;
 import com.example.grocerieswizard.databinding.ActivityAddRecipeBinding;
 import com.example.grocerieswizard.databinding.DialogAddIngredientBinding;
 import com.example.grocerieswizard.interfaces.AddInterface;
