@@ -4,9 +4,6 @@ import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -41,17 +38,42 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        RecyclerView.ViewHolder viewHolder;
 
         if (viewType == VIEW_TYPE_ROW) {
             RecyclerViewRowBinding rowBinding = RecyclerViewRowBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
-            viewHolder = new RowViewHolder(rowBinding, recipeInterface);
+            RecyclerView.ViewHolder rowHolder = new RowViewHolder(rowBinding, recipeInterface);
+            rowBinding.favIcon.setOnClickListener(v -> {
+                int position = rowHolder.getAdapterPosition();
+                if (position != RecyclerView.NO_POSITION) {
+                    RecipeModel recipeModel = recipeList.get(position);
+                    int recipeId = recipeModel.getId();
+                    boolean isCurrentlyFavorite = recipeInterface.isRecipeFavorite(recipeModel.getId());
+                    if (!isCurrentlyFavorite) {
+                        rowBinding.favIcon.setImageResource(R.drawable.baseline_favorite_24);
+                        recipeInterface.insertRecipeFav(recipeId);
+                        Toast.makeText(rowBinding.getRoot().getContext(), "Added to Favorites", Toast.LENGTH_SHORT).show();
+                    } else {
+                        rowBinding.favIcon.setImageResource(R.drawable.baseline_unfavorite_border_24);
+                        recipeInterface.deleteRecipeFav(recipeId);
+                        Toast.makeText(rowBinding.getRoot().getContext(), "Removed from Favorites", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+
+            return rowHolder;
+
         } else {
-            RecyclerViewMenuBinding menuBinding = RecyclerViewMenuBinding.inflate(inflater, parent, false);
-            viewHolder = new MenuViewHolder(menuBinding, recipeInterface);
+            RecyclerViewMenuBinding menuBinding = RecyclerViewMenuBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+            RecyclerView.ViewHolder menuHolder = new MenuViewHolder(menuBinding,recipeInterface);
+
+            menuBinding.editIcon.setOnClickListener(v -> recipeInterface.onItemEdit(menuHolder.getAdapterPosition()));
+            menuBinding.shareIcon.setOnClickListener(v -> { recipeInterface.onItemShare(menuHolder.getAdapterPosition());
+                Toast.makeText(menuBinding.getRoot().getContext(), "Share icon clicked", Toast.LENGTH_SHORT).show();
+            });
+            menuBinding.deleteIcon.setOnClickListener(v -> recipeInterface.onItemDelete(menuHolder.getAdapterPosition()));
+
+            return menuHolder;
         }
-        return viewHolder;
     }
 
     @Override
@@ -158,72 +180,86 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
 
     public static class RowViewHolder extends RecyclerView.ViewHolder {
         RecipeInterface recipeInterface;
-        TextView nameTV;
-        ImageButton favIcon;
-        ImageView recipeImage;
+        RecyclerViewRowBinding binding;
+        private static final String TAG = "RowViewHolder";
+
+        public void setBinding(RecyclerViewRowBinding binding) {
+            this.binding = binding;
+        }
 
         public RowViewHolder(RecyclerViewRowBinding binding, RecipeInterface recipeInterface) {
             super(binding.getRoot());
-            nameTV = binding.textView;
-            favIcon = binding.favIcon;
-            recipeImage = binding.defaultCardRecipeImage;
+            setBinding(binding);
             this.recipeInterface = recipeInterface;
 
             binding.getRoot().setOnClickListener(
                     v -> recipeInterface.onItemClick(getAdapterPosition())
             );
 
-            itemView.setOnLongClickListener(v -> true);
+            binding.getRoot().setOnLongClickListener(v -> {
+                boolean x = recipeInterface.onLongClick(getAdapterPosition());
+                if (x) {
+                    //selected
+                    binding.getRoot().setBackgroundColor(ContextCompat.getColor(binding.getRoot().getContext(), R.color.gray));
+                } else
+                    //unselected
+                    binding.getRoot().setBackgroundColor(ContextCompat.getColor(binding.getRoot().getContext(), android.R.color.transparent));
+                return true;
+            });
         }
 
         public void bind(RecipeModel recipeModel) {
-            nameTV.setText(recipeModel.getRecipeName());
-            recipeImage.setImageBitmap(recipeModel.getImageBitmap());
+            binding.textView.setText(recipeModel.getRecipeName());
+
             if (recipeModel.getImageBitmap() != null) {
-                recipeImage.setImageBitmap(recipeModel.getImageBitmap());
+                binding.defaultCardRecipeImage.setImageBitmap(recipeModel.getImageBitmap());
             } else {
-                recipeImage.setImageResource(R.drawable.recipe_image_default);
+                binding.defaultCardRecipeImage.setImageResource(R.drawable.recipe_image_default);
             }
 
-            boolean isFavorite = recipeInterface.isRecipeFavorite(recipeModel.getId());
-            if (isFavorite) {
+
+            if (recipeInterface.isRecipeFavorite(recipeModel.getId())) {
                 // Set the favorite icon if it is favorite
-                favIcon.setImageResource(R.drawable.baseline_favorite_24);
+                binding.favIcon.setImageResource(R.drawable.baseline_favorite_24);
             } else {
                 // Set the non-favorite icon if it is not favorite
-                favIcon.setImageResource(R.drawable.baseline_unfavorite_border_24);
+                binding.favIcon.setImageResource(R.drawable.baseline_unfavorite_border_24);
             }
-            if (!recipeModel.isSelected()) {
+
+            if (recipeInterface.isRecipeSelected(recipeModel.getId())) {
+                Log.d(TAG, "bind: recipe already selected make it gray " + recipeModel.getId());
+                binding.getRoot().setBackgroundColor(ContextCompat.getColor(binding.getRoot().getContext(), R.color.gray));
+
+            } else {
+                Log.d(TAG, "bind: unselected make it transparent "+ recipeModel.getId());
                 itemView.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), android.R.color.transparent));
             }
         }
     }
 
     public static class MenuViewHolder extends RecyclerView.ViewHolder {
-        ImageView deleteIcon, editIcon, shareIcon;
-        RecipeInterface recipeInterface;
+        private final RecipeInterface recipeInterface;
+        private RecyclerViewMenuBinding binding;
+        private static final String TAG = "MenuViewHolder";
 
         public MenuViewHolder(RecyclerViewMenuBinding binding, RecipeInterface recipeInterface) {
             super(binding.getRoot());
-            deleteIcon = binding.deleteIcon;
-            editIcon = binding.editIcon;
-            shareIcon = binding.shareIcon;
+            setBinding(binding);
             this.recipeInterface = recipeInterface;
         }
 
         public void bind(RecipeModel recipeModel) {
-
-            if (!recipeModel.isSelected()) {
+            if (recipeInterface.isRecipeSelected(recipeModel.getId())) {
+                Log.d(TAG, "bind: swiped, selected " + recipeModel.getId());
+                binding.getRoot().setBackgroundColor(ContextCompat.getColor(binding.getRoot().getContext(), R.color.gray));
+            } else {
+                Log.d(TAG, "bind: swiped, unselected "+ recipeModel.getId());
                 itemView.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), android.R.color.transparent));
             }
-            editIcon.setOnClickListener(v -> recipeInterface.onItemEdit(recipeModel, getAdapterPosition()));
+        }
 
-            shareIcon.setOnClickListener(v -> { // TODO: Handle share icon click
-                Toast.makeText(itemView.getContext(), "Share icon clicked", Toast.LENGTH_SHORT).show();
-            });
-
-            deleteIcon.setOnClickListener(v -> recipeInterface.onItemDelete(getAdapterPosition()));
-
+        public void setBinding(RecyclerViewMenuBinding binding) {
+            this.binding = binding;
         }
     }
 }

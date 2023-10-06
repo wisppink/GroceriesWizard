@@ -22,9 +22,11 @@ import com.example.grocerieswizard.RecipeDatabaseHelper;
 import com.example.grocerieswizard.activities.AddRecipeActivity;
 import com.example.grocerieswizard.activities.DetailActivity;
 import com.example.grocerieswizard.databinding.FragmentHomeBinding;
+import com.example.grocerieswizard.models.IngredientModel;
 import com.example.grocerieswizard.models.RecipeModel;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class HomeFragment extends Fragment implements RecipeInterface {
 
@@ -32,12 +34,14 @@ public class HomeFragment extends Fragment implements RecipeInterface {
     private RecipeRecyclerViewAdapter adapter;
     RecipeDatabaseHelper recipeDatabaseHelper;
     Context context;
+    private static final String TAG = "HomeFragment";
 
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         this.context = context;
     }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -177,13 +181,13 @@ public class HomeFragment extends Fragment implements RecipeInterface {
 
     // Handle item edit and start AddRecipe activity for editing
     @Override
-    public void onItemEdit(RecipeModel recipeModel, int position) {
+    public void onItemEdit(int position) {
+        RecipeModel recipeModel = adapter.getItemAtPosition(position);
         Intent editIntent = new Intent(getActivity(), AddRecipeActivity.class);
         editIntent.putExtra("editRecipe", true);
         editIntent.putExtra("recipeModel", recipeModel);
         editIntent.putExtra("position", position);
         launcher.launch(editIntent);
-
     }
 
     @Override
@@ -231,4 +235,55 @@ public class HomeFragment extends Fragment implements RecipeInterface {
         recipeDatabaseHelper.deleteRecipeFav(recipeId);
 
     }
+
+    @Override
+    public boolean onLongClick(int position) {
+        RecipeModel recipeModel = adapter.getItemAtPosition(position);
+        if (isRecipeSelected(recipeModel.getId())) {
+            //already selected, unselect
+            Log.d(TAG, "onLongClick: it is selected, unselect " + recipeModel.getId());
+            recipeModel.setSelected(false);
+            deleteSelectedRecipe(recipeModel.getId());
+            return false;
+        } else {
+            //not selected, select
+            Log.d(TAG, "onLongClick: its not selected, select " + recipeModel.getId());
+            insertSelectedRecipe(recipeModel.getId());
+            recipeModel.setSelected(true);
+            return true;
+        }
+
+    }
+
+    @Override
+    public void onItemShare(int adapterPosition) {
+        RecipeModel recipeModel = adapter.getItemAtPosition(adapterPosition);
+        String instructions = recipeModel.getInstructions();
+        String ingredients = getStringIngredients(recipeModel.getIngredients());
+
+        String shareString = recipeModel.getRecipeName() + "\n\n\n" + instructions + "\n\n\n" + ingredients;
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.setType("text/plain");
+
+        shareIntent.putExtra(Intent.EXTRA_TEXT, shareString);
+
+        // Start an activity to choose the sharing method
+        context.startActivity(Intent.createChooser(shareIntent, "Share Recipe"));
+    }
+
+    private String getStringIngredients(List<IngredientModel> ingredients) {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        for (IngredientModel ingredient : ingredients) {
+            stringBuilder.append(ingredient.getName())
+                    .append(" ")
+                    .append(ingredient.getQuantity())
+                    .append(" ")
+                    .append(ingredient.getUnit())
+                    .append("\n");
+        }
+
+        return stringBuilder.toString();
+    }
+
 }

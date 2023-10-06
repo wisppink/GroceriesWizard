@@ -8,7 +8,7 @@ public interface RecipeInterface {
 
     void onItemDelete(int position);
 
-    void onItemEdit(RecipeModel recipeModel,int position);
+    void onItemEdit(int position);
     Boolean isRecipeSelected(int id);
 
     int updateRecipe(RecipeModel oldRecipe);
@@ -26,5 +26,9 @@ public interface RecipeInterface {
     void insertRecipeFav(int recipeId);
 
     void deleteRecipeFav(int recipeId);
+
+    boolean onLongClick(int adapterPosition);
+
+    void onItemShare(int adapterPosition);
 }
 
