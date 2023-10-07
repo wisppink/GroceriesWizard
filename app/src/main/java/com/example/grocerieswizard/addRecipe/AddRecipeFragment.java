@@ -77,7 +77,7 @@ public class AddRecipeFragment extends Fragment implements AddInterface {
         binding.recyclerViewIngredients.setLayoutManager(new LinearLayoutManager(context));
         binding.recyclerViewIngredients.setAdapter(ingredientAdapter);
 
-        RecipeRecyclerViewAdapter recipeAdapter = new RecipeRecyclerViewAdapter(context);
+        RecipeRecyclerViewAdapter recipeAdapter = new RecipeRecyclerViewAdapter();
         Uri defaultImageUri = Uri.parse("android.resource://com.example.grocerieswizard/" + R.drawable.recipe_image_default);
 
 

@@ -1,7 +1,6 @@
 package com.example.grocerieswizard.home;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -22,11 +21,9 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
     private static final int VIEW_TYPE_ROW = 0;
     private final ArrayList<RecipeModel> recipeList = new ArrayList<>();
     private RecipeInterface recipeInterface;
-    private final Context context;
 
 
-    public RecipeRecyclerViewAdapter(Context context) {
-        this.context = context;
+    public RecipeRecyclerViewAdapter() {
     }
 
     @Override
@@ -111,10 +108,7 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
             int updatedRows = recipeInterface.updateRecipe(oldRecipe);
             if (updatedRows > 0) {
                 notifyItemChanged(position);
-            } else
-                Toast.makeText(context,
-                        "couldn't edited:" + oldRecipe.getRecipeName(),
-                        Toast.LENGTH_SHORT).show();
+            }
         }
 
         return editedRecipe;

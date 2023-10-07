@@ -21,21 +21,20 @@ public class FavRecyclerViewAdapter extends RecyclerView.Adapter<FavRecyclerView
     public ArrayList<RecipeModel> favList = new ArrayList<>();
     private FavInterface favInterface;
 
-    public FavRecyclerViewAdapter() {
+    public FavRecyclerViewAdapter(FavInterface favInterface) {
+        this.favInterface = favInterface;
     }
 
     @NonNull
     @Override
     public FavViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         FavItemRowBinding binding = FavItemRowBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
-        return new FavViewHolder(binding);
+        return new FavViewHolder(binding, favInterface);
     }
 
     @Override
     public void onBindViewHolder(@NonNull FavViewHolder holder, int position) {
         RecipeModel recipeModel = favList.get(position);
-        recipeModel.setFavInterface(favInterface);
-        recipeModel.setFavAdapter(this);
         holder.bind(recipeModel);
     }
 
@@ -64,20 +63,31 @@ public class FavRecyclerViewAdapter extends RecyclerView.Adapter<FavRecyclerView
         notifyItemRemoved(pos);
     }
 
+    public void updateIt(int adapterPosition) {
+        notifyItemChanged(adapterPosition);
+    }
+
     public static class FavViewHolder extends RecyclerView.ViewHolder {
         RecipeModel recipeModel;
         private FavItemRowBinding favItemRowBinding;
 
-        public FavViewHolder(FavItemRowBinding binding) {
+        FavInterface favInterface;
+
+        public void setFavInterface(FavInterface favInterface) {
+            this.favInterface = favInterface;
+        }
+
+        public FavViewHolder(FavItemRowBinding binding, FavInterface favInterface) {
             super(binding.getRoot());
             setFavItemRowBinding(binding);
+            setFavInterface(favInterface);
             binding.unFav.setOnClickListener(v -> {
                 AlertDialog.Builder builder = new AlertDialog.Builder(itemView.getContext());
                 builder.setMessage(R.string.unfav_recipe_dialog_ask)
                         .setPositiveButton(R.string.yes, (dialog, which) -> {
                             int adapterPosition = getAdapterPosition();
                             if (adapterPosition != RecyclerView.NO_POSITION) {
-                                recipeModel.getFavInterface().onRemoveFromFavorites(recipeModel);
+                                favInterface.onRemoveFromFavorites(recipeModel);
                             }
                         })
                         .setNegativeButton(R.string.no, (dialog, which) -> dialog.dismiss());
@@ -91,8 +101,7 @@ public class FavRecyclerViewAdapter extends RecyclerView.Adapter<FavRecyclerView
 
         public void bind(RecipeModel recipeModel) {
             favItemRowBinding.favRecipeTitle.setText(recipeModel.getRecipeName());
-            if (recipeModel.getFavInterface().isRecipeSelected(recipeModel.getId())) {
-                recipeModel.setSelected(true);
+            if (favInterface.isRecipeSelected(recipeModel.getId())) {
                 favItemRowBinding.cardView.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), R.color.gray));
             } else {
                 favItemRowBinding.cardView.setBackgroundColor(Color.TRANSPARENT);
@@ -100,16 +109,14 @@ public class FavRecyclerViewAdapter extends RecyclerView.Adapter<FavRecyclerView
 
             itemView.setOnClickListener(v -> {
                 Log.d(TAG, "bind: clicked!");
-                if (!recipeModel.isSelected()) {
-                    recipeModel.setSelected(true);
+                if (!favInterface.isRecipeSelected(recipeModel.getId())) {
                     favItemRowBinding.cardView.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), R.color.gray));
-                    recipeModel.getFavInterface().insertSelectedRecipe(recipeModel.getId());
+                    favInterface.insertSelectedRecipe(recipeModel.getId());
                 } else {
-                    recipeModel.setSelected(false);
-                    recipeModel.getFavInterface().removeSelectedRecipe(recipeModel.getId());
+                    favInterface.removeSelectedRecipe(recipeModel.getId());
                     itemView.setBackgroundColor(Color.TRANSPARENT);
                 }
-                recipeModel.getFavAdapter().notifyItemChanged(getAdapterPosition());
+                favInterface.updateIt(getAdapterPosition());
             });
             this.recipeModel = recipeModel;
         }

@@ -1,6 +1,5 @@
 package com.example.grocerieswizard.home;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -31,25 +30,15 @@ public class HomeFragment extends Fragment implements RecipeInterface {
 
     private RecipeRecyclerViewAdapter adapter;
     RecipeDatabaseHelper recipeDatabaseHelper;
-    ArrayList<RecipeModel> recipes;
-    Context context;
     private static final String TAG = "HomeFragment";
-
-    @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-        this.context = context;
-        recipes = new ArrayList<>();
-    }
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        recipeDatabaseHelper = new RecipeDatabaseHelper(context);
-        adapter = new RecipeRecyclerViewAdapter(context);
+        recipeDatabaseHelper = new RecipeDatabaseHelper(getContext());
+        adapter = new RecipeRecyclerViewAdapter();
         adapter.setRecyclerViewInterface(this);
-        recipes = recipeDatabaseHelper.getAllRecipesFromDB();
+        ArrayList<RecipeModel> recipes = recipeDatabaseHelper.getAllRecipesFromDB();
         adapter.setRecipeList(recipes);
     }
 
@@ -59,7 +48,7 @@ public class HomeFragment extends Fragment implements RecipeInterface {
                              Bundle savedInstanceState) {
         FragmentHomeBinding binding = FragmentHomeBinding.inflate(inflater, container, false);
         binding.recipeRecyclerView.setAdapter(adapter);
-        binding.recipeRecyclerView.setLayoutManager(new LinearLayoutManager(context));
+        binding.recipeRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         // Launch the AddRecipe activity to add a new recipe
         binding.fab.setOnClickListener(v -> {
             AddRecipeFragment addRecipeFragment = new AddRecipeFragment();
@@ -72,11 +61,11 @@ public class HomeFragment extends Fragment implements RecipeInterface {
         setupSwipeGesture(binding);
         return binding.getRoot();
     }
+
     @Override
     public void onResume() {
         super.onResume();
-
-        recipes = recipeDatabaseHelper.getAllRecipesFromDB();
+        ArrayList<RecipeModel> recipes = recipeDatabaseHelper.getAllRecipesFromDB();
         adapter.updateList();
         adapter.setRecipeList(recipes);
     }
@@ -134,13 +123,13 @@ public class HomeFragment extends Fragment implements RecipeInterface {
     public void onItemDelete(int position) {
         RecipeModel recipeModel = adapter.getItemAtPosition(position);
         if (recipeModel != null) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
             builder.setTitle("Confirm Deletion");
             builder.setMessage("Are you sure you want to delete " + recipeModel.getRecipeName() + " recipe?");
             builder.setPositiveButton("Delete", (dialog, which) -> {
                 // User confirmed deletion, remove the recipe and update the RecyclerView
                 adapter.removeRecipe(recipeModel);
-                Toast.makeText(context, "Recipe deleted: " + recipeModel.getRecipeName(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Recipe deleted: " + recipeModel.getRecipeName(), Toast.LENGTH_SHORT).show();
                 dialog.dismiss();
             });
             builder.setNegativeButton("Cancel", (dialog, which) -> {
@@ -222,14 +211,12 @@ public class HomeFragment extends Fragment implements RecipeInterface {
         if (isRecipeSelected(recipeModel.getId())) {
             //already selected, unselect
             Log.d(TAG, "onLongClick: it is selected, unselect " + recipeModel.getId());
-            recipeModel.setSelected(false);
             deleteSelectedRecipe(recipeModel.getId());
             return false;
         } else {
             //not selected, select
             Log.d(TAG, "onLongClick: its not selected, select " + recipeModel.getId());
             insertSelectedRecipe(recipeModel.getId());
-            recipeModel.setSelected(true);
             return true;
         }
 
@@ -248,7 +235,7 @@ public class HomeFragment extends Fragment implements RecipeInterface {
         shareIntent.putExtra(Intent.EXTRA_TEXT, shareString);
 
         // Start an activity to choose the sharing method
-        context.startActivity(Intent.createChooser(shareIntent, "Share Recipe"));
+        requireContext().startActivity(Intent.createChooser(shareIntent, "Share Recipe"));
     }
 
     private String getStringIngredients(List<IngredientModel> ingredients) {

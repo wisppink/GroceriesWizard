@@ -25,7 +25,7 @@ public class FavFragment extends Fragment implements FavInterface {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         dbHelper = new RecipeDatabaseHelper(getContext());
-        adapter = new FavRecyclerViewAdapter();
+        adapter = new FavRecyclerViewAdapter(this);
     }
 
     @Nullable
@@ -69,5 +69,10 @@ public class FavFragment extends Fragment implements FavInterface {
     @Override
     public void removeSelectedRecipe(int id) {
         dbHelper.deleteSelectedRecipe(id);
+    }
+
+    @Override
+    public void updateIt(int adapterPosition) {
+        adapter.updateIt(adapterPosition);
     }
 }

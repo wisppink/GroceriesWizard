@@ -6,8 +6,6 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 
-import com.example.grocerieswizard.Fav.FavInterface;
-import com.example.grocerieswizard.Fav.FavRecyclerViewAdapter;
 import com.example.grocerieswizard.addRecipe.IngredientModel;
 
 import java.util.List;
@@ -20,10 +18,7 @@ public class RecipeModel implements Parcelable {
     private List<IngredientModel> ingredients;
     private boolean isSwiped;
     private int id;
-    private boolean isSelected;
     private final String TAG = "RecipeModel";
-    private FavInterface favInterface;
-    private FavRecyclerViewAdapter favAdapter;
 
     public RecipeModel(String recipeName, List<IngredientModel> ingredients, String instructions, Bitmap imageBitmap) {
         this.recipeName = recipeName;
@@ -31,7 +26,6 @@ public class RecipeModel implements Parcelable {
         this.instructions = instructions;
         this.imageBitmap = imageBitmap;
         isSwiped = false;
-        isSelected = false;
     }
 
     protected RecipeModel(Parcel in) {
@@ -119,30 +113,6 @@ public class RecipeModel implements Parcelable {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public boolean isSelected() {
-        return isSelected;
-    }
-
-    public void setSelected(boolean selected) {
-        isSelected = selected;
-    }
-
-    public FavInterface getFavInterface() {
-        return favInterface;
-    }
-
-    public void setFavInterface(FavInterface favInterface) {
-        this.favInterface = favInterface;
-    }
-
-    public FavRecyclerViewAdapter getFavAdapter() {
-        return favAdapter;
-    }
-
-    public void setFavAdapter(FavRecyclerViewAdapter favAdapter) {
-        this.favAdapter = favAdapter;
     }
 
 }
