@@ -1,59 +1,36 @@
 <!-- sub_ingredient_item.xml -->
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
 
     <TextView
         android:id="@+id/sub_recipe_name"
-        android:text="@string/recipe_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_weight="10"
+        android:text="@string/recipe_title"
         android:textColor="@android:color/black"
-        android:textSize="18sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="0.05"
-        app:layout_constraintEnd_toStartOf="@+id/sub_ingredient_quantity" />
+        android:textSize="18sp" />
 
     <TextView
         android:id="@+id/sub_ingredient_quantity"
-        android:text="@string/quantity"
-        android:layout_width="30dp"
-        android:gravity="center"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="@string/quantity"
         android:textColor="@android:color/black"
-        android:textSize="18sp"
-        app:layout_constraintStart_toEndOf="@+id/sub_recipe_name"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="0.3"
-        app:layout_constraintEnd_toStartOf="@+id/sub_ingredient_unit" />
+        android:textSize="18sp" />
 
     <TextView
         android:id="@+id/sub_ingredient_unit"
-        android:text="@string/unit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="@string/unit"
         android:textColor="@android:color/black"
-        android:textSize="18sp"
-        app:layout_constraintStart_toEndOf="@+id/sub_ingredient_quantity"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintEnd_toStartOf="@+id/sub_ingredient_checkbox" />
+        android:textSize="18sp" />
 
-    <CheckBox
-        android:id="@+id/sub_ingredient_checkbox"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_gravity="center_vertical"
-        android:gravity="center"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/sub_ingredient_unit"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

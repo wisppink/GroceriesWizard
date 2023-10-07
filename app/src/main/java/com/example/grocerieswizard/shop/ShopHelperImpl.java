@@ -32,7 +32,7 @@ public class ShopHelperImpl implements ShopHelper {
                         // If it's already in the list, create a sub-shopping item
                         // and add it to the existing shopping item
                         SubShoppingItem subItem = new SubShoppingItem(recipeName, unit, quantity);
-                        item.addSubItem(subItem, false);
+                        item.addSubItem(subItem);
                         itemExists = true;
                         break;
                     }
@@ -42,7 +42,7 @@ public class ShopHelperImpl implements ShopHelper {
                     // If it's not in the list, create a new shopping item
                     ShoppingItem newItem = new ShoppingItem(ingredientName);
                     SubShoppingItem subItem = new SubShoppingItem(recipeName, unit, quantity);
-                    newItem.addSubItem(subItem, false);
+                    newItem.addSubItem(subItem);
                     shoppingItems.add(newItem);
                 }
             }
@@ -52,26 +52,25 @@ public class ShopHelperImpl implements ShopHelper {
     }
 
     @Override
-    public String generateTotal(Map<SubShoppingItem, Boolean> subShoppingItems) {
+    public String generateTotal(ArrayList<SubShoppingItem> subShoppingItems) {
         Map<String, Double> unitToQuantity = new HashMap<>();
 
-        subShoppingItems.forEach((item, isChecked) -> {
-            if (!isChecked) {
-                if (!unitToQuantity.containsKey(item.getIngredientUnit())) {
-                    unitToQuantity.put(item.getIngredientUnit(), item.getIngredientQuantity());
-                    Log.d(TAG, "it doesn't contain and it is false added: " + item.getRecipeName() + " " + item.getIngredientUnit() + " " + item.getIngredientQuantity());
-                } else {
-                    Log.d(TAG, "it contains and it is false added: " + item.getRecipeName() + " " + item.getIngredientUnit());
-                    Double oldValue = unitToQuantity.get(item.getIngredientUnit());
-                    Log.d(TAG, "generateTotal: old value " + oldValue);
-                    Double quantity = item.getIngredientQuantity();
-                    Log.d(TAG, "generateTotal: quantity " + quantity);
-                    assert oldValue != null;
-                    Double newValue = oldValue + quantity;
-                    Log.d(TAG, "generateTotal: new value " + newValue);
-                    unitToQuantity.put(item.getIngredientUnit(), newValue);
-                }
+        subShoppingItems.forEach((item) -> {
+            if (!unitToQuantity.containsKey(item.getIngredientUnit())) {
+                unitToQuantity.put(item.getIngredientUnit(), item.getIngredientQuantity());
+                Log.d(TAG, "it doesn't contain and it is false added: " + item.getRecipeName() + " " + item.getIngredientUnit() + " " + item.getIngredientQuantity());
+            } else {
+                Log.d(TAG, "it contains and it is false added: " + item.getRecipeName() + " " + item.getIngredientUnit());
+                Double oldValue = unitToQuantity.get(item.getIngredientUnit());
+                Log.d(TAG, "generateTotal: old value " + oldValue);
+                Double quantity = item.getIngredientQuantity();
+                Log.d(TAG, "generateTotal: quantity " + quantity);
+                assert oldValue != null;
+                Double newValue = oldValue + quantity;
+                Log.d(TAG, "generateTotal: new value " + newValue);
+                unitToQuantity.put(item.getIngredientUnit(), newValue);
             }
+
         });
 
         StringBuilder resultBuilder = new StringBuilder();

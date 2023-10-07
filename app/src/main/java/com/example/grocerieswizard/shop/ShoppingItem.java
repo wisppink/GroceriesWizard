@@ -2,19 +2,24 @@ package com.example.grocerieswizard.shop;
 
 import com.example.grocerieswizard.shop.subshop.SubShoppingItem;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
 
 public class ShoppingItem {
     private final String ingredientName;
 
-    private final Map<SubShoppingItem, Boolean> subShoppingItems = new HashMap<>();
+    public boolean isChecked() {
+        return isChecked;
+    }
+
+    boolean isChecked;
+    private final ArrayList<SubShoppingItem> subShoppingItems = new ArrayList<>();
 
     public ShoppingItem(String ingredientName) {
         this.ingredientName = ingredientName;
+        isChecked = false;
     }
 
-    public Map<SubShoppingItem, Boolean> getSubShoppingItems() {
+    public ArrayList<SubShoppingItem> getSubShoppingItems() {
         return subShoppingItems;
     }
 
@@ -22,23 +27,11 @@ public class ShoppingItem {
         return ingredientName;
     }
 
-    public void addSubItem(SubShoppingItem subItem, boolean isChecked) {
-        subShoppingItems.put(subItem, isChecked);
-
+    public void addSubItem(SubShoppingItem subItem) {
+        subShoppingItems.add(subItem);
     }
 
-    public Boolean ControlAllValuesTrue(){
-        for (Boolean value : getSubShoppingItems().values()) {
-            if (!value) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public void setEverySubValue(boolean b){
-        for (Map.Entry<SubShoppingItem, Boolean> entry : getSubShoppingItems().entrySet()) {
-            entry.setValue(b);
-        }
+    public void setChecked(boolean b) {
+        isChecked = b;
     }
 }

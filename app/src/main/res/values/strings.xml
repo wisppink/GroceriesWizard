@@ -37,4 +37,5 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="fab_description">Click here to add Recipe</string>
     <string name="open_menu_description">Click here to see menu</string>
+    <string name="done">Done!</string>
 </resources>
