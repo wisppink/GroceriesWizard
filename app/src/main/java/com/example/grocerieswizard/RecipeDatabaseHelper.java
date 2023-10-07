@@ -38,9 +38,9 @@ public class RecipeDatabaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_RECIPE_ID_FK = "recipe_id";
 
     // Table and column names for selected recipes
-    private static final String TABLE_SELECTED = "selected";
-    private static final String COLUMN_SELECTED_ID = "_id";
-    private static final String COLUMN_RECIPE_ID_SELECTED = "recipe_id";
+    private static final String TABLE_SHOPPING_CART = "shopping_cart";
+    private static final String COLUMN_SHOPPING_CART_INGREDIENT_ID = "_id";
+    private static final String COLUMN_RECIPE_ID_SHOPPING_CART = "recipe_id";
 
     // Table and column names for favorite recipes
     private static final String TABLE_FAV = "fav";
@@ -63,9 +63,9 @@ public class RecipeDatabaseHelper extends SQLiteOpenHelper {
             + "FOREIGN KEY(" + COLUMN_RECIPE_ID_FK + ") REFERENCES " + TABLE_RECIPES + "(" + COLUMN_RECIPE_ID + "));";
 
     // Database creation SQL statement for selected recipes
-    private static final String DATABASE_CREATE_SELECTED = "create table " + TABLE_SELECTED
-            + "(" + COLUMN_SELECTED_ID + " integer primary key autoincrement, "
-            + COLUMN_RECIPE_ID_SELECTED + " integer not null);";
+    private static final String DATABASE_CREATE_SELECTED = "create table " + TABLE_SHOPPING_CART
+            + "(" + COLUMN_SHOPPING_CART_INGREDIENT_ID + " integer primary key autoincrement, "
+            + COLUMN_RECIPE_ID_SHOPPING_CART + " integer not null);";
 
     private static final String DATABASE_CREATE_FAV = "create table " + TABLE_FAV
             + "(" + COLUMN_FAV_ID + " integer primary key autoincrement, "
@@ -88,7 +88,7 @@ public class RecipeDatabaseHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase database, int oldVersion, int newVersion) {
         database.execSQL("DROP TABLE IF EXISTS " + TABLE_INGREDIENTS);
         database.execSQL("DROP TABLE IF EXISTS " + TABLE_RECIPES);
-        database.execSQL("DROP TABLE IF EXISTS " + TABLE_SELECTED);
+        database.execSQL("DROP TABLE IF EXISTS " + TABLE_SHOPPING_CART);
         database.execSQL("DROP TABLE IF EXISTS " + TABLE_FAV);
         onCreate(database);
     }
@@ -240,31 +240,31 @@ public class RecipeDatabaseHelper extends SQLiteOpenHelper {
         return ingredients;
     }
 
-    public void insertSelectedRecipe(int recipeId) {
+    public void insertShoppingCartRecipe(int recipeId) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(COLUMN_RECIPE_ID_SELECTED, recipeId);
-        db.insert(TABLE_SELECTED, null, values);
+        values.put(COLUMN_RECIPE_ID_SHOPPING_CART, recipeId);
+        db.insert(TABLE_SHOPPING_CART, null, values);
         Log.d(TAG, "insert selected");
 
     }
 
-    public void deleteSelectedRecipe(int recipeId) {
+    public void deleteShoppingCartRecipe(int recipeId) {
         SQLiteDatabase db = this.getWritableDatabase();
         Log.d("helper: ", recipeId + "is deleted");
-        db.delete(TABLE_SELECTED, COLUMN_RECIPE_ID_SELECTED + " = ?", new String[]{String.valueOf(recipeId)});
+        db.delete(TABLE_SHOPPING_CART, COLUMN_RECIPE_ID_SHOPPING_CART + " = ?", new String[]{String.valueOf(recipeId)});
 
     }
 
 
-    public ArrayList<RecipeModel> getSelectedRecipes() {
+    public ArrayList<RecipeModel> getShoppingCartIngredients() {
         ArrayList<RecipeModel> selectedRecipes = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
 
         // Get recipe IDs from the selected table
-        Cursor cursor = db.query(TABLE_SELECTED, new String[]{COLUMN_RECIPE_ID_SELECTED}, null, null, null, null, null);
+        Cursor cursor = db.query(TABLE_SHOPPING_CART, new String[]{COLUMN_RECIPE_ID_SHOPPING_CART}, null, null, null, null, null);
         while (cursor.moveToNext()) {
-            int recipeId = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_RECIPE_ID_SELECTED));
+            int recipeId = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_RECIPE_ID_SHOPPING_CART));
 
             // Get recipe information from the recipes table
             Cursor recipeCursor = db.query(TABLE_RECIPES, new String[]{COLUMN_RECIPE_ID, COLUMN_RECIPE_NAME, COLUMN_RECIPE_INSTRUCTIONS, COLUMN_RECIPE_IMAGE}, COLUMN_RECIPE_ID + "=?", new String[]{String.valueOf(recipeId)}, null, null, null);
@@ -294,9 +294,9 @@ public class RecipeDatabaseHelper extends SQLiteOpenHelper {
         return selectedRecipes;
     }
 
-    public boolean isRecipeSelected(int recipeId) {
+    public boolean isRecipeInShoppingCart(int recipeId) {
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.query(TABLE_SELECTED, null, COLUMN_RECIPE_ID_SELECTED + " = ?", new String[]{String.valueOf(recipeId)}, null, null, null);
+        Cursor cursor = db.query(TABLE_SHOPPING_CART, null, COLUMN_RECIPE_ID_SHOPPING_CART + " = ?", new String[]{String.valueOf(recipeId)}, null, null, null);
         boolean isSelected = cursor.getCount() > 0;
         cursor.close();
         return isSelected;

@@ -58,17 +58,17 @@ public class FavFragment extends Fragment implements FavInterface {
 
     @Override
     public boolean isRecipeSelected(int id) {
-        return dbHelper.isRecipeSelected(id);
+        return dbHelper.isRecipeInShoppingCart(id);
     }
 
     @Override
     public void insertSelectedRecipe(int id) {
-        dbHelper.insertSelectedRecipe(id);
+        dbHelper.insertShoppingCartRecipe(id);
     }
 
     @Override
     public void removeSelectedRecipe(int id) {
-        dbHelper.deleteSelectedRecipe(id);
+        dbHelper.deleteShoppingCartRecipe(id);
     }
 
     @Override

@@ -160,7 +160,7 @@ public class HomeFragment extends Fragment implements RecipeInterface {
 
     @Override
     public Boolean isRecipeSelected(int id) {
-        return recipeDatabaseHelper.isRecipeSelected(id);
+        return recipeDatabaseHelper.isRecipeInShoppingCart(id);
     }
 
     @Override
@@ -180,12 +180,12 @@ public class HomeFragment extends Fragment implements RecipeInterface {
 
     @Override
     public void deleteSelectedRecipe(int recipeId) {
-        recipeDatabaseHelper.deleteSelectedRecipe(recipeId);
+        recipeDatabaseHelper.deleteShoppingCartRecipe(recipeId);
     }
 
     @Override
     public void insertSelectedRecipe(int recipeId) {
-        recipeDatabaseHelper.insertSelectedRecipe(recipeId);
+        recipeDatabaseHelper.insertShoppingCartRecipe(recipeId);
     }
 
     @Override

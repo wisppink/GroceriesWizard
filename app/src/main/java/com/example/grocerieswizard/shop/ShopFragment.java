@@ -29,7 +29,7 @@ public class ShopFragment extends Fragment {
         // Retrieve selected recipes from the database
         ArrayList<RecipeModel> recipes;
         try (RecipeDatabaseHelper dbHelper = new RecipeDatabaseHelper(requireContext())) {
-            recipes = dbHelper.getSelectedRecipes();
+            recipes = dbHelper.getShoppingCartIngredients();
             adapter.setSelectedRecipeList(recipes);
         }
         binding.shoppingCart.setAdapter(adapter);
