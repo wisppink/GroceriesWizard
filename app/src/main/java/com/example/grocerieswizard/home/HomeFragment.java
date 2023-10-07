@@ -9,29 +9,29 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.grocerieswizard.R;
 import com.example.grocerieswizard.RecipeDatabaseHelper;
-import com.example.grocerieswizard.addRecipe.AddRecipeActivity;
-import com.example.grocerieswizard.detail.DetailActivity;
-import com.example.grocerieswizard.databinding.FragmentHomeBinding;
+import com.example.grocerieswizard.addRecipe.AddRecipeFragment;
 import com.example.grocerieswizard.addRecipe.IngredientModel;
+import com.example.grocerieswizard.databinding.FragmentHomeBinding;
+import com.example.grocerieswizard.detail.DetailFragment;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class HomeFragment extends Fragment implements RecipeInterface {
 
-    private FragmentHomeBinding binding;
     private RecipeRecyclerViewAdapter adapter;
     RecipeDatabaseHelper recipeDatabaseHelper;
+    ArrayList<RecipeModel> recipes;
     Context context;
     private static final String TAG = "HomeFragment";
 
@@ -39,70 +39,50 @@ public class HomeFragment extends Fragment implements RecipeInterface {
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         this.context = context;
+        recipes = new ArrayList<>();
     }
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         recipeDatabaseHelper = new RecipeDatabaseHelper(context);
         adapter = new RecipeRecyclerViewAdapter(context);
+        adapter.setRecyclerViewInterface(this);
+        recipes = recipeDatabaseHelper.getAllRecipesFromDB();
+        adapter.setRecipeList(recipes);
     }
-
-    // Launcher for starting AddRecipe activity and receiving results
-    ActivityResultLauncher<Intent> launcher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-        // Check if a new recipe was added
-        Intent data = result.getData();
-        if (data != null && data.hasExtra("recipe")) {
-            RecipeModel recipe = data.getParcelableExtra("recipe");
-            // Add the new recipe to the RecyclerView
-            if (recipe != null) {
-                recipe.setSwiped(false);
-                adapter.addRecipe(recipe);
-            }
-        }
-        // Check if a new recipe was added
-        if (data != null && data.hasExtra("new_recipe")) {
-            RecipeModel recipe = data.getParcelableExtra("new_recipe");
-            int position = data.getIntExtra("position", -1);
-            // Add the new recipe to the RecyclerView
-            if (recipe != null) {
-                recipe.setSwiped(false);
-                adapter.addRecipe(recipe);
-                adapter.removeRecipeAtPosition(position);
-            }
-        }
-    });
-
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container,
                              Bundle savedInstanceState) {
-        binding = FragmentHomeBinding.inflate(inflater, container, false);
-
-        recipeDatabaseHelper = new RecipeDatabaseHelper(context);
-
-        setupRecyclerView();
-        setupSwipeGesture();
-
-        // Launch the AddRecipe activity to add a new recipe
-        binding.fab.setOnClickListener(v -> {
-            Intent intent = new Intent(getActivity(), AddRecipeActivity.class);
-            launcher.launch(intent);
-        });
-
-        return binding.getRoot();
-    }
-
-    private void setupRecyclerView() {
+        FragmentHomeBinding binding = FragmentHomeBinding.inflate(inflater, container, false);
         binding.recipeRecyclerView.setAdapter(adapter);
         binding.recipeRecyclerView.setLayoutManager(new LinearLayoutManager(context));
-        adapter.setRecyclerViewInterface(this);
-        ArrayList<RecipeModel> recipes = recipeDatabaseHelper.getAllRecipesFromDB();
+        // Launch the AddRecipe activity to add a new recipe
+        binding.fab.setOnClickListener(v -> {
+            AddRecipeFragment addRecipeFragment = new AddRecipeFragment();
+            requireActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.frameLayout, addRecipeFragment)
+                    .addToBackStack(null)
+                    .commit();
+        });
+        setupSwipeGesture(binding);
+        return binding.getRoot();
+    }
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        recipes = recipeDatabaseHelper.getAllRecipesFromDB();
+        adapter.updateList();
         adapter.setRecipeList(recipes);
     }
 
-    private void setupSwipeGesture() {
+
+    private void setupSwipeGesture(FragmentHomeBinding binding) {
         ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
             @Override
             public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
@@ -128,12 +108,6 @@ public class HomeFragment extends Fragment implements RecipeInterface {
         new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(binding.recipeRecyclerView);
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        binding = null;
-    }
-
     // Handle item click to show details of a recipe
     @Override
     public void onItemClick(int position) {
@@ -143,14 +117,16 @@ public class HomeFragment extends Fragment implements RecipeInterface {
             if (!recipeModel.isSwiped()) {
                 recipeModel.setSwiped(false);
                 adapter.itemChanged(position);
-                Intent intent = new Intent(getActivity(), DetailActivity.class);
-                intent.putExtra("MyRecipe", recipeModel);
-                startActivity(intent);
+                DetailFragment detailFragment = DetailFragment.newInstance(recipeModel);
+                requireActivity().getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.frameLayout, detailFragment)
+                        .addToBackStack(null)
+                        .commit();
             } else {
                 Log.d("MainActivity", "recipe model null");
             }
         }
-
     }
 
     // Handle item delete with confirmation dialog
@@ -182,12 +158,17 @@ public class HomeFragment extends Fragment implements RecipeInterface {
     @Override
     public void onItemEdit(int position) {
         RecipeModel recipeModel = adapter.getItemAtPosition(position);
-        Intent editIntent = new Intent(getActivity(), AddRecipeActivity.class);
-        editIntent.putExtra("editRecipe", true);
-        editIntent.putExtra("recipeModel", recipeModel);
-        editIntent.putExtra("position", position);
-        launcher.launch(editIntent);
+        FragmentTransaction transaction = requireActivity().getSupportFragmentManager().beginTransaction();
+        AddRecipeFragment addRecipeFragment = new AddRecipeFragment();
+        Bundle bundle = new Bundle();
+        bundle.putParcelable("recipeModel", recipeModel);
+        bundle.putInt("position", position);
+        addRecipeFragment.setArguments(bundle);
+        transaction.replace(R.id.frameLayout, addRecipeFragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
     }
+
 
     @Override
     public Boolean isRecipeSelected(int id) {

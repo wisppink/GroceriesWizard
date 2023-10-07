@@ -1,5 +1,8 @@
 package com.example.grocerieswizard.addRecipe;
 
+import static android.app.Activity.RESULT_OK;
+
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
@@ -10,8 +13,9 @@ import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -20,20 +24,18 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.grocerieswizard.meal.MealResponse;
 import com.example.grocerieswizard.R;
 import com.example.grocerieswizard.RecipeDatabaseHelper;
-import com.example.grocerieswizard.home.RecipeRecyclerViewAdapter;
-import com.example.grocerieswizard.databinding.ActivityAddRecipeBinding;
 import com.example.grocerieswizard.databinding.DialogAddIngredientBinding;
-import com.example.grocerieswizard.meal.MealService;
+import com.example.grocerieswizard.databinding.FragmentAddRecipeBinding;
 import com.example.grocerieswizard.home.RecipeModel;
+import com.example.grocerieswizard.home.RecipeRecyclerViewAdapter;
+import com.example.grocerieswizard.meal.MealResponse;
+import com.example.grocerieswizard.meal.MealService;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -46,66 +48,70 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class AddRecipeActivity extends AppCompatActivity implements AddInterface {
+public class AddRecipeFragment extends Fragment implements AddInterface {
 
-    ActivityAddRecipeBinding binding;
-    private ActivityResultLauncher<Intent> pickImageLauncher;
-    private IngredientAdapter ingredientAdapter;
-    private final List<IngredientModel> ingredientList = new ArrayList<>();
-    private RecipeModel recipe;
-    private boolean editMode = false;
-    private Bitmap defaultImageBitmap;
+
     private RecipeDatabaseHelper recipeDatabaseHelper;
-    private static final String TAG = "AddRecipeActivity";
-
+    private IngredientAdapter ingredientAdapter;
+    private List<IngredientModel> ingredientList;
+    Context context;
+    private FragmentAddRecipeBinding binding;
+    private Bitmap defaultImageBitmap;
+    private RecipeModel recipe;
+    private static final String TAG = "AddRecipeFragment";
+    private ActivityResultLauncher<Intent> pickImageLauncher;
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = ActivityAddRecipeBinding.inflate(getLayoutInflater());
-        View view = binding.getRoot();
-        setContentView(view);
+        recipeDatabaseHelper = new RecipeDatabaseHelper(getContext());
+        ingredientList = new ArrayList<>();
+    }
 
-        recipeDatabaseHelper = new RecipeDatabaseHelper(this);
-
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        binding = FragmentAddRecipeBinding.inflate(inflater, container, false);
         ingredientAdapter = new IngredientAdapter(ingredientList);
         ingredientAdapter.setRecyclerViewInterface(this);
+        context = getContext();
+        binding.recyclerViewIngredients.setLayoutManager(new LinearLayoutManager(context));
+        binding.recyclerViewIngredients.setAdapter(ingredientAdapter);
 
-        RecyclerView recyclerViewIngredients = binding.recyclerViewIngredients;
-        recyclerViewIngredients.setLayoutManager(new LinearLayoutManager(this));
-        recyclerViewIngredients.setAdapter(ingredientAdapter);
-
-        RecipeRecyclerViewAdapter recipeAdapter = new RecipeRecyclerViewAdapter(this);
-
-        TextView editRecipeName = binding.editRecipeName;
-
-        TextView editRecipeHowToPrepare = binding.editRecipeHowToPrepare;
-
-        Intent intent = getIntent();
-        editMode = intent.getBooleanExtra("editRecipe", false);
-        int position = intent.getIntExtra("position", -1);
-
-        ImageView addImage = binding.addImage;
-
-        Button addIngredient = binding.addIngredientButton;
-
+        RecipeRecyclerViewAdapter recipeAdapter = new RecipeRecyclerViewAdapter(context);
         Uri defaultImageUri = Uri.parse("android.resource://com.example.grocerieswizard/" + R.drawable.recipe_image_default);
 
-        Button saveRecipe = binding.saveRecipeButton;
-
-        ImageView discharge = binding.dischargeRecipe;
 
         try {
-            defaultImageBitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), defaultImageUri);
+            defaultImageBitmap = MediaStore.Images.Media.getBitmap(requireContext().getContentResolver(), defaultImageUri);
         } catch (Exception e) {
-            Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
         }
         //create an empty recipe
         recipe = new RecipeModel(null, null, null, null);
 
-        if (!editMode) {
+        // Check if the fragment is opened for editing
+        Bundle arguments = getArguments();
+        if (arguments != null) {
+            RecipeModel recipeModel = arguments.getParcelable("recipeModel");
+            int position = arguments.getInt("position");
+            //get old ones to show user
+            assert recipeModel != null;
+            binding.editRecipeName.setText(recipeModel.getRecipeName());
+            binding.editRecipeHowToPrepare.setText(recipeModel.getInstructions());
+            ingredientList.addAll(recipeModel.getIngredients());
+            Bitmap selectedImageBitmap = recipeModel.getImageBitmap();
+            //get new ones to update
+            String recipeName = binding.editRecipeName.getText().toString();
+            String howToPrepare = binding.editRecipeHowToPrepare.getText().toString();
+
+            RecipeModel editedRecipe = new RecipeModel(recipeName, ingredientList, howToPrepare, selectedImageBitmap);
+            recipe = recipeAdapter.editRecipe(position, editedRecipe);
+            ingredientAdapter.changeItem(position);
+            binding.addImage.setImageBitmap(selectedImageBitmap);
+        } else {
+            binding.addImage.setImageURI(defaultImageUri);
             final Handler mHandler = new Handler();
-            editRecipeName.addTextChangedListener(new TextWatcher() {
+            binding.editRecipeName.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
 
@@ -119,7 +125,7 @@ public class AddRecipeActivity extends AppCompatActivity implements AddInterface
                 public void afterTextChanged(Editable s) {
                     mHandler.removeCallbacksAndMessages(null);
                     mHandler.postDelayed(() -> {
-                        String inputText = editRecipeName.getText().toString().trim();
+                        String inputText = binding.editRecipeName.getText().toString().trim();
                         Retrofit retrofit = new Retrofit.Builder()
                                 .baseUrl("https://www.themealdb.com/api/json/v1/1/")
                                 .addConverterFactory(GsonConverterFactory.create())
@@ -136,7 +142,7 @@ public class AddRecipeActivity extends AppCompatActivity implements AddInterface
 
                                     MealResponse mealResponse = response.body();
                                     if (mealResponse != null && mealResponse.getMeals() != null) {
-                                        showAlertDialogForFoundRecipe(mealResponse.getMeal(0), editRecipeHowToPrepare, addImage);
+                                        showAlertDialogForFoundRecipe(mealResponse.getMeal(0), binding.editRecipeHowToPrepare, binding.addImage);
                                     } else {
                                         System.out.println("No meals found.");
                                     }
@@ -155,10 +161,10 @@ public class AddRecipeActivity extends AppCompatActivity implements AddInterface
                     }, 1000); // 0.5 saniye
                 }
             });
+
         }
 
-
-        addIngredient.setOnClickListener(v -> {
+        binding.addIngredientButton.setOnClickListener(v -> {
             IngredientModel newIngredient = new IngredientModel(null, 0, null);
             showAddIngredientDialog(newIngredient);
         });
@@ -171,13 +177,13 @@ public class AddRecipeActivity extends AppCompatActivity implements AddInterface
                     Picasso.get().load(selectedImageUri).resize(150, 150).centerCrop().into(new Target() {
                         @Override
                         public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                            addImage.setImageBitmap(bitmap);
+                            binding.addImage.setImageBitmap(bitmap);
                             recipe.setImageBitmap(bitmap);
                         }
 
                         @Override
                         public void onBitmapFailed(Exception e, Drawable errorDrawable) {
-                            Toast.makeText(AddRecipeActivity.this, "image error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), "image error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                         }
 
                         @Override
@@ -186,48 +192,27 @@ public class AddRecipeActivity extends AppCompatActivity implements AddInterface
                     });
 
                 } catch (Exception e) {
-                    Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
-                    addImage.setImageBitmap(defaultImageBitmap);
+                    Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
+                    binding.addImage.setImageBitmap(defaultImageBitmap);
                     recipe.setImageBitmap(defaultImageBitmap);
                 }
             } else {
-                addImage.setImageBitmap(defaultImageBitmap);
+                binding.addImage.setImageBitmap(defaultImageBitmap);
                 recipe.setImageBitmap(defaultImageBitmap);
             }
         });
 
-        addImage.setOnClickListener(v -> {
+        binding.addImage.setOnClickListener(v -> {
             Intent pickImageIntent = new Intent(Intent.ACTION_GET_CONTENT);
             pickImageIntent.setType("image/*");
             pickImageLauncher.launch(pickImageIntent);
         });
 
-        // Check if the activity is opened for editing
-        if (editMode) {
-            RecipeModel recipeModel = intent.getParcelableExtra("recipeModel");
-            //get old ones to show user
-            assert recipeModel != null;
-            editRecipeName.setText(recipeModel.getRecipeName());
-            editRecipeHowToPrepare.setText(recipeModel.getInstructions());
-            ingredientList.addAll(recipeModel.getIngredients());
-            Bitmap selectedImageBitmap = recipeModel.getImageBitmap();
-            //get new ones to update
-            String recipeName = editRecipeName.getText().toString();
-            String howToPrepare = editRecipeHowToPrepare.getText().toString();
-
-            RecipeModel editedRecipe = new RecipeModel(recipeName, ingredientList, howToPrepare, selectedImageBitmap);
-            recipe = recipeAdapter.editRecipe(position, editedRecipe);
-            ingredientAdapter.changeItem(position);
-            addImage.setImageBitmap(selectedImageBitmap);
-        } else {
-            addImage.setImageURI(defaultImageUri);
-        }
-
-        saveRecipe.setOnClickListener(v -> {
-            String recipeName = editRecipeName.getText().toString();
-            String howToPrepare = editRecipeHowToPrepare.getText().toString();
+        binding.saveRecipeButton.setOnClickListener(v -> {
+            String recipeName = binding.editRecipeName.getText().toString();
+            String howToPrepare = binding.editRecipeHowToPrepare.getText().toString();
             if (recipeName.isEmpty() || ingredientList.isEmpty() || howToPrepare.isEmpty()) {
-                Toast.makeText(this, "Please fill all fields!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Please fill all fields!", Toast.LENGTH_SHORT).show();
                 return;
             }
             if (recipe.getImageBitmap() == null) recipe.setImageBitmap(defaultImageBitmap);
@@ -237,33 +222,78 @@ public class AddRecipeActivity extends AppCompatActivity implements AddInterface
             recipe.setSwiped(false);
             recipe.setIngredients(ingredientList);
 
-
-            if (editMode) {
-                Intent editintent = new Intent();
-                editintent.putExtra("edited", true);
-                editintent.putExtra("new_recipe", recipe);
-                editintent.putExtra("position", position);
-                setResult(RESULT_OK, editintent);
+            Bundle checkEdit = getArguments();
+            //if it comes from edit mode, delete original put edited version as new recipe
+            if (checkEdit != null) {
+                if (arguments != null) {
+                    RecipeModel recipeModel = arguments.getParcelable("recipeModel");
+                    if (recipeModel != null) {
+                        recipeDatabaseHelper.deleteRecipe(recipeModel.getId());
+                    }
+                }
+                recipeDatabaseHelper.insertRecipe(recipe);
             } else {
-                Intent resultIntent = new Intent();
-                resultIntent.putExtra("recipe", recipe);
-                setResult(RESULT_OK, resultIntent);
+                recipeDatabaseHelper.insertRecipe(recipe);
             }
-
-            finish();
-
+            getParentFragmentManager().popBackStack();
         });
 
-        discharge.setOnClickListener(v -> {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        binding.dischargeRecipe.setOnClickListener(v -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder.setTitle("Confirm Discharge").setMessage("Are you sure you want to discharge this recipe?")
-                    .setPositiveButton(R.string.yes, (dialog, which) -> finish()).setNegativeButton(android.R.string.cancel, (dialog, which) -> dialog.dismiss()).show();
+                    .setPositiveButton(R.string.yes, (dialog, which) -> getParentFragmentManager().popBackStack())
+                    .setNegativeButton(android.R.string.cancel, (dialog, which) -> dialog.dismiss())
+                    .show();
         });
+        return binding.getRoot();
+    }
+
+    @Override
+    public void onItemDelete(IngredientModel ingredientModel) {
+        if (ingredientModel != null) {
+            recipeDatabaseHelper.deleteIngredient(ingredientModel.getId());
+            ingredientAdapter.removeIngredient(ingredientModel, context);
+        }
 
     }
 
+    @Override
+    public void onItemEdit(IngredientModel ingredientModel) {
+        if (ingredientModel != null) {
+            showEditIngredientDialog(ingredientModel);
+        }
+    }
+
+    private void showAddIngredientDialog(IngredientModel ingredientModel) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        DialogAddIngredientBinding dialogBinding = DialogAddIngredientBinding.inflate(getLayoutInflater());
+        View dialogView = dialogBinding.getRoot();
+        builder.setView(dialogView);
+
+        EditText ingredientNameEditText = dialogBinding.ingredientNameEditText;
+        EditText ingredientQuantityEditText = dialogBinding.ingredientQuantityEditText;
+        EditText ingredientUnitEditText = dialogBinding.ingredientUnitEditText;
+
+        builder.setPositiveButton(R.string.add, (dialog, which) -> {
+            String name = ingredientNameEditText.getText().toString();
+            String quantityStr = ingredientQuantityEditText.getText().toString();
+            double quantity = Double.parseDouble(quantityStr);
+            String unit = ingredientUnitEditText.getText().toString();
+
+            ingredientModel.setName(name);
+            ingredientModel.setUnit(unit);
+            ingredientModel.setQuantity(quantity);
+            ingredientAdapter.addIngredient(ingredientModel);
+            recipeDatabaseHelper.insertIngredient(ingredientModel, ingredientModel.getRecipeId());
+
+        });
+        builder.setNegativeButton(android.R.string.cancel, (dialog, which) -> dialog.dismiss());
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
     private void showAlertDialogForFoundRecipe(MealService.Meal meal, TextView howToPrepare, ImageView addImage) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle(R.string.TitleFoundRecipe);
         builder.setMessage(R.string.MessageFoundRecipe);
         builder.setPositiveButton(R.string.yes, (dialog, which) -> {
@@ -286,7 +316,7 @@ public class AddRecipeActivity extends AppCompatActivity implements AddInterface
 
     }
 
-    private void bitmapFromMeal(String strImageSource, BitmapCallback callback) {
+    private void bitmapFromMeal(String strImageSource, AddRecipeFragment.BitmapCallback callback) {
         Log.d(TAG, "bitmapFromMeal: strImage " + strImageSource);
         try {
             Picasso.get().load(strImageSource).resize(150, 150).centerCrop().into(new Target() {
@@ -310,7 +340,6 @@ public class AddRecipeActivity extends AppCompatActivity implements AddInterface
             throw new RuntimeException(e);
         }
     }
-
 
     private void setIngredients(MealService.Meal meal) {
         String[] ingredientNames = {
@@ -370,6 +399,11 @@ public class AddRecipeActivity extends AppCompatActivity implements AddInterface
         }
     }
 
+    private void addIngredientAutomatically(IngredientModel ingredientModel) {
+        ingredientAdapter.addIngredient(ingredientModel);
+        recipeDatabaseHelper.insertIngredient(ingredientModel, ingredientModel.getRecipeId());
+    }
+
     private double parseQuantity(String measure) {
         StringBuilder quantityStr = new StringBuilder();
         boolean foundDigit = false;
@@ -412,79 +446,8 @@ public class AddRecipeActivity extends AppCompatActivity implements AddInterface
     }
 
 
-    private void addIngredientAutomatically(IngredientModel ingredientModel) {
-        ingredientAdapter.addIngredient(ingredientModel);
-        recipeDatabaseHelper.insertIngredient(ingredientModel, ingredientModel.getRecipeId());
-    }
-
-
-    private void showAddIngredientDialog(IngredientModel ingredientModel) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        DialogAddIngredientBinding dialogBinding = DialogAddIngredientBinding.inflate(getLayoutInflater());
-        View dialogView = dialogBinding.getRoot();
-        builder.setView(dialogView);
-
-        EditText ingredientNameEditText = dialogBinding.ingredientNameEditText;
-        EditText ingredientQuantityEditText = dialogBinding.ingredientQuantityEditText;
-        EditText ingredientUnitEditText = dialogBinding.ingredientUnitEditText;
-
-        builder.setPositiveButton(R.string.add, (dialog, which) -> {
-            String name = ingredientNameEditText.getText().toString();
-            String quantityStr = ingredientQuantityEditText.getText().toString();
-            double quantity = Double.parseDouble(quantityStr);
-            String unit = ingredientUnitEditText.getText().toString();
-
-            ingredientModel.setName(name);
-            ingredientModel.setUnit(unit);
-            ingredientModel.setQuantity(quantity);
-            ingredientAdapter.addIngredient(ingredientModel);
-            recipeDatabaseHelper.insertIngredient(ingredientModel, ingredientModel.getRecipeId());
-
-        });
-        builder.setNegativeButton(android.R.string.cancel, (dialog, which) -> dialog.dismiss());
-        AlertDialog dialog = builder.create();
-        dialog.show();
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (unsavedChangesExist()) {
-            showUnsavedChangesDialog();
-        } else {
-            super.onBackPressed();
-        }
-    }
-
-    private boolean unsavedChangesExist() {
-        String recipeName = binding.editRecipeName.getText().toString();
-        String howToPrepare = binding.editRecipeHowToPrepare.getText().toString();
-
-        return !recipeName.isEmpty() || !ingredientList.isEmpty() || !howToPrepare.isEmpty();
-    }
-
-    private void showUnsavedChangesDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Unsaved Changes").setMessage("You have unsaved changes. Are you sure you want to discard them?").setPositiveButton("Discard", (dialog, which) -> finish()).setNegativeButton(android.R.string.cancel, (dialog, which) -> dialog.dismiss()).show();
-    }
-
-    @Override
-    public void onItemDelete(IngredientModel ingredientModel) {
-        if (ingredientModel != null) {
-            recipeDatabaseHelper.deleteIngredient(ingredientModel.getId());
-            ingredientAdapter.removeIngredient(ingredientModel, this);
-        }
-
-    }
-
-    @Override
-    public void onItemEdit(IngredientModel ingredientModel) {
-        if (ingredientModel != null) {
-            showEditIngredientDialog(ingredientModel);
-        }
-    }
-
     public void showEditIngredientDialog(IngredientModel ingredientModel) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
         DialogAddIngredientBinding dialogBinding = DialogAddIngredientBinding.inflate(getLayoutInflater());
         View dialogView = dialogBinding.getRoot();
         builder.setView(dialogView);
@@ -538,5 +501,4 @@ public class AddRecipeActivity extends AppCompatActivity implements AddInterface
     interface BitmapCallback {
         void onBitmapLoaded(Bitmap bitmap);
     }
-
 }

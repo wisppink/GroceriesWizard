@@ -1,6 +1,7 @@
 package com.example.grocerieswizard.addRecipe;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.PopupMenu;
@@ -17,6 +18,7 @@ import java.util.List;
 public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.IngredientViewHolder> {
     private static List<IngredientModel> ingredientList;
     private AddInterface addInterface;
+    private static final String TAG = "IngredientAdapter";
 
     public IngredientAdapter(List<IngredientModel> ingredientList) {
         IngredientAdapter.ingredientList = ingredientList;
@@ -34,6 +36,7 @@ public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.In
         IngredientModel ingredient = ingredientList.get(position);
         ingredient.setInterface(addInterface);
         holder.bind(ingredient);
+        Log.d(TAG, "onBindViewHolder: recieved ingredient: " + ingredient.getName());
     }
 
     @Override

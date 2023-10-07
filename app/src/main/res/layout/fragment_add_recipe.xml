@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".addRecipe.AddRecipeFragment">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:ignore="UselessParent">
+
+        <ImageButton
+            android:id="@+id/discharge_recipe"
+            android:layout_width="27dp"
+            android:layout_height="30dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:background="@android:color/transparent"
+            android:contentDescription="@string/discharge"
+            app:srcCompat="@android:drawable/ic_delete" />
+
+        <ImageView
+            android:id="@+id/add_image"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:contentDescription="@string/add_image"
+            android:src="@drawable/recipe_image_default" />
+
+
+        <TextView
+            android:id="@+id/ask_recipe"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/edit_recipe_name"
+            android:layout_marginStart="16dp"
+            android:layout_marginBottom="0dp"
+            android:layout_toEndOf="@+id/add_image"
+            android:gravity="start"
+            android:text="@string/ask_recipe_name"
+            android:textSize="15sp" />
+
+        <EditText
+            android:id="@+id/edit_recipe_name"
+            android:layout_width="246dp"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/add_image"
+            android:layout_alignParentEnd="true"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="17dp"
+            android:layout_marginBottom="0dp"
+            android:layout_toEndOf="@+id/add_image"
+            android:hint="@string/recipe_name"
+            android:textSize="20sp" />
+
+        <EditText
+            android:id="@+id/edit_recipe_how_to_prepare"
+            android:layout_width="344dp"
+            android:layout_height="143dp"
+            android:layout_below="@+id/add_image"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:gravity="start"
+            android:hint="@string/hint_how_to_prepare" />
+
+        <Button
+            android:id="@+id/addIngredientButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/edit_recipe_how_to_prepare"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:text="@string/add_ingredient" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView_ingredients"
+            android:layout_width="361dp"
+            android:layout_height="200dp"
+            android:layout_below="@+id/addIngredientButton"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp" />
+
+        <Button
+            android:id="@+id/save_recipe_button"
+            android:layout_width="280dp"
+            android:layout_height="50dp"
+            android:layout_below="@+id/recyclerView_ingredients"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:text="@string/save_recipe" />
+
+    </RelativeLayout>
+
+
+</FrameLayout>

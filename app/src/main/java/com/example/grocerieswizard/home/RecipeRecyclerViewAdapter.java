@@ -1,5 +1,6 @@
 package com.example.grocerieswizard.home;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -63,10 +64,11 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
 
         } else {
             RecyclerViewMenuBinding menuBinding = RecyclerViewMenuBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
-            RecyclerView.ViewHolder menuHolder = new MenuViewHolder(menuBinding,recipeInterface);
+            RecyclerView.ViewHolder menuHolder = new MenuViewHolder(menuBinding, recipeInterface);
 
             menuBinding.editIcon.setOnClickListener(v -> recipeInterface.onItemEdit(menuHolder.getAdapterPosition()));
-            menuBinding.shareIcon.setOnClickListener(v -> { recipeInterface.onItemShare(menuHolder.getAdapterPosition());
+            menuBinding.shareIcon.setOnClickListener(v -> {
+                recipeInterface.onItemShare(menuHolder.getAdapterPosition());
                 Toast.makeText(menuBinding.getRoot().getContext(), "Share icon clicked", Toast.LENGTH_SHORT).show();
             });
             menuBinding.deleteIcon.setOnClickListener(v -> recipeInterface.onItemDelete(menuHolder.getAdapterPosition()));
@@ -145,21 +147,6 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
         recipeInterface.deleteRecipe(recipeModel.getId());
     }
 
-    public void removeRecipeAtPosition(int position) {
-        if (position >= 0 && position < recipeList.size()) {
-
-            RecipeModel removedRecipe = getItemAtPosition(position);
-            if (removedRecipe.isSelected()) {
-                removedRecipe.setSelected(false);
-                notifyItemChanged(position);
-            }
-            recipeInterface.deleteRecipe(removedRecipe.getId());
-            recipeList.remove(position);
-            notifyItemRemoved(position);
-        }
-    }
-
-
     public void setRecyclerViewInterface(RecipeInterface recipeInterface) {
         this.recipeInterface = recipeInterface;
     }
@@ -174,6 +161,12 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
 
     public void itemChanged(int position) {
         notifyItemChanged(position);
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    public void updateList() {
+        recipeList.clear();
+        notifyDataSetChanged();
     }
 
 
@@ -230,7 +223,7 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
                 binding.getRoot().setBackgroundColor(ContextCompat.getColor(binding.getRoot().getContext(), R.color.gray));
 
             } else {
-                Log.d(TAG, "bind: unselected make it transparent "+ recipeModel.getId());
+                Log.d(TAG, "bind: unselected make it transparent " + recipeModel.getId());
                 itemView.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), android.R.color.transparent));
             }
         }
@@ -252,7 +245,7 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
                 Log.d(TAG, "bind: swiped, selected " + recipeModel.getId());
                 binding.getRoot().setBackgroundColor(ContextCompat.getColor(binding.getRoot().getContext(), R.color.gray));
             } else {
-                Log.d(TAG, "bind: swiped, unselected "+ recipeModel.getId());
+                Log.d(TAG, "bind: swiped, unselected " + recipeModel.getId());
                 itemView.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), android.R.color.transparent));
             }
         }
