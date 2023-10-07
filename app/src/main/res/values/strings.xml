@@ -39,4 +39,6 @@
     <string name="open_menu_description">Click here to see menu</string>
     <string name="done">Done!</string>
     <string name="recipe_need">Which recipe needs this?</string>
+    <string name="added_to_cart">Added to Cart!</string>
+    <string name="removed_from_cart">Removed from Cart!</string>
 </resources>

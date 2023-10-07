@@ -30,7 +30,6 @@ public class HomeFragment extends Fragment implements RecipeInterface {
 
     private RecipeRecyclerViewAdapter adapter;
     RecipeDatabaseHelper recipeDatabaseHelper;
-    private static final String TAG = "HomeFragment";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -202,23 +201,6 @@ public class HomeFragment extends Fragment implements RecipeInterface {
     @Override
     public void deleteRecipeFav(int recipeId) {
         recipeDatabaseHelper.deleteRecipeFav(recipeId);
-
-    }
-
-    @Override
-    public boolean onLongClick(int position) {
-        RecipeModel recipeModel = adapter.getItemAtPosition(position);
-        if (isRecipeSelected(recipeModel.getId())) {
-            //already selected, unselect
-            Log.d(TAG, "onLongClick: it is selected, unselect " + recipeModel.getId());
-            deleteSelectedRecipe(recipeModel.getId());
-            return false;
-        } else {
-            //not selected, select
-            Log.d(TAG, "onLongClick: its not selected, select " + recipeModel.getId());
-            insertSelectedRecipe(recipeModel.getId());
-            return true;
-        }
 
     }
 
