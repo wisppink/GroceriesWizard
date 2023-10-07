@@ -1,11 +1,9 @@
-package com.example.grocerieswizard.models;
+package com.example.grocerieswizard.addRecipe;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
-
-import com.example.grocerieswizard.interfaces.AddInterface;
 
 public class IngredientModel implements Parcelable {
     private String name;

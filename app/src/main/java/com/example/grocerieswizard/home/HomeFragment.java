@@ -19,11 +19,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.grocerieswizard.RecipeDatabaseHelper;
-import com.example.grocerieswizard.activities.AddRecipeActivity;
-import com.example.grocerieswizard.activities.DetailActivity;
+import com.example.grocerieswizard.addRecipe.AddRecipeActivity;
+import com.example.grocerieswizard.detail.DetailActivity;
 import com.example.grocerieswizard.databinding.FragmentHomeBinding;
-import com.example.grocerieswizard.models.IngredientModel;
-import com.example.grocerieswizard.models.RecipeModel;
+import com.example.grocerieswizard.addRecipe.IngredientModel;
 
 import java.util.ArrayList;
 import java.util.List;

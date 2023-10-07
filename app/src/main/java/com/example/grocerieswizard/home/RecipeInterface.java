@@ -1,7 +1,5 @@
 package com.example.grocerieswizard.home;
 
-import com.example.grocerieswizard.models.RecipeModel;
-
 public interface RecipeInterface {
 
     void onItemClick(int position);

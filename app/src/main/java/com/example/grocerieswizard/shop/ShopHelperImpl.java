@@ -4,8 +4,8 @@ import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
 
 import android.util.Log;
 
-import com.example.grocerieswizard.models.IngredientModel;
-import com.example.grocerieswizard.models.RecipeModel;
+import com.example.grocerieswizard.addRecipe.IngredientModel;
+import com.example.grocerieswizard.home.RecipeModel;
 import com.example.grocerieswizard.shop.subshop.SubShoppingItem;
 
 import java.util.ArrayList;

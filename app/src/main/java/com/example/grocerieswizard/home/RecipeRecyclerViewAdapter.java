@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.grocerieswizard.R;
 import com.example.grocerieswizard.databinding.RecyclerViewMenuBinding;
 import com.example.grocerieswizard.databinding.RecyclerViewRowBinding;
-import com.example.grocerieswizard.models.RecipeModel;
 
 import java.util.ArrayList;
 

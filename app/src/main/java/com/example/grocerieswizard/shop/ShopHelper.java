@@ -1,6 +1,6 @@
 package com.example.grocerieswizard.shop;
 
-import com.example.grocerieswizard.models.RecipeModel;
+import com.example.grocerieswizard.home.RecipeModel;
 import com.example.grocerieswizard.shop.subshop.SubShoppingItem;
 
 import java.util.ArrayList;

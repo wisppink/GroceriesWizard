@@ -1,4 +1,4 @@
-package com.example.grocerieswizard.activities;
+package com.example.grocerieswizard.detail;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -8,8 +8,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.grocerieswizard.databinding.DetailBinding;
-import com.example.grocerieswizard.models.IngredientModel;
-import com.example.grocerieswizard.models.RecipeModel;
+import com.example.grocerieswizard.addRecipe.IngredientModel;
+import com.example.grocerieswizard.home.RecipeModel;
 
 import java.util.List;
 

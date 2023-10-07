@@ -14,11 +14,8 @@ import com.example.grocerieswizard.shop.ShoppingItem;
 import java.util.ArrayList;
 
 public class SubShopAdapter extends RecyclerView.Adapter<SubShopAdapter.SubShopViewHolder> {
-
-    SubRecipeBinding binding;
     private final ArrayList<SubShoppingItem> shoppingItems;
     private static final String TAG = "SubShopAdapter";
-
 
     public SubShopAdapter() {
         shoppingItems = new ArrayList<>();
@@ -27,7 +24,7 @@ public class SubShopAdapter extends RecyclerView.Adapter<SubShopAdapter.SubShopV
     @NonNull
     @Override
     public SubShopViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        binding = SubRecipeBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+        SubRecipeBinding binding = SubRecipeBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
         return new SubShopViewHolder(binding);
     }
 

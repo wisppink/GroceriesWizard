@@ -1,4 +1,4 @@
-package com.example.grocerieswizard.activities;
+package com.example.grocerieswizard.home;
 
 import android.os.Bundle;
 import android.widget.Toast;
@@ -11,7 +11,6 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.example.grocerieswizard.Fav.FavFragment;
 import com.example.grocerieswizard.databinding.ActivityMainBinding;
-import com.example.grocerieswizard.home.HomeFragment;
 import com.example.grocerieswizard.shop.ShopFragment;
 
 public class MainActivity extends AppCompatActivity {

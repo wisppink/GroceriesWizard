@@ -9,8 +9,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
 
-import com.example.grocerieswizard.models.IngredientModel;
-import com.example.grocerieswizard.models.RecipeModel;
+import com.example.grocerieswizard.addRecipe.IngredientModel;
+import com.example.grocerieswizard.home.RecipeModel;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;

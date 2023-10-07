@@ -10,13 +10,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.grocerieswizard.R;
 import com.example.grocerieswizard.databinding.ShoppingItemRowBinding;
-import com.example.grocerieswizard.models.RecipeModel;
+import com.example.grocerieswizard.home.RecipeModel;
 import com.example.grocerieswizard.shop.subshop.SubShopAdapter;
 
 import java.util.ArrayList;
 
 public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ShoppingViewHolder> {
-    ShoppingItemRowBinding binding;
     private final ArrayList<ShoppingItem> shoppingItems = new ArrayList<>();
     private final ShopHelper shopHelper;
     SubShopAdapter subShopAdapter = new SubShopAdapter();
@@ -30,23 +29,20 @@ public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ShoppingViewHo
     @NonNull
     @Override
     public ShoppingViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        binding = ShoppingItemRowBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+        ShoppingItemRowBinding binding = ShoppingItemRowBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
         ShoppingViewHolder holder = new ShoppingViewHolder(binding);
         binding.subRecipeRecycler.setAdapter(subShopAdapter);
         binding.subRecipeRecycler.setLayoutManager(new LinearLayoutManager(context));
 
-        binding.isFinished.setOnClickListener(v -> {
+        binding.isFinished.setOnClickListener(v ->
+        {
             ShoppingItem shoppingItem = shoppingItems.get(holder.getAdapterPosition());
-            // Toggle the checkbox state
-            shoppingItem.setChecked(!shoppingItem.isChecked());
-
-            // Update the total text based on the checkbox state
-            if (shoppingItem.isChecked()) {
+            if (binding.isFinished.isChecked()) {
                 binding.total.setText(R.string.done);
             } else {
-                // Set it back to the original total when unchecked
                 binding.total.setText(shopHelper.generateTotal(shoppingItem.getSubShoppingItems()));
             }
+
         });
         return holder;
     }
@@ -72,7 +68,6 @@ public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ShoppingViewHo
     }
 
     public static class ShoppingViewHolder extends RecyclerView.ViewHolder {
-
         private ShoppingItemRowBinding binding;
         Context context;
 
@@ -90,18 +85,6 @@ public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ShoppingViewHo
             binding.subRecipeRecycler.setAdapter(subShopAdapter);
             binding.subRecipeRecycler.setLayoutManager(new LinearLayoutManager(context));
             subShopAdapter.setShoppingItems(shoppingItem);
-
-            binding.isFinished.setOnClickListener(v ->
-            {
-                if (binding.isFinished.isChecked()) {
-                    binding.total.setText(R.string.done);
-                }
-                else{
-                    binding.total.setText(total);
-                }
-
-            });
-
         }
 
         public void setBinding(ShoppingItemRowBinding binding) {

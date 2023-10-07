@@ -12,15 +12,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.grocerieswizard.R;
 import com.example.grocerieswizard.databinding.FavItemRowBinding;
-import com.example.grocerieswizard.models.RecipeModel;
+import com.example.grocerieswizard.home.RecipeModel;
 
 import java.util.ArrayList;
 
 public class FavRecyclerViewAdapter extends RecyclerView.Adapter<FavRecyclerViewAdapter.FavViewHolder> {
     private static final String TAG = "FavRecyclerViewAdapter";
-
     public ArrayList<RecipeModel> favList = new ArrayList<>();
-    FavItemRowBinding binding;
     private FavInterface favInterface;
 
     public FavRecyclerViewAdapter() {
@@ -29,7 +27,7 @@ public class FavRecyclerViewAdapter extends RecyclerView.Adapter<FavRecyclerView
     @NonNull
     @Override
     public FavViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        binding = FavItemRowBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+        FavItemRowBinding binding = FavItemRowBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
         return new FavViewHolder(binding);
     }
 

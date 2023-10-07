@@ -1,4 +1,4 @@
-package com.example.grocerieswizard.models;
+package com.example.grocerieswizard.meal;
 
 @SuppressWarnings("unused")
 public class Meal {

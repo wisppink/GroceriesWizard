@@ -1,4 +1,4 @@
-package com.example.grocerieswizard.activities;
+package com.example.grocerieswizard.addRecipe;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -26,18 +26,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.grocerieswizard.MealResponse;
+import com.example.grocerieswizard.meal.MealResponse;
 import com.example.grocerieswizard.R;
 import com.example.grocerieswizard.RecipeDatabaseHelper;
-import com.example.grocerieswizard.adapters.IngredientAdapter;
 import com.example.grocerieswizard.home.RecipeRecyclerViewAdapter;
 import com.example.grocerieswizard.databinding.ActivityAddRecipeBinding;
 import com.example.grocerieswizard.databinding.DialogAddIngredientBinding;
-import com.example.grocerieswizard.interfaces.AddInterface;
-import com.example.grocerieswizard.interfaces.MealService;
-import com.example.grocerieswizard.models.IngredientModel;
-import com.example.grocerieswizard.models.Meal;
-import com.example.grocerieswizard.models.RecipeModel;
+import com.example.grocerieswizard.meal.MealService;
+import com.example.grocerieswizard.home.RecipeModel;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -266,7 +262,7 @@ public class AddRecipeActivity extends AppCompatActivity implements AddInterface
 
     }
 
-    private void showAlertDialogForFoundRecipe(Meal meal, TextView howToPrepare, ImageView addImage) {
+    private void showAlertDialogForFoundRecipe(MealService.Meal meal, TextView howToPrepare, ImageView addImage) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.TitleFoundRecipe);
         builder.setMessage(R.string.MessageFoundRecipe);
@@ -316,7 +312,7 @@ public class AddRecipeActivity extends AppCompatActivity implements AddInterface
     }
 
 
-    private void setIngredients(Meal meal) {
+    private void setIngredients(MealService.Meal meal) {
         String[] ingredientNames = {
                 meal.getStrIngredient1(),
                 meal.getStrIngredient2(),

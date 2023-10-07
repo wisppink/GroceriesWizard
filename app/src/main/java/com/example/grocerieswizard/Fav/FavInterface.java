@@ -1,6 +1,6 @@
 package com.example.grocerieswizard.Fav;
 
-import com.example.grocerieswizard.models.RecipeModel;
+import com.example.grocerieswizard.home.RecipeModel;
 
 public interface FavInterface {
     void onRemoveFromFavorites(RecipeModel recipeModel);

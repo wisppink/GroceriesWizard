@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.grocerieswizard.RecipeDatabaseHelper;
 import com.example.grocerieswizard.databinding.FragmentShopBinding;
-import com.example.grocerieswizard.models.RecipeModel;
+import com.example.grocerieswizard.home.RecipeModel;
 
 import java.util.ArrayList;
 

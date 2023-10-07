@@ -1,4 +1,4 @@
-package com.example.grocerieswizard.models;
+package com.example.grocerieswizard.home;
 
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -8,6 +8,7 @@ import android.util.Log;
 
 import com.example.grocerieswizard.Fav.FavInterface;
 import com.example.grocerieswizard.Fav.FavRecyclerViewAdapter;
+import com.example.grocerieswizard.addRecipe.IngredientModel;
 
 import java.util.List;
 
@@ -20,7 +21,6 @@ public class RecipeModel implements Parcelable {
     private boolean isSwiped;
     private int id;
     private boolean isSelected;
-    private boolean isFavorite;
     private final String TAG = "RecipeModel";
     private FavInterface favInterface;
     private FavRecyclerViewAdapter favAdapter;
@@ -32,8 +32,6 @@ public class RecipeModel implements Parcelable {
         this.imageBitmap = imageBitmap;
         isSwiped = false;
         isSelected = false;
-        isFavorite = false;
-
     }
 
     protected RecipeModel(Parcel in) {
@@ -147,11 +145,4 @@ public class RecipeModel implements Parcelable {
         this.favAdapter = favAdapter;
     }
 
-    public boolean isFavorite() {
-        return isFavorite;
-    }
-
-    public void setFavorite(boolean favorite) {
-        isFavorite = favorite;
-    }
 }

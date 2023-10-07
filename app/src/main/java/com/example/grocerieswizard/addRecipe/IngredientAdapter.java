@@ -1,8 +1,7 @@
-package com.example.grocerieswizard.adapters;
+package com.example.grocerieswizard.addRecipe;
 
 import android.content.Context;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.PopupMenu;
 
@@ -12,14 +11,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.grocerieswizard.R;
 import com.example.grocerieswizard.databinding.ItemIngredientBinding;
-import com.example.grocerieswizard.interfaces.AddInterface;
-import com.example.grocerieswizard.models.IngredientModel;
 
 import java.util.List;
 
 public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.IngredientViewHolder> {
-
-    ItemIngredientBinding binding;
     private static List<IngredientModel> ingredientList;
     private AddInterface addInterface;
 
@@ -27,11 +22,10 @@ public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.In
         IngredientAdapter.ingredientList = ingredientList;
     }
 
-
     @NonNull
     @Override
     public IngredientAdapter.IngredientViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        binding = ItemIngredientBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+        ItemIngredientBinding binding = ItemIngredientBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
         return new IngredientViewHolder(binding);
     }
 
@@ -103,7 +97,7 @@ public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.In
             setBinding(binding);
 
             itemView.setOnLongClickListener(v -> {
-                showPopUpMenu(v, getItemAtPosition(getAdapterPosition()));
+                showPopUpMenu(getItemAtPosition(getAdapterPosition()));
                 return false;
             });
         }
@@ -112,8 +106,8 @@ public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.In
             this.binding = binding;
         }
 
-        private void showPopUpMenu(View v, IngredientModel ingredientModel) {
-            PopupMenu popupMenu = new PopupMenu(itemView.getContext(), v);
+        private void showPopUpMenu(IngredientModel ingredientModel) {
+            PopupMenu popupMenu = new PopupMenu(itemView.getContext(), binding.getRoot());
             popupMenu.inflate(R.menu.popup_menu_ingredient); // Create a menu resource file
             // Set click listeners for menu items
             popupMenu.setOnMenuItemClickListener(item -> {

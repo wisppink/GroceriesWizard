@@ -1,6 +1,4 @@
-package com.example.grocerieswizard.interfaces;
-
-import com.example.grocerieswizard.models.IngredientModel;
+package com.example.grocerieswizard.addRecipe;
 
 public interface AddInterface {
     void onItemEdit(IngredientModel ingredientModel);
