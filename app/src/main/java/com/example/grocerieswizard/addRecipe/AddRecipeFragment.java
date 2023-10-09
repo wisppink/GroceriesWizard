@@ -34,6 +34,7 @@ import com.example.grocerieswizard.databinding.DialogAddIngredientBinding;
 import com.example.grocerieswizard.databinding.FragmentAddRecipeBinding;
 import com.example.grocerieswizard.home.RecipeModel;
 import com.example.grocerieswizard.home.RecipeRecyclerViewAdapter;
+import com.example.grocerieswizard.meal.Meal;
 import com.example.grocerieswizard.meal.MealResponse;
 import com.example.grocerieswizard.meal.MealService;
 import com.squareup.picasso.Picasso;
@@ -292,7 +293,7 @@ public class AddRecipeFragment extends Fragment implements AddInterface {
         dialog.show();
     }
 
-    private void showAlertDialogForFoundRecipe(MealService.Meal meal, TextView howToPrepare, ImageView addImage) {
+    private void showAlertDialogForFoundRecipe(Meal meal, TextView howToPrepare, ImageView addImage) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle(R.string.TitleFoundRecipe);
         builder.setMessage(R.string.MessageFoundRecipe);
@@ -341,7 +342,7 @@ public class AddRecipeFragment extends Fragment implements AddInterface {
         }
     }
 
-    private void setIngredients(MealService.Meal meal) {
+    private void setIngredients(Meal meal) {
         String[] ingredientNames = {
                 meal.getStrIngredient1(),
                 meal.getStrIngredient2(),

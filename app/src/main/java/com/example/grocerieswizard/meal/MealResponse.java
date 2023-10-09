@@ -2,12 +2,12 @@ package com.example.grocerieswizard.meal;
 
 @SuppressWarnings("unused")
 public class MealResponse {
-    private MealService.Meal[] meals;
+    private Meal[] meals;
 
-    public MealService.Meal[] getMeals() {
+    public Meal[] getMeals() {
         return meals;
     }
-    public MealService.Meal getMeal(int i) {
+    public Meal getMeal(int i) {
         if (meals != null && i >= 0 && i < meals.length) {
             return meals[i];
         } else {
