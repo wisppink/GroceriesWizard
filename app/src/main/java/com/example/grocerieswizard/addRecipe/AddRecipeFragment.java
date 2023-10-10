@@ -51,7 +51,6 @@ public class AddRecipeFragment extends Fragment implements AddInterface {
     private IngredientAdapter ingredientAdapter;
     private List<IngredientModel> ingredientList;
     Context context;
-    private FragmentAddRecipeBinding binding;
     private Bitmap defaultImageBitmap;
     private RecipeUi recipeUi;
     private static final String TAG = "AddRecipeFragment";
@@ -68,7 +67,7 @@ public class AddRecipeFragment extends Fragment implements AddInterface {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        binding = FragmentAddRecipeBinding.inflate(inflater, container, false);
+        FragmentAddRecipeBinding binding = FragmentAddRecipeBinding.inflate(inflater, container, false);
         ingredientAdapter = new IngredientAdapter(ingredientList);
         ingredientAdapter.setRecyclerViewInterface(this);
         context = getContext();
