@@ -1,4 +1,4 @@
-package com.example.grocerieswizard.meal;
+package com.example.grocerieswizard.data.remote.model;
 
 @SuppressWarnings("unused")
 public class MealResponse {
@@ -16,4 +16,3 @@ public class MealResponse {
     }
 
 }
-

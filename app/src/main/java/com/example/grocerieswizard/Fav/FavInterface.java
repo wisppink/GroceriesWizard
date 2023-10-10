@@ -1,9 +1,9 @@
 package com.example.grocerieswizard.Fav;
 
-import com.example.grocerieswizard.home.RecipeModel;
+import com.example.grocerieswizard.ui.model.RecipeUi;
 
 public interface FavInterface {
-    void onRemoveFromFavorites(RecipeModel recipeModel);
+    void onRemoveFromFavorites(RecipeUi recipeUi);
 
     boolean isRecipeSelected(int id);
 

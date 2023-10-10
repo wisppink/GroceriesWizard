@@ -36,7 +36,7 @@ public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.In
         IngredientModel ingredient = ingredientList.get(position);
         ingredient.setInterface(addInterface);
         holder.bind(ingredient);
-        Log.d(TAG, "onBindViewHolder: recieved ingredient: " + ingredient.getName());
+        Log.d(TAG, "onBindViewHolder: received ingredient: " + ingredient.getName());
     }
 
     @Override

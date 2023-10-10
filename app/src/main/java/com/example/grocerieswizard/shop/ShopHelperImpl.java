@@ -5,23 +5,24 @@ import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
 import android.util.Log;
 
 import com.example.grocerieswizard.addRecipe.IngredientModel;
-import com.example.grocerieswizard.home.RecipeModel;
+import com.example.grocerieswizard.ui.model.RecipeUi;
 import com.example.grocerieswizard.shop.subshop.SubShoppingItem;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 public class ShopHelperImpl implements ShopHelper {
 
     @Override
-    public ArrayList<ShoppingItem> generateShoppingItems(ArrayList<RecipeModel> recipes) {
+    public ArrayList<ShoppingItem> generateShoppingItems(List<RecipeUi> recipeUis) {
         ArrayList<ShoppingItem> shoppingItems = new ArrayList<>();
-        for (RecipeModel recipe : recipes) {
-            for (IngredientModel ingredient : recipe.getIngredients()) {
+        for (RecipeUi recipeUi : recipeUis) {
+            for (IngredientModel ingredient : recipeUi.getIngredients()) {
                 String ingredientName = ingredient.getName();
-                String recipeName = recipe.getRecipeName();
+                String recipeName = recipeUi.getRecipeName();
                 String unit = ingredient.getUnit();
                 double quantity = ingredient.getQuantity();
 

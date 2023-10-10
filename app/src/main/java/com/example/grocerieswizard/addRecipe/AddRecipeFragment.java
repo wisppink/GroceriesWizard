@@ -29,43 +29,40 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.grocerieswizard.R;
-import com.example.grocerieswizard.RecipeDatabaseHelper;
+import com.example.grocerieswizard.data.repo.RecipeRepository;
+import com.example.grocerieswizard.data.repo.RepositoryCallback;
+import com.example.grocerieswizard.data.repo.model.Recipe;
 import com.example.grocerieswizard.databinding.DialogAddIngredientBinding;
 import com.example.grocerieswizard.databinding.FragmentAddRecipeBinding;
-import com.example.grocerieswizard.home.RecipeModel;
+import com.example.grocerieswizard.di.GroceriesWizardInjector;
 import com.example.grocerieswizard.home.RecipeRecyclerViewAdapter;
-import com.example.grocerieswizard.meal.Meal;
-import com.example.grocerieswizard.meal.MealResponse;
-import com.example.grocerieswizard.meal.MealService;
+import com.example.grocerieswizard.ui.model.RecipeUi;
+import com.example.grocerieswizard.ui.model.UiMapper;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
-
 public class AddRecipeFragment extends Fragment implements AddInterface {
 
-
-    private RecipeDatabaseHelper recipeDatabaseHelper;
+    private RecipeRepository recipeRepository;
+    private UiMapper uiMapper;
     private IngredientAdapter ingredientAdapter;
     private List<IngredientModel> ingredientList;
     Context context;
     private FragmentAddRecipeBinding binding;
     private Bitmap defaultImageBitmap;
-    private RecipeModel recipe;
+    private RecipeUi recipeUi;
     private static final String TAG = "AddRecipeFragment";
     private ActivityResultLauncher<Intent> pickImageLauncher;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        recipeDatabaseHelper = new RecipeDatabaseHelper(getContext());
+        GroceriesWizardInjector injector = GroceriesWizardInjector.getInstance();
+        recipeRepository = injector.getRecipeRepository();
+        uiMapper = injector.getUiMapper();
         ingredientList = new ArrayList<>();
     }
 
@@ -88,26 +85,27 @@ public class AddRecipeFragment extends Fragment implements AddInterface {
             Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
         }
         //create an empty recipe
-        recipe = new RecipeModel(null, null, null, null);
+        recipeUi = new RecipeUi(null, null, null, null);
 
         // Check if the fragment is opened for editing
         Bundle arguments = getArguments();
         if (arguments != null) {
-            RecipeModel recipeModel = arguments.getParcelable("recipeModel");
+            RecipeUi recipeUi = arguments.getParcelable("recipeModel");
             int position = arguments.getInt("position");
             //get old ones to show user
-            assert recipeModel != null;
-            binding.editRecipeName.setText(recipeModel.getRecipeName());
-            binding.editRecipeHowToPrepare.setText(recipeModel.getInstructions());
-            ingredientList.addAll(recipeModel.getIngredients());
-            Bitmap selectedImageBitmap = recipeModel.getImageBitmap();
+            assert recipeUi != null;
+            binding.editRecipeName.setText(recipeUi.getRecipeName());
+            binding.editRecipeHowToPrepare.setText(recipeUi.getInstructions());
+            ingredientList.addAll(recipeUi.getIngredients());
+            Bitmap selectedImageBitmap = recipeUi.getImageBitmap();
             //get new ones to update
             String recipeName = binding.editRecipeName.getText().toString();
             String howToPrepare = binding.editRecipeHowToPrepare.getText().toString();
 
-            RecipeModel editedRecipe = new RecipeModel(recipeName, ingredientList, howToPrepare, selectedImageBitmap);
-            recipe = recipeAdapter.editRecipe(position, editedRecipe);
+            RecipeUi editedRecipeUi = new RecipeUi(recipeName, ingredientList, howToPrepare, selectedImageBitmap);
+            this.recipeUi = recipeAdapter.editRecipe(position, editedRecipeUi);
             ingredientAdapter.changeItem(position);
+            //TODO: selectedImageBitmap takes a little time, don't set it immediately
             binding.addImage.setImageBitmap(selectedImageBitmap);
         } else {
             binding.addImage.setImageURI(defaultImageUri);
@@ -127,38 +125,24 @@ public class AddRecipeFragment extends Fragment implements AddInterface {
                     mHandler.removeCallbacksAndMessages(null);
                     mHandler.postDelayed(() -> {
                         String inputText = binding.editRecipeName.getText().toString().trim();
-                        Retrofit retrofit = new Retrofit.Builder()
-                                .baseUrl("https://www.themealdb.com/api/json/v1/1/")
-                                .addConverterFactory(GsonConverterFactory.create())
-                                .build();
-
-                        MealService mealApi = retrofit.create(MealService.class);
-                        Call<MealResponse> call = mealApi.searchMeals(inputText);
                         Log.d(TAG, "afterTextChanged: input text " + inputText);
 
-                        call.enqueue(new Callback<MealResponse>() {
+                        recipeRepository.searchMeals(inputText, new RepositoryCallback<List<Recipe>>() {
                             @Override
-                            public void onResponse(@NonNull Call<MealResponse> call, @NonNull Response<MealResponse> response) {
-                                if (response.isSuccessful()) {
-
-                                    MealResponse mealResponse = response.body();
-                                    if (mealResponse != null && mealResponse.getMeals() != null) {
-                                        showAlertDialogForFoundRecipe(mealResponse.getMeal(0), binding.editRecipeHowToPrepare, binding.addImage);
-                                    } else {
-                                        System.out.println("No meals found.");
-                                    }
-                                } else {
-                                    System.out.println("API request failed.");
-                                }
-
+                            public void onSuccess(List<Recipe> data) {
+                                if (data.isEmpty()) return;
+                                //uiMapper.toRecipeUi has image in here.
+                                showAlertDialogForFoundRecipe(uiMapper.toRecipeUi(data.get(0)), binding.editRecipeHowToPrepare, binding.addImage);
+                                Log.d(TAG, "onSuccess: uiMapper image bitmap: " + uiMapper.toRecipeUi(data.get(0)).getImageBitmap());
+                                recipeUi.setImageBitmap(uiMapper.toRecipeUi(data.get(0)).getImageBitmap());
+                                Log.d(TAG, "onSuccess: recipeUi image bitmap: " + recipeUi.getImageBitmap());
                             }
 
                             @Override
-                            public void onFailure(@NonNull Call<MealResponse> call, @NonNull Throwable t) {
-                                Log.e(TAG, "onFailure: ", t);
+                            public void onError(Exception e) {
+                                Log.e(TAG, "onError", e);
                             }
                         });
-
                     }, 1000); // 0.5 saniye
                 }
             });
@@ -179,7 +163,7 @@ public class AddRecipeFragment extends Fragment implements AddInterface {
                         @Override
                         public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
                             binding.addImage.setImageBitmap(bitmap);
-                            recipe.setImageBitmap(bitmap);
+                            recipeUi.setImageBitmap(bitmap);
                         }
 
                         @Override
@@ -195,11 +179,11 @@ public class AddRecipeFragment extends Fragment implements AddInterface {
                 } catch (Exception e) {
                     Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
                     binding.addImage.setImageBitmap(defaultImageBitmap);
-                    recipe.setImageBitmap(defaultImageBitmap);
+                    recipeUi.setImageBitmap(defaultImageBitmap);
                 }
             } else {
                 binding.addImage.setImageBitmap(defaultImageBitmap);
-                recipe.setImageBitmap(defaultImageBitmap);
+                recipeUi.setImageBitmap(defaultImageBitmap);
             }
         });
 
@@ -212,29 +196,33 @@ public class AddRecipeFragment extends Fragment implements AddInterface {
         binding.saveRecipeButton.setOnClickListener(v -> {
             String recipeName = binding.editRecipeName.getText().toString();
             String howToPrepare = binding.editRecipeHowToPrepare.getText().toString();
+
             if (recipeName.isEmpty() || ingredientList.isEmpty() || howToPrepare.isEmpty()) {
                 Toast.makeText(context, "Please fill all fields!", Toast.LENGTH_SHORT).show();
                 return;
             }
-            if (recipe.getImageBitmap() == null) recipe.setImageBitmap(defaultImageBitmap);
+            if (recipeUi.getImageBitmap() == null) {
+                recipeUi.setImageBitmap(defaultImageBitmap);
+                Log.d(TAG, "onCreateView: recipe ui image bitmap null");
+            }
 
-            recipe.setRecipeName(recipeName);
-            recipe.setInstructions(howToPrepare);
-            recipe.setSwiped(false);
-            recipe.setIngredients(ingredientList);
+            recipeUi.setRecipeName(recipeName);
+            recipeUi.setInstructions(howToPrepare);
+            recipeUi.setSwiped(false);
+            recipeUi.setIngredients(ingredientList);
 
             Bundle checkEdit = getArguments();
             //if it comes from edit mode, delete original put edited version as new recipe
             if (checkEdit != null) {
                 if (arguments != null) {
-                    RecipeModel recipeModel = arguments.getParcelable("recipeModel");
-                    if (recipeModel != null) {
-                        recipeDatabaseHelper.deleteRecipe(recipeModel.getId());
+                    RecipeUi recipeUi = arguments.getParcelable("recipeModel");
+                    if (recipeUi != null) {
+                        recipeRepository.deleteRecipe(recipeUi.getId());
                     }
                 }
-                recipeDatabaseHelper.insertRecipe(recipe);
+                recipeRepository.insertRecipe(uiMapper.toRecipe(recipeUi));
             } else {
-                recipeDatabaseHelper.insertRecipe(recipe);
+                recipeRepository.insertRecipe(uiMapper.toRecipe(recipeUi));
             }
             getParentFragmentManager().popBackStack();
         });
@@ -252,7 +240,7 @@ public class AddRecipeFragment extends Fragment implements AddInterface {
     @Override
     public void onItemDelete(IngredientModel ingredientModel) {
         if (ingredientModel != null) {
-            recipeDatabaseHelper.deleteIngredient(ingredientModel.getId());
+            recipeRepository.deleteIngredient(ingredientModel.getId());
             ingredientAdapter.removeIngredient(ingredientModel, context);
         }
 
@@ -285,7 +273,7 @@ public class AddRecipeFragment extends Fragment implements AddInterface {
             ingredientModel.setUnit(unit);
             ingredientModel.setQuantity(quantity);
             ingredientAdapter.addIngredient(ingredientModel);
-            recipeDatabaseHelper.insertIngredient(ingredientModel, ingredientModel.getRecipeId());
+            recipeRepository.insertIngredient(ingredientModel, ingredientModel.getRecipeId());
 
         });
         builder.setNegativeButton(android.R.string.cancel, (dialog, which) -> dialog.dismiss());
@@ -293,159 +281,20 @@ public class AddRecipeFragment extends Fragment implements AddInterface {
         dialog.show();
     }
 
-    private void showAlertDialogForFoundRecipe(Meal meal, TextView howToPrepare, ImageView addImage) {
+    private void showAlertDialogForFoundRecipe(RecipeUi recipeUi, TextView howToPrepare, ImageView addImage) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle(R.string.TitleFoundRecipe);
         builder.setMessage(R.string.MessageFoundRecipe);
         builder.setPositiveButton(R.string.yes, (dialog, which) -> {
-            System.out.println("Meal ID: " + meal.getIdMeal());
-            System.out.println("Meal Name: " + meal.getStrMeal());
-            howToPrepare.setText(meal.getStrInstructions());
-            setIngredients(meal);
-            bitmapFromMeal(meal.getStrMealThumb(), bitmap -> {
-                if (bitmap != null) {
-                    Log.d(TAG, "showAlertDialogForFoundRecipe: its not null" + bitmap);
-                    recipe.setImageBitmap(bitmap);
-                    addImage.setImageBitmap(bitmap);
-                    Log.d(TAG, "showAlertDialogForFoundRecipe: recipe set image: " + recipe.getImageBitmap());
-                }
-            });
-
+            Log.d(TAG, "showAlert: recipeUi image bitmap: " + recipeUi.getImageBitmap());
+            howToPrepare.setText(recipeUi.getInstructions());
+            ingredientList.addAll(recipeUi.getIngredients());
+            addImage.setImageBitmap(recipeUi.getImageBitmap());
         });
         builder.setNegativeButton(R.string.no, (dialog, which) -> Log.d(TAG, "showAlertDialogForFoundRecipe: do nothing."));
         builder.show();
 
     }
-
-    private void bitmapFromMeal(String strImageSource, AddRecipeFragment.BitmapCallback callback) {
-        Log.d(TAG, "bitmapFromMeal: strImage " + strImageSource);
-        try {
-            Picasso.get().load(strImageSource).resize(150, 150).centerCrop().into(new Target() {
-                @Override
-                public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                    Log.d(TAG, "onBitmapLoaded: strImageSource " + strImageSource);
-                    Log.d(TAG, "onBitmapLoaded: bitmap: " + bitmap);
-                    callback.onBitmapLoaded(bitmap);
-                }
-
-                @Override
-                public void onBitmapFailed(Exception e, Drawable errorDrawable) {
-                    callback.onBitmapLoaded(null); // Callback with null in case of failure
-                }
-
-                @Override
-                public void onPrepareLoad(Drawable placeHolderDrawable) {
-                }
-            });
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private void setIngredients(Meal meal) {
-        String[] ingredientNames = {
-                meal.getStrIngredient1(),
-                meal.getStrIngredient2(),
-                meal.getStrIngredient3(),
-                meal.getStrIngredient4(),
-                meal.getStrIngredient5(),
-                meal.getStrIngredient6(),
-                meal.getStrIngredient7(),
-                meal.getStrIngredient8(),
-                meal.getStrIngredient9(),
-                meal.getStrIngredient10(),
-                meal.getStrIngredient11(),
-                meal.getStrIngredient12(),
-                meal.getStrIngredient13(),
-                meal.getStrIngredient14(),
-                meal.getStrIngredient15(),
-                meal.getStrIngredient16(),
-                meal.getStrIngredient17(),
-                meal.getStrIngredient18(),
-                meal.getStrIngredient19(),
-                meal.getStrIngredient20()
-        };
-
-        String[] ingredientMeasures = {
-                meal.getStrMeasure1(),
-                meal.getStrMeasure2(),
-                meal.getStrMeasure3(),
-                meal.getStrMeasure4(),
-                meal.getStrMeasure5(),
-                meal.getStrMeasure6(),
-                meal.getStrMeasure7(),
-                meal.getStrMeasure8(),
-                meal.getStrMeasure9(),
-                meal.getStrMeasure10(),
-                meal.getStrMeasure11(),
-                meal.getStrMeasure12(),
-                meal.getStrMeasure13(),
-                meal.getStrMeasure14(),
-                meal.getStrMeasure15(),
-                meal.getStrMeasure16(),
-                meal.getStrMeasure17(),
-                meal.getStrMeasure18(),
-                meal.getStrMeasure19(),
-                meal.getStrMeasure20()
-        };
-
-        for (int i = 0; i < ingredientNames.length; i++) {
-            String name = ingredientNames[i];
-            String measure = ingredientMeasures[i];
-
-            if (name != null && !name.isEmpty() && measure != null && !measure.isEmpty()) {
-                IngredientModel ingredient = new IngredientModel(name, parseQuantity(measure), parseUnit(measure));
-                addIngredientAutomatically(ingredient);
-            }
-        }
-    }
-
-    private void addIngredientAutomatically(IngredientModel ingredientModel) {
-        ingredientAdapter.addIngredient(ingredientModel);
-        recipeDatabaseHelper.insertIngredient(ingredientModel, ingredientModel.getRecipeId());
-    }
-
-    private double parseQuantity(String measure) {
-        StringBuilder quantityStr = new StringBuilder();
-        boolean foundDigit = false;
-
-        for (char c : measure.toCharArray()) {
-            if (Character.isDigit(c) || c == '.') {
-                quantityStr.append(c);
-                foundDigit = true;
-            } else if (foundDigit) {
-                break;
-            }
-        }
-
-        try {
-            return Double.parseDouble(quantityStr.toString());
-        } catch (NumberFormatException e) {
-            return 0.0;
-        }
-    }
-
-    private String parseUnit(String measure) {
-        StringBuilder unitStr = new StringBuilder();
-        boolean foundDigit = false;
-
-        for (char c : measure.toCharArray()) {
-            if (Character.isDigit(c) || c == '.') {
-                foundDigit = true;
-            } else if (foundDigit) {
-                unitStr.append(c);
-            }
-        }
-
-        String unit = unitStr.toString().trim();
-
-        if (unit.isEmpty()) {
-            unit = "piece";
-        }
-
-        return unit;
-    }
-
 
     public void showEditIngredientDialog(IngredientModel ingredientModel) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -499,7 +348,4 @@ public class AddRecipeFragment extends Fragment implements AddInterface {
         dialog.show();
     }
 
-    interface BitmapCallback {
-        void onBitmapLoaded(Bitmap bitmap);
-    }
 }

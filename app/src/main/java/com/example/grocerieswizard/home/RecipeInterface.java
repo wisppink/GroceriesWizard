@@ -1,5 +1,7 @@
 package com.example.grocerieswizard.home;
 
+import com.example.grocerieswizard.ui.model.RecipeUi;
+
 public interface RecipeInterface {
 
     void onItemClick(int position);
@@ -9,9 +11,9 @@ public interface RecipeInterface {
     void onItemEdit(int position);
     Boolean isRecipeSelected(int id);
 
-    int updateRecipe(RecipeModel oldRecipe);
+    int updateRecipe(RecipeUi oldRecipeUi);
 
-    void insertRecipe(RecipeModel recipe);
+    void insertRecipe(RecipeUi recipeUi);
 
     void deleteRecipe(int id);
 
@@ -25,6 +27,7 @@ public interface RecipeInterface {
 
     void deleteRecipeFav(int recipeId);
 
+    boolean onLongClick(int adapterPosition);
+
     void onItemShare(int adapterPosition);
 }
-

@@ -1,6 +1,16 @@
-package com.example.grocerieswizard.meal;
+package com.example.grocerieswizard.data.remote.model;
 
-@SuppressWarnings("unused")
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
+import android.util.Log;
+
+import com.example.grocerieswizard.addRecipe.IngredientModel;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class Meal {
     private String idMeal;
     private String strMeal;
@@ -55,6 +65,9 @@ public class Meal {
     private String strImageSource;
     private String strCreativeCommonsConfirmed;
     private String dateModified;
+    List<IngredientModel> ingredients = new ArrayList<>();
+    private Bitmap imageBitmap;
+    private static final String TAG = "Meal";
 
     public String getIdMeal() {
         return idMeal;
@@ -266,5 +279,130 @@ public class Meal {
 
     public String getDateModified() {
         return dateModified;
+    }
+
+    public List<IngredientModel> getIngredients() {
+        String[] ingredientNames = {
+                getStrIngredient1(),
+                getStrIngredient2(),
+                getStrIngredient3(),
+                getStrIngredient4(),
+                getStrIngredient5(),
+                getStrIngredient6(),
+                getStrIngredient7(),
+                getStrIngredient8(),
+                getStrIngredient9(),
+                getStrIngredient10(),
+                getStrIngredient11(),
+                getStrIngredient12(),
+                getStrIngredient13(),
+                getStrIngredient14(),
+                getStrIngredient15(),
+                getStrIngredient16(),
+                getStrIngredient17(),
+                getStrIngredient18(),
+                getStrIngredient19(),
+                getStrIngredient20()
+        };
+
+        String[] ingredientMeasures = {
+                getStrMeasure1(),
+                getStrMeasure2(),
+                getStrMeasure3(),
+                getStrMeasure4(),
+                getStrMeasure5(),
+                getStrMeasure6(),
+                getStrMeasure7(),
+                getStrMeasure8(),
+                getStrMeasure9(),
+                getStrMeasure10(),
+                getStrMeasure11(),
+                getStrMeasure12(),
+                getStrMeasure13(),
+                getStrMeasure14(),
+                getStrMeasure15(),
+                getStrMeasure16(),
+                getStrMeasure17(),
+                getStrMeasure18(),
+                getStrMeasure19(),
+                getStrMeasure20()
+        };
+
+        for (int i = 0; i < ingredientNames.length; i++) {
+            String name = ingredientNames[i];
+            String measure = ingredientMeasures[i];
+
+            if (name != null && !name.isEmpty() && measure != null && !measure.isEmpty()) {
+                IngredientModel ingredient = new IngredientModel(name, parseQuantity(measure), parseUnit(measure));
+                ingredients.add(ingredient);
+            }
+        }
+        return ingredients;
+    }
+
+    private double parseQuantity(String measure) {
+        StringBuilder quantityStr = new StringBuilder();
+        boolean foundDigit = false;
+
+        for (char c : measure.toCharArray()) {
+            if (Character.isDigit(c) || c == '.') {
+                quantityStr.append(c);
+                foundDigit = true;
+            } else if (foundDigit) {
+                break;
+            }
+        }
+
+        try {
+            return Double.parseDouble(quantityStr.toString());
+        } catch (NumberFormatException e) {
+            return 0.0;
+        }
+    }
+
+    private String parseUnit(String measure) {
+        StringBuilder unitStr = new StringBuilder();
+        boolean foundDigit = false;
+
+        for (char c : measure.toCharArray()) {
+            if (Character.isDigit(c) || c == '.') {
+                foundDigit = true;
+            } else if (foundDigit) {
+                unitStr.append(c);
+            }
+        }
+
+        String unit = unitStr.toString().trim();
+
+        if (unit.isEmpty()) {
+            unit = "piece";
+        }
+
+        return unit;
+    }
+
+    public Bitmap getImageBitmap(String strMealThumb) {
+        Picasso.get().load(strMealThumb).resize(150, 150).centerCrop().into(new Target() {
+            @Override
+            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                setImageBitmap(bitmap);
+                Log.d(TAG, "onBitmapLoaded: sucsess");
+            }
+
+            @Override
+            public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+                Log.e(TAG, "onBitmapFailed: ", e);
+            }
+
+            @Override
+            public void onPrepareLoad(Drawable placeHolderDrawable) {
+            }
+        });
+        Log.d(TAG, "getImageBitmap: " + imageBitmap);
+        return imageBitmap;
+    }
+
+    public void setImageBitmap(Bitmap imageBitmap) {
+        this.imageBitmap = imageBitmap;
     }
 }

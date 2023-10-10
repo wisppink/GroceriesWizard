@@ -10,10 +10,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.grocerieswizard.R;
 import com.example.grocerieswizard.databinding.ShoppingItemRowBinding;
-import com.example.grocerieswizard.home.RecipeModel;
+import com.example.grocerieswizard.ui.model.RecipeUi;
 import com.example.grocerieswizard.shop.subshop.SubShopAdapter;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ShoppingViewHolder> {
     private final ArrayList<ShoppingItem> shoppingItems = new ArrayList<>();
@@ -59,8 +60,8 @@ public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ShoppingViewHo
         return shoppingItems.size();
     }
 
-    public void setSelectedRecipeList(ArrayList<RecipeModel> selectedRecipeList) {
-        ArrayList<ShoppingItem> tempList = shopHelper.generateShoppingItems(selectedRecipeList);
+    public void setSelectedRecipeList(List<RecipeUi> selectedRecipeListUi) {
+        ArrayList<ShoppingItem> tempList = shopHelper.generateShoppingItems(selectedRecipeListUi);
         for (ShoppingItem shoppingItem : tempList) {
             shoppingItems.add(shoppingItem);
             notifyItemInserted(shoppingItems.size() - 1);

@@ -1,4 +1,4 @@
-package com.example.grocerieswizard.home;
+package com.example.grocerieswizard.ui.model;
 
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -10,7 +10,7 @@ import com.example.grocerieswizard.addRecipe.IngredientModel;
 
 import java.util.List;
 
-public class RecipeModel implements Parcelable {
+public class RecipeUi implements Parcelable {
 
     private String recipeName;
     private Bitmap imageBitmap;
@@ -20,7 +20,7 @@ public class RecipeModel implements Parcelable {
     private int id;
     private final String TAG = "RecipeModel";
 
-    public RecipeModel(String recipeName, List<IngredientModel> ingredients, String instructions, Bitmap imageBitmap) {
+    public RecipeUi(String recipeName, List<IngredientModel> ingredients, String instructions, Bitmap imageBitmap) {
         this.recipeName = recipeName;
         this.ingredients = ingredients;
         this.instructions = instructions;
@@ -28,22 +28,22 @@ public class RecipeModel implements Parcelable {
         isSwiped = false;
     }
 
-    protected RecipeModel(Parcel in) {
+    protected RecipeUi(Parcel in) {
         recipeName = in.readString();
         imageBitmap = in.readParcelable(Uri.class.getClassLoader());
         instructions = in.readString();
         ingredients = in.createTypedArrayList(IngredientModel.CREATOR);
     }
 
-    public static final Parcelable.Creator<RecipeModel> CREATOR = new Parcelable.Creator<RecipeModel>() {
+    public static final Parcelable.Creator<RecipeUi> CREATOR = new Parcelable.Creator<RecipeUi>() {
         @Override
-        public RecipeModel createFromParcel(Parcel source) {
-            return new RecipeModel(source);
+        public RecipeUi createFromParcel(Parcel source) {
+            return new RecipeUi(source);
         }
 
         @Override
-        public RecipeModel[] newArray(int size) {
-            return new RecipeModel[size];
+        public RecipeUi[] newArray(int size) {
+            return new RecipeUi[size];
         }
     };
 

@@ -1,21 +1,25 @@
 package com.example.grocerieswizard.Fav;
 
+import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.grocerieswizard.R;
 import com.example.grocerieswizard.databinding.FavItemRowBinding;
-import com.example.grocerieswizard.home.RecipeModel;
+import com.example.grocerieswizard.ui.model.RecipeUi;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class FavRecyclerViewAdapter extends RecyclerView.Adapter<FavRecyclerViewAdapter.FavViewHolder> {
-    public ArrayList<RecipeModel> favList = new ArrayList<>();
+    private static final String TAG = "FavRecyclerViewAdapter";
+    public ArrayList<RecipeUi> favList = new ArrayList<>();
     private FavInterface favInterface;
 
     public FavRecyclerViewAdapter(FavInterface favInterface) {
@@ -26,41 +30,13 @@ public class FavRecyclerViewAdapter extends RecyclerView.Adapter<FavRecyclerView
     @Override
     public FavViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         FavItemRowBinding binding = FavItemRowBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
-        FavViewHolder holder = new FavViewHolder(binding,favInterface);
-        binding.unFav.setOnClickListener(v -> {
-            AlertDialog.Builder builder = new AlertDialog.Builder(binding.getRoot().getContext());
-            RecipeModel recipeModel = favList.get(holder.getAdapterPosition());
-            builder.setMessage(R.string.unfav_recipe_dialog_ask)
-                    .setPositiveButton(R.string.yes, (dialog, which) -> {
-                        int adapterPosition = holder.getAdapterPosition();
-                        if (adapterPosition != RecyclerView.NO_POSITION) {
-                            favInterface.onRemoveFromFavorites(recipeModel);
-                        }
-                    })
-                    .setNegativeButton(R.string.no, (dialog, which) -> dialog.dismiss());
-            AlertDialog dialog = builder.create();
-            dialog.show();
-        });
-        binding.unCart.setOnClickListener(v -> {
-            RecipeModel recipeModel = favList.get(holder.getAdapterPosition());
-            if (!favInterface.isRecipeSelected(recipeModel.getId())) {
-                binding.unCart.setImageResource(R.drawable.baseline_remove_shopping_cart_24);
-                favInterface.insertSelectedRecipe(recipeModel.getId());
-                Toast.makeText(binding.getRoot().getContext(), R.string.added_to_cart, Toast.LENGTH_SHORT).show();
-            } else {
-                binding.unCart.setImageResource(R.drawable.add_cart);
-                favInterface.removeSelectedRecipe(recipeModel.getId());
-                Toast.makeText(binding.getRoot().getContext(), R.string.removed_from_cart, Toast.LENGTH_SHORT).show();
-            }
-            favInterface.updateIt(holder.getAdapterPosition());
-        });
-        return holder;
+        return new FavViewHolder(binding, favInterface);
     }
 
     @Override
     public void onBindViewHolder(@NonNull FavViewHolder holder, int position) {
-        RecipeModel recipeModel = favList.get(position);
-        holder.bind(recipeModel);
+        RecipeUi recipeUi = favList.get(position);
+        holder.bind(recipeUi);
     }
 
     @Override
@@ -68,13 +44,13 @@ public class FavRecyclerViewAdapter extends RecyclerView.Adapter<FavRecyclerView
         return favList.size();
     }
 
-    public ArrayList<RecipeModel> getFavList() {
+    public ArrayList<RecipeUi> getFavList() {
         return favList;
     }
 
-    public void setFavList(ArrayList<RecipeModel> recipes) {
-        for (RecipeModel recipe : recipes) {
-            favList.add(recipe);
+    public void setFavList(List<RecipeUi> recipeUis) {
+        for (RecipeUi recipeUi : recipeUis) {
+            favList.add(recipeUi);
             notifyItemInserted(favList.size() - 1);
         }
     }
@@ -93,8 +69,8 @@ public class FavRecyclerViewAdapter extends RecyclerView.Adapter<FavRecyclerView
     }
 
     public static class FavViewHolder extends RecyclerView.ViewHolder {
-
-        private FavItemRowBinding binding;
+        RecipeUi recipeUi;
+        private FavItemRowBinding favItemRowBinding;
 
         FavInterface favInterface;
 
@@ -102,26 +78,52 @@ public class FavRecyclerViewAdapter extends RecyclerView.Adapter<FavRecyclerView
             this.favInterface = favInterface;
         }
 
-        public FavViewHolder(FavItemRowBinding binding,FavInterface favInterface) {
+        public FavViewHolder(FavItemRowBinding binding, FavInterface favInterface) {
             super(binding.getRoot());
-            setBinding(binding);
+            setFavItemRowBinding(binding);
             setFavInterface(favInterface);
+            binding.unFav.setOnClickListener(v -> {
+                AlertDialog.Builder builder = new AlertDialog.Builder(itemView.getContext());
+                builder.setMessage(R.string.unfav_recipe_dialog_ask)
+                        .setPositiveButton(R.string.yes, (dialog, which) -> {
+                            int adapterPosition = getAdapterPosition();
+                            if (adapterPosition != RecyclerView.NO_POSITION) {
+                                favInterface.onRemoveFromFavorites(recipeUi);
+                            }
+                        })
+                        .setNegativeButton(R.string.no, (dialog, which) -> dialog.dismiss());
+                AlertDialog dialog = builder.create();
+                dialog.show();
+
+
+            });
+
         }
 
-        public void bind(RecipeModel recipeModel) {
-            binding.favRecipeTitle.setText(recipeModel.getRecipeName());
-
-            if (favInterface.isRecipeSelected(recipeModel.getId())) {
-                // Set the cart icon if it is selected
-                binding.unCart.setImageResource(R.drawable.baseline_remove_shopping_cart_24);
+        public void bind(RecipeUi recipeUi) {
+            favItemRowBinding.favRecipeTitle.setText(recipeUi.getRecipeName());
+            if (favInterface.isRecipeSelected(recipeUi.getId())) {
+                favItemRowBinding.cardView.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), R.color.gray));
             } else {
-                // Set the add to cart icon if it is not selected
-                binding.unCart.setImageResource(R.drawable.add_cart);
+                favItemRowBinding.cardView.setBackgroundColor(Color.TRANSPARENT);
             }
+
+            itemView.setOnClickListener(v -> {
+                Log.d(TAG, "bind: clicked!");
+                if (!favInterface.isRecipeSelected(recipeUi.getId())) {
+                    favItemRowBinding.cardView.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), R.color.gray));
+                    favInterface.insertSelectedRecipe(recipeUi.getId());
+                } else {
+                    favInterface.removeSelectedRecipe(recipeUi.getId());
+                    itemView.setBackgroundColor(Color.TRANSPARENT);
+                }
+                favInterface.updateIt(getAdapterPosition());
+            });
+            this.recipeUi = recipeUi;
         }
 
-        public void setBinding(FavItemRowBinding binding) {
-            this.binding = binding;
+        public void setFavItemRowBinding(FavItemRowBinding favItemRowBinding) {
+            this.favItemRowBinding = favItemRowBinding;
         }
     }
 }

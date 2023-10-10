@@ -17,28 +17,40 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.grocerieswizard.R;
-import com.example.grocerieswizard.RecipeDatabaseHelper;
 import com.example.grocerieswizard.addRecipe.AddRecipeFragment;
 import com.example.grocerieswizard.addRecipe.IngredientModel;
+import com.example.grocerieswizard.data.repo.RecipeRepository;
 import com.example.grocerieswizard.databinding.FragmentHomeBinding;
 import com.example.grocerieswizard.detail.DetailFragment;
+import com.example.grocerieswizard.di.GroceriesWizardInjector;
+import com.example.grocerieswizard.ui.model.RecipeUi;
+import com.example.grocerieswizard.ui.model.UiMapper;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class HomeFragment extends Fragment implements RecipeInterface {
 
     private RecipeRecyclerViewAdapter adapter;
-    RecipeDatabaseHelper recipeDatabaseHelper;
+    private RecipeRepository recipeRepository;
+    private UiMapper uiMapper;
+    private static final String TAG = "HomeFragment";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        recipeDatabaseHelper = new RecipeDatabaseHelper(getContext());
         adapter = new RecipeRecyclerViewAdapter();
         adapter.setRecyclerViewInterface(this);
-        ArrayList<RecipeModel> recipes = recipeDatabaseHelper.getAllRecipesFromDB();
-        adapter.setRecipeList(recipes);
+        GroceriesWizardInjector injector = GroceriesWizardInjector.getInstance();
+        recipeRepository = injector.getRecipeRepository();
+        uiMapper = injector.getUiMapper();
+    }
+
+    @NonNull
+    private List<RecipeUi> getAllRecipes() {
+        return recipeRepository.getAllRecipes().stream()
+                .map(uiMapper::toRecipeUi)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -64,11 +76,9 @@ public class HomeFragment extends Fragment implements RecipeInterface {
     @Override
     public void onResume() {
         super.onResume();
-        ArrayList<RecipeModel> recipes = recipeDatabaseHelper.getAllRecipesFromDB();
-        adapter.updateList();
-        adapter.setRecipeList(recipes);
+        List<RecipeUi> recipeUis = getAllRecipes();
+        adapter.setRecipeList(recipeUis);
     }
-
 
     private void setupSwipeGesture(FragmentHomeBinding binding) {
         ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
@@ -80,7 +90,7 @@ public class HomeFragment extends Fragment implements RecipeInterface {
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
                 int position = viewHolder.getAdapterPosition();
-                RecipeModel myModel = adapter.getItemAtPosition(position);
+                RecipeUi myModel = adapter.getItemAtPosition(position);
 
                 if (direction == ItemTouchHelper.LEFT && !myModel.isSwiped()) {
                     // Show menu
@@ -100,12 +110,12 @@ public class HomeFragment extends Fragment implements RecipeInterface {
     @Override
     public void onItemClick(int position) {
 
-        RecipeModel recipeModel = adapter.getItemAtPosition(position);
-        if (recipeModel != null) {
-            if (!recipeModel.isSwiped()) {
-                recipeModel.setSwiped(false);
+        RecipeUi recipeUi = adapter.getItemAtPosition(position);
+        if (recipeUi != null) {
+            if (!recipeUi.isSwiped()) {
+                recipeUi.setSwiped(false);
                 adapter.itemChanged(position);
-                DetailFragment detailFragment = DetailFragment.newInstance(recipeModel);
+                DetailFragment detailFragment = DetailFragment.newInstance(recipeUi);
                 requireActivity().getSupportFragmentManager()
                         .beginTransaction()
                         .replace(R.id.frameLayout, detailFragment)
@@ -120,19 +130,19 @@ public class HomeFragment extends Fragment implements RecipeInterface {
     // Handle item delete with confirmation dialog
     @Override
     public void onItemDelete(int position) {
-        RecipeModel recipeModel = adapter.getItemAtPosition(position);
-        if (recipeModel != null) {
+        RecipeUi recipeUi = adapter.getItemAtPosition(position);
+        if (recipeUi != null) {
             AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
             builder.setTitle("Confirm Deletion");
-            builder.setMessage("Are you sure you want to delete " + recipeModel.getRecipeName() + " recipe?");
+            builder.setMessage("Are you sure you want to delete " + recipeUi.getRecipeName() + " recipe?");
             builder.setPositiveButton("Delete", (dialog, which) -> {
                 // User confirmed deletion, remove the recipe and update the RecyclerView
-                adapter.removeRecipe(recipeModel);
-                Toast.makeText(getContext(), "Recipe deleted: " + recipeModel.getRecipeName(), Toast.LENGTH_SHORT).show();
+                adapter.removeRecipe(recipeUi);
+                Toast.makeText(getContext(), "Recipe deleted: " + recipeUi.getRecipeName(), Toast.LENGTH_SHORT).show();
                 dialog.dismiss();
             });
             builder.setNegativeButton("Cancel", (dialog, which) -> {
-                recipeModel.setSwiped(false);
+                recipeUi.setSwiped(false);
                 adapter.itemChanged(position);
                 dialog.dismiss();
             });
@@ -145,11 +155,11 @@ public class HomeFragment extends Fragment implements RecipeInterface {
     // Handle item edit and start AddRecipe activity for editing
     @Override
     public void onItemEdit(int position) {
-        RecipeModel recipeModel = adapter.getItemAtPosition(position);
+        RecipeUi recipeUi = adapter.getItemAtPosition(position);
         FragmentTransaction transaction = requireActivity().getSupportFragmentManager().beginTransaction();
         AddRecipeFragment addRecipeFragment = new AddRecipeFragment();
         Bundle bundle = new Bundle();
-        bundle.putParcelable("recipeModel", recipeModel);
+        bundle.putParcelable("recipeModel", recipeUi);
         bundle.putInt("position", position);
         addRecipeFragment.setArguments(bundle);
         transaction.replace(R.id.frameLayout, addRecipeFragment);
@@ -160,57 +170,76 @@ public class HomeFragment extends Fragment implements RecipeInterface {
 
     @Override
     public Boolean isRecipeSelected(int id) {
-        return recipeDatabaseHelper.isRecipeInShoppingCart(id);
+        return recipeRepository.isRecipeSelected(id);
     }
 
     @Override
-    public int updateRecipe(RecipeModel oldRecipe) {
-        return recipeDatabaseHelper.updateRecipe(oldRecipe.getId(), oldRecipe);
+    public int updateRecipe(RecipeUi oldRecipeUi) {
+        return recipeRepository.updateRecipe(oldRecipeUi.getId(), uiMapper.toRecipe(oldRecipeUi));
     }
 
     @Override
-    public void insertRecipe(RecipeModel recipe) {
-        recipeDatabaseHelper.insertRecipe(recipe);
+    public void insertRecipe(RecipeUi recipeUi) {
+        recipeRepository.insertRecipe(uiMapper.toRecipe(recipeUi));
     }
 
     @Override
     public void deleteRecipe(int id) {
-        recipeDatabaseHelper.deleteRecipe(id);
+        Log.d(TAG, "deleteRecipe: id: " + id);
+        Log.d(TAG, "deleteRecipe: recipes before: " + recipeRepository.getAllRecipes().size());
+        recipeRepository.deleteRecipe(id);
+        Log.d(TAG, "deleteRecipe: recipes after: " + recipeRepository.getAllRecipes().size());
     }
 
     @Override
     public void deleteSelectedRecipe(int recipeId) {
-        recipeDatabaseHelper.deleteShoppingCartRecipe(recipeId);
+        recipeRepository.deleteSelectedRecipe(recipeId);
     }
 
     @Override
     public void insertSelectedRecipe(int recipeId) {
-        recipeDatabaseHelper.insertShoppingCartRecipe(recipeId);
+        recipeRepository.insertSelectedRecipe(recipeId);
     }
 
     @Override
     public boolean isRecipeFavorite(int id) {
-        return recipeDatabaseHelper.isRecipeFavorite(id);
+        return recipeRepository.isRecipeFavorite(id);
     }
 
     @Override
     public void insertRecipeFav(int recipeId) {
-        recipeDatabaseHelper.insertRecipeFav(recipeId);
+        recipeRepository.insertRecipeFav(recipeId);
     }
 
     @Override
     public void deleteRecipeFav(int recipeId) {
-        recipeDatabaseHelper.deleteRecipeFav(recipeId);
+        recipeRepository.deleteRecipeFromFavorites(recipeId);
+    }
+
+    @Override
+    public boolean onLongClick(int position) {
+        RecipeUi recipeUi = adapter.getItemAtPosition(position);
+        if (isRecipeSelected(recipeUi.getId())) {
+            //already selected, unselect
+            Log.d(TAG, "onLongClick: it is selected, unselect " + recipeUi.getId());
+            deleteSelectedRecipe(recipeUi.getId());
+            return false;
+        } else {
+            //not selected, select
+            Log.d(TAG, "onLongClick: its not selected, select " + recipeUi.getId());
+            insertSelectedRecipe(recipeUi.getId());
+            return true;
+        }
 
     }
 
     @Override
     public void onItemShare(int adapterPosition) {
-        RecipeModel recipeModel = adapter.getItemAtPosition(adapterPosition);
-        String instructions = recipeModel.getInstructions();
-        String ingredients = getStringIngredients(recipeModel.getIngredients());
+        RecipeUi recipeUi = adapter.getItemAtPosition(adapterPosition);
+        String instructions = recipeUi.getInstructions();
+        String ingredients = getStringIngredients(recipeUi.getIngredients());
 
-        String shareString = recipeModel.getRecipeName() + "\n\n\n" + instructions + "\n\n\n" + ingredients;
+        String shareString = recipeUi.getRecipeName() + "\n\n\n" + instructions + "\n\n\n" + ingredients;
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
         shareIntent.setType("text/plain");
 

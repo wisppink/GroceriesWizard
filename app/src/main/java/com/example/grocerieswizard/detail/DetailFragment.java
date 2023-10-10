@@ -10,7 +10,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.grocerieswizard.addRecipe.IngredientModel;
 import com.example.grocerieswizard.databinding.FragmentDetailBinding;
-import com.example.grocerieswizard.home.RecipeModel;
+import com.example.grocerieswizard.ui.model.RecipeUi;
 
 import java.util.List;
 
@@ -21,10 +21,10 @@ public class DetailFragment extends Fragment {
         super.onCreate(savedInstanceState);
     }
 
-    public static DetailFragment newInstance(RecipeModel recipe) {
+    public static DetailFragment newInstance(RecipeUi recipeUi) {
         DetailFragment fragment = new DetailFragment();
         Bundle args = new Bundle();
-        args.putParcelable("MyRecipe", recipe);
+        args.putParcelable("MyRecipe", recipeUi);
         fragment.setArguments(args);
         return fragment;
     }
@@ -36,16 +36,16 @@ public class DetailFragment extends Fragment {
 
         Bundle args = getArguments();
         if (args != null) {
-            RecipeModel recipe = args.getParcelable("MyRecipe");
-            if (recipe != null) {
-                recipe.setSwiped(false);
+            RecipeUi recipeUi = args.getParcelable("MyRecipe");
+            if (recipeUi != null) {
+                recipeUi.setSwiped(false);
 
-                binding.showTitle.setText(recipe.getRecipeName());
-                binding.showRecipeImage.setImageBitmap(recipe.getImageBitmap());
-                String inst = "\t\t" + recipe.getInstructions();
+                binding.showTitle.setText(recipeUi.getRecipeName());
+                binding.showRecipeImage.setImageBitmap(recipeUi.getImageBitmap());
+                String inst = "\t\t" + recipeUi.getInstructions();
                 binding.showHowToPrepare.setText(inst);
 
-                List<IngredientModel> ingredients = recipe.getIngredients();
+                List<IngredientModel> ingredients = recipeUi.getIngredients();
                 StringBuilder ingredientsBuilder = new StringBuilder();
                 for (IngredientModel ingredient : ingredients) {
                     ingredientsBuilder.append(ingredient.getName()).append(" ").append(ingredient.getQuantity()).append(" ").append(ingredient.getUnit()).append("\n");
