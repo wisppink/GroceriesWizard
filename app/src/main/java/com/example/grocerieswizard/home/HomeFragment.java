@@ -217,23 +217,6 @@ public class HomeFragment extends Fragment implements RecipeInterface {
     }
 
     @Override
-    public boolean onLongClick(int position) {
-        RecipeUi recipeUi = adapter.getItemAtPosition(position);
-        if (isRecipeSelected(recipeUi.getId())) {
-            //already selected, unselect
-            Log.d(TAG, "onLongClick: it is selected, unselect " + recipeUi.getId());
-            deleteSelectedRecipe(recipeUi.getId());
-            return false;
-        } else {
-            //not selected, select
-            Log.d(TAG, "onLongClick: its not selected, select " + recipeUi.getId());
-            insertSelectedRecipe(recipeUi.getId());
-            return true;
-        }
-
-    }
-
-    @Override
     public void onItemShare(int adapterPosition) {
         RecipeUi recipeUi = adapter.getItemAtPosition(adapterPosition);
         String instructions = recipeUi.getInstructions();

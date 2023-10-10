@@ -6,7 +6,6 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.grocerieswizard.R;
@@ -57,12 +56,28 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
                     }
                 }
             });
+            rowBinding.addCart.setOnClickListener(v -> {
+                int position = rowHolder.getAdapterPosition();
+                if (position != RecyclerView.NO_POSITION) {
+                    RecipeUi recipeUi = recipeUiList.get(position);
+                    boolean isItInCart = recipeInterface.isRecipeSelected(recipeUi.getId());
+                    if (!isItInCart) {
+                        rowBinding.addCart.setImageResource(R.drawable.baseline_remove_shopping_cart_24);
+                        recipeInterface.insertSelectedRecipe(recipeUi.getId());
+                        Toast.makeText(rowBinding.getRoot().getContext(), R.string.added_to_cart, Toast.LENGTH_SHORT).show();
+                    } else {
+                        rowBinding.addCart.setImageResource(R.drawable.add_cart);
+                        recipeInterface.deleteSelectedRecipe(recipeUi.getId());
+                        Toast.makeText(rowBinding.getRoot().getContext(), R.string.removed_from_cart, Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
 
             return rowHolder;
 
         } else {
             RecyclerViewMenuBinding menuBinding = RecyclerViewMenuBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
-            RecyclerView.ViewHolder menuHolder = new MenuViewHolder(menuBinding, recipeInterface);
+            RecyclerView.ViewHolder menuHolder = new MenuViewHolder(menuBinding);
 
             menuBinding.editIcon.setOnClickListener(v -> recipeInterface.onItemEdit(menuHolder.getAdapterPosition()));
             menuBinding.shareIcon.setOnClickListener(v -> {
@@ -78,13 +93,9 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         RecipeUi item = recipeUiList.get(position);
-
         if (holder instanceof RowViewHolder) {
             RowViewHolder rowViewHolder = (RowViewHolder) holder;
             rowViewHolder.bind(item);
-        } else if (holder instanceof MenuViewHolder) {
-            MenuViewHolder menuViewHolder = (MenuViewHolder) holder;
-            menuViewHolder.bind(item);
         }
     }
 
@@ -160,7 +171,6 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
     public static class RowViewHolder extends RecyclerView.ViewHolder {
         RecipeInterface recipeInterface;
         RecyclerViewRowBinding binding;
-        private static final String TAG = "RowViewHolder";
 
         public void setBinding(RecyclerViewRowBinding binding) {
             this.binding = binding;
@@ -174,17 +184,6 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
             binding.getRoot().setOnClickListener(
                     v -> recipeInterface.onItemClick(getAdapterPosition())
             );
-
-            binding.getRoot().setOnLongClickListener(v -> {
-                boolean x = recipeInterface.onLongClick(getAdapterPosition());
-                if (x) {
-                    //selected
-                    binding.getRoot().setBackgroundColor(ContextCompat.getColor(binding.getRoot().getContext(), R.color.gray));
-                } else
-                    //unselected
-                    binding.getRoot().setBackgroundColor(ContextCompat.getColor(binding.getRoot().getContext(), android.R.color.transparent));
-                return true;
-            });
         }
 
         public void bind(RecipeUi recipeUi) {
@@ -206,39 +205,18 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
             }
 
             if (recipeInterface.isRecipeSelected(recipeUi.getId())) {
-                Log.d(TAG, "bind: recipe already selected make it gray " + recipeUi.getId());
-                binding.getRoot().setBackgroundColor(ContextCompat.getColor(binding.getRoot().getContext(), R.color.gray));
+                binding.addCart.setImageResource(R.drawable.baseline_remove_shopping_cart_24);
 
             } else {
-                Log.d(TAG, "bind: unselected make it transparent " + recipeUi.getId());
-                itemView.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), android.R.color.transparent));
+                binding.addCart.setImageResource(R.drawable.add_cart);
+
             }
         }
     }
 
     public static class MenuViewHolder extends RecyclerView.ViewHolder {
-        private final RecipeInterface recipeInterface;
-        private RecyclerViewMenuBinding binding;
-        private static final String TAG = "MenuViewHolder";
-
-        public MenuViewHolder(RecyclerViewMenuBinding binding, RecipeInterface recipeInterface) {
+        public MenuViewHolder(RecyclerViewMenuBinding binding) {
             super(binding.getRoot());
-            setBinding(binding);
-            this.recipeInterface = recipeInterface;
-        }
-
-        public void bind(RecipeUi recipeUi) {
-            if (recipeInterface.isRecipeSelected(recipeUi.getId())) {
-                Log.d(TAG, "bind: swiped, selected " + recipeUi.getId());
-                binding.getRoot().setBackgroundColor(ContextCompat.getColor(binding.getRoot().getContext(), R.color.gray));
-            } else {
-                Log.d(TAG, "bind: swiped, unselected " + recipeUi.getId());
-                itemView.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), android.R.color.transparent));
-            }
-        }
-
-        public void setBinding(RecyclerViewMenuBinding binding) {
-            this.binding = binding;
         }
     }
 }

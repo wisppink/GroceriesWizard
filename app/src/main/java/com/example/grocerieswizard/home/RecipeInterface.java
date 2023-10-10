@@ -27,7 +27,5 @@ public interface RecipeInterface {
 
     void deleteRecipeFav(int recipeId);
 
-    boolean onLongClick(int adapterPosition);
-
     void onItemShare(int adapterPosition);
 }
