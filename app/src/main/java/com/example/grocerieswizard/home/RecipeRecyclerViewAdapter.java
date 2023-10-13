@@ -126,14 +126,6 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
         return editedRecipeUi;
     }
 
-
-    // Add a new recipe to the list and notify the adapter
-    public void addRecipe(RecipeUi recipeUi) {
-        recipeUiList.add(recipeUi);
-        notifyItemInserted(recipeUiList.size() - 1);
-        recipeInterface.insertRecipe(recipeUi);
-    }
-
     public RecipeUi getItemAtPosition(int position) {
         if (position >= 0 && position < recipeUiList.size()) {
             return recipeUiList.get(position);

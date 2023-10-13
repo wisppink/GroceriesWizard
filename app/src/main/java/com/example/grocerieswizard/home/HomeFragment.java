@@ -18,11 +18,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.grocerieswizard.R;
 import com.example.grocerieswizard.addRecipe.AddRecipeFragment;
-import com.example.grocerieswizard.addRecipe.IngredientModel;
 import com.example.grocerieswizard.data.repo.RecipeRepository;
 import com.example.grocerieswizard.databinding.FragmentHomeBinding;
 import com.example.grocerieswizard.detail.DetailFragment;
 import com.example.grocerieswizard.di.GroceriesWizardInjector;
+import com.example.grocerieswizard.ui.model.IngredientUi;
 import com.example.grocerieswizard.ui.model.RecipeUi;
 import com.example.grocerieswizard.ui.model.UiMapper;
 
@@ -232,10 +232,10 @@ public class HomeFragment extends Fragment implements RecipeInterface {
         requireContext().startActivity(Intent.createChooser(shareIntent, "Share Recipe"));
     }
 
-    private String getStringIngredients(List<IngredientModel> ingredients) {
+    private String getStringIngredients(List<IngredientUi> ingredients) {
         StringBuilder stringBuilder = new StringBuilder();
 
-        for (IngredientModel ingredient : ingredients) {
+        for (IngredientUi ingredient : ingredients) {
             stringBuilder.append(ingredient.getName())
                     .append(" ")
                     .append(ingredient.getQuantity())

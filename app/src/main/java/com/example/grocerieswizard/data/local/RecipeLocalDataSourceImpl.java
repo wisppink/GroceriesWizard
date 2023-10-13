@@ -2,7 +2,7 @@ package com.example.grocerieswizard.data.local;
 
 import android.util.Log;
 
-import com.example.grocerieswizard.addRecipe.IngredientModel;
+import com.example.grocerieswizard.data.repo.model.Ingredient;
 import com.example.grocerieswizard.data.repo.model.Recipe;
 
 import java.util.List;
@@ -79,8 +79,8 @@ public class RecipeLocalDataSourceImpl implements RecipeLocalDataSource {
     }
 
     @Override
-    public void insertIngredient(IngredientModel ingredientModel, long recipeId) {
-        dbHelper.insertIngredient(ingredientModel, recipeId);
+    public void insertIngredient(Ingredient ingredient) {
+        dbHelper.insertIngredient(ingredient);
     }
 
     @Override

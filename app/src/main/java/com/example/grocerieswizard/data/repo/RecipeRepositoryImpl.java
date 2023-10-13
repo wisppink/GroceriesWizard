@@ -4,10 +4,10 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.example.grocerieswizard.addRecipe.IngredientModel;
 import com.example.grocerieswizard.data.local.RecipeLocalDataSource;
 import com.example.grocerieswizard.data.remote.RecipeRemoteDataSource;
 import com.example.grocerieswizard.data.remote.model.MealResponse;
+import com.example.grocerieswizard.data.repo.model.Ingredient;
 import com.example.grocerieswizard.data.repo.model.Recipe;
 import com.example.grocerieswizard.data.repo.model.RepoMapper;
 
@@ -23,6 +23,7 @@ public class RecipeRepositoryImpl implements RecipeRepository {
     private final RecipeRemoteDataSource remoteDataSource;
     private final RepoMapper mapper;
     private static final String TAG = "RecipeRepositoryImpl";
+
     public RecipeRepositoryImpl(RecipeLocalDataSource localDataSource, RecipeRemoteDataSource remoteDataSource, RepoMapper mapper) {
         this.localDataSource = localDataSource;
         this.remoteDataSource = remoteDataSource;
@@ -93,8 +94,8 @@ public class RecipeRepositoryImpl implements RecipeRepository {
     }
 
     @Override
-    public void insertIngredient(IngredientModel ingredientModel, long recipeId) {
-        localDataSource.insertIngredient(ingredientModel, recipeId);
+    public void insertIngredient(Ingredient ingredient) {
+        localDataSource.insertIngredient(ingredient);
     }
 
     @Override

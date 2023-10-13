@@ -1,7 +1,9 @@
 package com.example.grocerieswizard.addRecipe;
 
-public interface AddInterface {
-    void onItemEdit(IngredientModel ingredientModel);
+import com.example.grocerieswizard.ui.model.IngredientUi;
 
-    void onItemDelete(IngredientModel ingredientModel);
+public interface AddInterface {
+    void onItemEdit(IngredientUi ingredientUi);
+
+    void onItemDelete(IngredientUi ingredientUi);
 }

@@ -9,7 +9,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
 
-import com.example.grocerieswizard.addRecipe.IngredientModel;
+import com.example.grocerieswizard.data.repo.model.Ingredient;
 import com.example.grocerieswizard.data.repo.model.Recipe;
 
 import java.io.ByteArrayOutputStream;
@@ -115,10 +115,10 @@ public class RecipeDatabaseHelper extends SQLiteOpenHelper {
         long recipeId = db.insert(TABLE_RECIPES, null, values);
         recipe.setId((int) recipeId);
 
-        ArrayList<IngredientModel> ingredients = new ArrayList<>(recipe.getIngredients());
-        for (IngredientModel ingredient : ingredients) {
-            insertIngredient(ingredient, recipeId);
-            ingredient.setRecipeId(recipeId);
+        ArrayList<Ingredient> ingredients = new ArrayList<>(recipe.getIngredients());
+        for (Ingredient ingredient : ingredients) {
+            ingredient.setRecipeID((int) recipeId);
+            insertIngredient(ingredient);
         }
     }
 
@@ -143,8 +143,8 @@ public class RecipeDatabaseHelper extends SQLiteOpenHelper {
         int updatedRecipeRows = db.update(TABLE_RECIPES, values, COLUMN_RECIPE_ID + " = ?", new String[]{String.valueOf(recipeId)});
 
         // Update the ingredients
-        ArrayList<IngredientModel> updatedIngredients = new ArrayList<>(recipe.getIngredients());
-        for (IngredientModel ingredient : updatedIngredients) {
+        ArrayList<Ingredient> updatedIngredients = new ArrayList<>(recipe.getIngredients());
+        for (Ingredient ingredient : updatedIngredients) {
             updateIngredient(ingredient);
         }
 
@@ -159,17 +159,17 @@ public class RecipeDatabaseHelper extends SQLiteOpenHelper {
 
     // Ingredient CRUD operations
 
-    public void insertIngredient(IngredientModel ingredient, long recipeId) {
+    public void insertIngredient(Ingredient ingredient) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(COLUMN_RECIPE_ID_FK, recipeId); // Assign the recipe ID as a foreign key
+        values.put(COLUMN_RECIPE_ID_FK, ingredient.getRecipeID()); // Assign the recipe ID as a foreign key
         values.put(COLUMN_INGREDIENT_NAME, ingredient.getName());
         values.put(COLUMN_INGREDIENT_QUANTITY, ingredient.getQuantity());
         values.put(COLUMN_INGREDIENT_UNIT, ingredient.getUnit());
         db.insert(TABLE_INGREDIENTS, null, values); // Insert ingredient into the ingredients table
     }
 
-    public void updateIngredient(IngredientModel ingredient) {
+    public void updateIngredient(Ingredient ingredient) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(COLUMN_INGREDIENT_NAME, ingredient.getName());
@@ -205,7 +205,7 @@ public class RecipeDatabaseHelper extends SQLiteOpenHelper {
                     Log.e(TAG, "getAllRecipesDB  imageBytes is null");
                 }
 
-                ArrayList<IngredientModel> ingredients = getAllIngredientsForRecipeFromDB(recipeId);
+                ArrayList<Ingredient> ingredients = getAllIngredientsForRecipeFromDB(recipeId);
 
                 Recipe recipe = new Recipe(recipeName, ingredients, recipeInstructions, imageBitmap);
                 recipe.setId(recipeId);
@@ -219,8 +219,8 @@ public class RecipeDatabaseHelper extends SQLiteOpenHelper {
         return recipes;
     }
 
-    public ArrayList<IngredientModel> getAllIngredientsForRecipeFromDB(int recipeId) {
-        ArrayList<IngredientModel> ingredients = new ArrayList<>();
+    public ArrayList<Ingredient> getAllIngredientsForRecipeFromDB(int recipeId) {
+        ArrayList<Ingredient> ingredients = new ArrayList<>();
 
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(TABLE_INGREDIENTS, null, COLUMN_RECIPE_ID_FK + " = ?", new String[]{String.valueOf(recipeId)}, null, null, null);
@@ -230,8 +230,8 @@ public class RecipeDatabaseHelper extends SQLiteOpenHelper {
             String ingredientUnit = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_INGREDIENT_UNIT));
             double ingredientQuantity = cursor.getDouble(cursor.getColumnIndexOrThrow(COLUMN_INGREDIENT_QUANTITY));
 
-            IngredientModel ingredientModel = new IngredientModel(ingredientName, ingredientQuantity, ingredientUnit);
-            ingredients.add(ingredientModel);
+            Ingredient ingredient = new Ingredient(ingredientName, ingredientQuantity, ingredientUnit, recipeId);
+            ingredients.add(ingredient);
         }
 
         cursor.close();

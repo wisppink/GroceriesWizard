@@ -12,15 +12,16 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.grocerieswizard.R;
 import com.example.grocerieswizard.databinding.ItemIngredientBinding;
+import com.example.grocerieswizard.ui.model.IngredientUi;
 
 import java.util.List;
 
 public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.IngredientViewHolder> {
-    private static List<IngredientModel> ingredientList;
+    private static List<IngredientUi> ingredientList;
     private AddInterface addInterface;
     private static final String TAG = "IngredientAdapter";
 
-    public IngredientAdapter(List<IngredientModel> ingredientList) {
+    public IngredientAdapter(List<IngredientUi> ingredientList) {
         IngredientAdapter.ingredientList = ingredientList;
     }
 
@@ -33,7 +34,7 @@ public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.In
 
     @Override
     public void onBindViewHolder(@NonNull IngredientAdapter.IngredientViewHolder holder, int position) {
-        IngredientModel ingredient = ingredientList.get(position);
+        IngredientUi ingredient = ingredientList.get(position);
         ingredient.setInterface(addInterface);
         holder.bind(ingredient);
         Log.d(TAG, "onBindViewHolder: received ingredient: " + ingredient.getName());
@@ -44,7 +45,7 @@ public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.In
         return ingredientList.size();
     }
 
-    public static IngredientModel getItemAtPosition(int position) {
+    public static IngredientUi getItemAtPosition(int position) {
         if (position >= 0 && position < ingredientList.size()) {
             return ingredientList.get(position);
         }
@@ -62,22 +63,22 @@ public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.In
     }
 
 
-    public void addIngredient(IngredientModel ingredientModel) {
-        ingredientList.add(ingredientModel);
+    public void addIngredient(IngredientUi ingredientUi) {
+        ingredientList.add(ingredientUi);
         notifyItemInserted(ingredientList.size() - 1);
     }
 
-    public void removeIngredient(IngredientModel ingredientModel, Context context) {
+    public void removeIngredient(IngredientUi ingredientUi, Context context) {
         // Find the position of the recipe in the list
-        int pos = ingredientList.indexOf(ingredientModel);
+        int pos = ingredientList.indexOf(ingredientUi);
 
         // Show a confirmation dialog
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle("Confirm Deletion");
-        builder.setMessage("Are you sure you want to delete " + ingredientModel.getName() + " recipe?");
+        builder.setMessage("Are you sure you want to delete " + ingredientUi.getName() + " recipe?");
         builder.setPositiveButton("Delete", (dialog, which) -> {
             // User confirmed deletion, remove the recipe and update the RecyclerView
-            ingredientList.remove(ingredientModel);
+            ingredientList.remove(ingredientUi);
             notifyItemRemoved(pos);
             dialog.dismiss();
         });
@@ -109,21 +110,21 @@ public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.In
             this.binding = binding;
         }
 
-        private void showPopUpMenu(IngredientModel ingredientModel) {
+        private void showPopUpMenu(IngredientUi ingredientUi) {
             PopupMenu popupMenu = new PopupMenu(itemView.getContext(), binding.getRoot());
             popupMenu.inflate(R.menu.popup_menu_ingredient); // Create a menu resource file
             // Set click listeners for menu items
             popupMenu.setOnMenuItemClickListener(item -> {
                 int itemId = item.getItemId();
                 if (itemId == R.id.menu_edit) {// Implement the edit action here
-                    if (ingredientModel.getInterface() != null) {
-                        ingredientModel.getInterface().onItemEdit(ingredientModel);
+                    if (ingredientUi.getInterface() != null) {
+                        ingredientUi.getInterface().onItemEdit(ingredientUi);
                         popupMenu.dismiss();
                     }
                     return true;
                 } else if (itemId == R.id.menu_delete) {// Implement the delete action here
-                    if (ingredientModel.getInterface() != null) {
-                        ingredientModel.getInterface().onItemDelete(ingredientModel);
+                    if (ingredientUi.getInterface() != null) {
+                        ingredientUi.getInterface().onItemDelete(ingredientUi);
                         popupMenu.dismiss();
                     }
                     return true;
@@ -134,7 +135,7 @@ public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.In
             popupMenu.show();
         }
 
-        public void bind(IngredientModel ingredient) {
+        public void bind(IngredientUi ingredient) {
             binding.ingredientName.setText(ingredient.getName());
             binding.quantity.setText(String.valueOf(ingredient.getQuantity()));
             binding.unit.setText(ingredient.getUnit());

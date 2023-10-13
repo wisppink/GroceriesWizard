@@ -4,7 +4,7 @@ import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
 
 import android.util.Log;
 
-import com.example.grocerieswizard.addRecipe.IngredientModel;
+import com.example.grocerieswizard.ui.model.IngredientUi;
 import com.example.grocerieswizard.ui.model.RecipeUi;
 import com.example.grocerieswizard.shop.subshop.SubShoppingItem;
 
@@ -20,7 +20,7 @@ public class ShopHelperImpl implements ShopHelper {
     public ArrayList<ShoppingItem> generateShoppingItems(List<RecipeUi> recipeUis) {
         ArrayList<ShoppingItem> shoppingItems = new ArrayList<>();
         for (RecipeUi recipeUi : recipeUis) {
-            for (IngredientModel ingredient : recipeUi.getIngredients()) {
+            for (IngredientUi ingredient : recipeUi.getIngredients()) {
                 String ingredientName = ingredient.getName();
                 String recipeName = recipeUi.getRecipeName();
                 String unit = ingredient.getUnit();

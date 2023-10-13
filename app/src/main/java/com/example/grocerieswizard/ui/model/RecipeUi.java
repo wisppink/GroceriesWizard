@@ -6,8 +6,6 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 
-import com.example.grocerieswizard.addRecipe.IngredientModel;
-
 import java.util.List;
 
 public class RecipeUi implements Parcelable {
@@ -15,12 +13,12 @@ public class RecipeUi implements Parcelable {
     private String recipeName;
     private Bitmap imageBitmap;
     private String instructions;
-    private List<IngredientModel> ingredients;
+    private List<IngredientUi> ingredients;
     private boolean isSwiped;
     private int id;
     private final String TAG = "RecipeModel";
 
-    public RecipeUi(String recipeName, List<IngredientModel> ingredients, String instructions, Bitmap imageBitmap) {
+    public RecipeUi(String recipeName, List<IngredientUi> ingredients, String instructions, Bitmap imageBitmap) {
         this.recipeName = recipeName;
         this.ingredients = ingredients;
         this.instructions = instructions;
@@ -32,7 +30,7 @@ public class RecipeUi implements Parcelable {
         recipeName = in.readString();
         imageBitmap = in.readParcelable(Uri.class.getClassLoader());
         instructions = in.readString();
-        ingredients = in.createTypedArrayList(IngredientModel.CREATOR);
+        ingredients = in.createTypedArrayList(IngredientUi.CREATOR);
     }
 
     public static final Parcelable.Creator<RecipeUi> CREATOR = new Parcelable.Creator<RecipeUi>() {
@@ -77,7 +75,7 @@ public class RecipeUi implements Parcelable {
         return instructions;
     }
 
-    public List<IngredientModel> getIngredients() {
+    public List<IngredientUi> getIngredients() {
         return ingredients;
     }
 
@@ -95,7 +93,7 @@ public class RecipeUi implements Parcelable {
         this.instructions = instructions;
     }
 
-    public void setIngredients(List<IngredientModel> ingredients) {
+    public void setIngredients(List<IngredientUi> ingredients) {
         this.ingredients = ingredients;
     }
 

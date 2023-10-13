@@ -1,6 +1,6 @@
 package com.example.grocerieswizard.data.local;
 
-import com.example.grocerieswizard.addRecipe.IngredientModel;
+import com.example.grocerieswizard.data.repo.model.Ingredient;
 import com.example.grocerieswizard.data.repo.model.Recipe;
 
 import java.util.List;
@@ -30,7 +30,7 @@ public interface RecipeLocalDataSource {
 
     void deleteIngredient(int ingredientId);
 
-    void insertIngredient(IngredientModel ingredientModel, long recipeId);
+    void insertIngredient(Ingredient ingredient);
 
     List<Recipe> getSelectedRecipes();
 }

@@ -1,11 +1,13 @@
-package com.example.grocerieswizard.addRecipe;
+package com.example.grocerieswizard.ui.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 
-public class IngredientModel implements Parcelable {
+import com.example.grocerieswizard.addRecipe.AddInterface;
+
+public class IngredientUi implements Parcelable {
     private String name;
     private double quantity;
     private String unit;
@@ -13,13 +15,13 @@ public class IngredientModel implements Parcelable {
     private long recipeId;
     private AddInterface addinterface;
 
-    public IngredientModel(String name, double quantity, String unit) {
+    public IngredientUi(String name, double quantity, String unit) {
         this.name = name;
         this.quantity = quantity;
         this.unit = unit;
     }
 
-    protected IngredientModel(Parcel in) {
+    protected IngredientUi(Parcel in) {
         name = in.readString();
         quantity = in.readDouble();
         unit = in.readString();
@@ -43,15 +45,15 @@ public class IngredientModel implements Parcelable {
         return getName() + " " + getQuantity() + " " + getUnit();
     }
 
-    public static final Creator<IngredientModel> CREATOR = new Creator<IngredientModel>() {
+    public static final Creator<IngredientUi> CREATOR = new Creator<IngredientUi>() {
         @Override
-        public IngredientModel createFromParcel(Parcel in) {
-            return new IngredientModel(in);
+        public IngredientUi createFromParcel(Parcel in) {
+            return new IngredientUi(in);
         }
 
         @Override
-        public IngredientModel[] newArray(int size) {
-            return new IngredientModel[size];
+        public IngredientUi[] newArray(int size) {
+            return new IngredientUi[size];
         }
     };
 

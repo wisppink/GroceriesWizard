@@ -2,8 +2,6 @@ package com.example.grocerieswizard.data.repo.model;
 
 import android.graphics.Bitmap;
 
-import com.example.grocerieswizard.addRecipe.IngredientModel;
-
 import java.util.List;
 
 public class Recipe {
@@ -12,9 +10,9 @@ public class Recipe {
     private String recipeName;
     private Bitmap imageBitmap;
     private String instructions;
-    private List<IngredientModel> ingredients;
+    private List<Ingredient> ingredients;
 
-    public Recipe(long id, String recipeName, Bitmap imageBitmap, String instructions, List<IngredientModel> ingredients) {
+    public Recipe(long id, String recipeName, Bitmap imageBitmap, String instructions, List<Ingredient> ingredients) {
         this.id = id;
         this.recipeName = recipeName;
         this.imageBitmap = imageBitmap;
@@ -22,14 +20,14 @@ public class Recipe {
         this.ingredients = ingredients;
     }
 
-    public Recipe(String recipeName, List<IngredientModel> ingredients, String instructions, Bitmap imageBitmap) {
+    public Recipe(String recipeName, List<Ingredient> ingredients, String instructions, Bitmap imageBitmap) {
         this.recipeName = recipeName;
         this.ingredients = ingredients;
         this.instructions = instructions;
         this.imageBitmap = imageBitmap;
     }
 
-    public Recipe(String recipeName, List<IngredientModel> ingredients, String instructions, String imageUrl) {
+    public Recipe(String recipeName, List<Ingredient> ingredients, String instructions, String imageUrl) {
         this.recipeName = recipeName;
         this.ingredients = ingredients;
         this.instructions = instructions;
@@ -68,11 +66,11 @@ public class Recipe {
         this.instructions = instructions;
     }
 
-    public List<IngredientModel> getIngredients() {
+    public List<Ingredient> getIngredients() {
         return ingredients;
     }
 
-    public void setIngredients(List<IngredientModel> ingredients) {
+    public void setIngredients(List<Ingredient> ingredients) {
         this.ingredients = ingredients;
     }
 

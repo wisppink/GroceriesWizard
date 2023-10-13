@@ -31,11 +31,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.example.grocerieswizard.R;
 import com.example.grocerieswizard.data.repo.RecipeRepository;
 import com.example.grocerieswizard.data.repo.RepositoryCallback;
+import com.example.grocerieswizard.data.repo.model.Ingredient;
 import com.example.grocerieswizard.data.repo.model.Recipe;
 import com.example.grocerieswizard.databinding.DialogAddIngredientBinding;
 import com.example.grocerieswizard.databinding.FragmentAddRecipeBinding;
 import com.example.grocerieswizard.di.GroceriesWizardInjector;
 import com.example.grocerieswizard.home.RecipeRecyclerViewAdapter;
+import com.example.grocerieswizard.ui.model.IngredientUi;
 import com.example.grocerieswizard.ui.model.RecipeUi;
 import com.example.grocerieswizard.ui.model.UiMapper;
 import com.squareup.picasso.Picasso;
@@ -49,7 +51,7 @@ public class AddRecipeFragment extends Fragment implements AddInterface {
     private RecipeRepository recipeRepository;
     private UiMapper uiMapper;
     private IngredientAdapter ingredientAdapter;
-    private List<IngredientModel> ingredientList;
+    private List<IngredientUi> ingredientList;
     Context context;
     private Bitmap defaultImageBitmap;
     private RecipeUi recipeUi;
@@ -163,7 +165,7 @@ public class AddRecipeFragment extends Fragment implements AddInterface {
         }
 
         binding.addIngredientButton.setOnClickListener(v -> {
-            IngredientModel newIngredient = new IngredientModel(null, 0, null);
+            IngredientUi newIngredient = new IngredientUi(null, 0, null);
             showAddIngredientDialog(newIngredient);
         });
 
@@ -251,22 +253,22 @@ public class AddRecipeFragment extends Fragment implements AddInterface {
     }
 
     @Override
-    public void onItemDelete(IngredientModel ingredientModel) {
-        if (ingredientModel != null) {
-            recipeRepository.deleteIngredient(ingredientModel.getId());
-            ingredientAdapter.removeIngredient(ingredientModel, context);
+    public void onItemDelete(IngredientUi ingredientUi) {
+        if (ingredientUi != null) {
+            recipeRepository.deleteIngredient(ingredientUi.getId());
+            ingredientAdapter.removeIngredient(ingredientUi, context);
         }
 
     }
 
     @Override
-    public void onItemEdit(IngredientModel ingredientModel) {
-        if (ingredientModel != null) {
-            showEditIngredientDialog(ingredientModel);
+    public void onItemEdit(IngredientUi ingredientUi) {
+        if (ingredientUi != null) {
+            showEditIngredientDialog(ingredientUi);
         }
     }
 
-    private void showAddIngredientDialog(IngredientModel ingredientModel) {
+    private void showAddIngredientDialog(IngredientUi ingredientUi) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         DialogAddIngredientBinding dialogBinding = DialogAddIngredientBinding.inflate(getLayoutInflater());
         View dialogView = dialogBinding.getRoot();
@@ -282,11 +284,12 @@ public class AddRecipeFragment extends Fragment implements AddInterface {
             double quantity = Double.parseDouble(quantityStr);
             String unit = ingredientUnitEditText.getText().toString();
 
-            ingredientModel.setName(name);
-            ingredientModel.setUnit(unit);
-            ingredientModel.setQuantity(quantity);
-            ingredientAdapter.addIngredient(ingredientModel);
-            recipeRepository.insertIngredient(ingredientModel, ingredientModel.getRecipeId());
+            ingredientUi.setName(name);
+            ingredientUi.setUnit(unit);
+            ingredientUi.setQuantity(quantity);
+            ingredientAdapter.addIngredient(ingredientUi);
+            Ingredient ingredient = uiMapper.toIngredient(ingredientUi);
+            recipeRepository.insertIngredient(ingredient);
 
         });
         builder.setNegativeButton(android.R.string.cancel, (dialog, which) -> dialog.dismiss());
@@ -309,7 +312,7 @@ public class AddRecipeFragment extends Fragment implements AddInterface {
 
     }
 
-    public void showEditIngredientDialog(IngredientModel ingredientModel) {
+    public void showEditIngredientDialog(IngredientUi ingredientUi) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         DialogAddIngredientBinding dialogBinding = DialogAddIngredientBinding.inflate(getLayoutInflater());
         View dialogView = dialogBinding.getRoot();
@@ -321,9 +324,9 @@ public class AddRecipeFragment extends Fragment implements AddInterface {
         EditText ingredientUnitEditText = dialogBinding.ingredientUnitEditText;
 
         // Pre-fill the dialog's fields with the existing ingredient's information
-        ingredientNameEditText.setText(ingredientModel.getName());
-        ingredientQuantityEditText.setText(String.valueOf(ingredientModel.getQuantity()));
-        ingredientUnitEditText.setText(ingredientModel.getUnit());
+        ingredientNameEditText.setText(ingredientUi.getName());
+        ingredientQuantityEditText.setText(String.valueOf(ingredientUi.getQuantity()));
+        ingredientUnitEditText.setText(ingredientUi.getUnit());
 
         builder.setPositiveButton("Save", (dialog, which) -> {
             // Get the updated values from the dialog's fields
@@ -333,14 +336,14 @@ public class AddRecipeFragment extends Fragment implements AddInterface {
             String unit = ingredientUnitEditText.getText().toString();
 
             // Update the ingredient model with the new values
-            ingredientModel.setName(name);
-            ingredientModel.setQuantity(quantity);
-            ingredientModel.setUnit(unit);
+            ingredientUi.setName(name);
+            ingredientUi.setQuantity(quantity);
+            ingredientUi.setUnit(unit);
 
             // Find the position of the ingredient model in the list
             int position = -1;
             for (int i = 0; i < ingredientList.size(); i++) {
-                if (ingredientList.get(i) == ingredientModel) {
+                if (ingredientList.get(i) == ingredientUi) {
                     position = i;
                     break;
                 }

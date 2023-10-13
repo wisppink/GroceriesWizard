@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
-import com.example.grocerieswizard.addRecipe.IngredientModel;
+import com.example.grocerieswizard.ui.model.IngredientUi;
 import com.example.grocerieswizard.databinding.FragmentDetailBinding;
 import com.example.grocerieswizard.ui.model.RecipeUi;
 
@@ -45,9 +45,9 @@ public class DetailFragment extends Fragment {
                 String inst = "\t\t" + recipeUi.getInstructions();
                 binding.showHowToPrepare.setText(inst);
 
-                List<IngredientModel> ingredients = recipeUi.getIngredients();
+                List<IngredientUi> ingredients = recipeUi.getIngredients();
                 StringBuilder ingredientsBuilder = new StringBuilder();
-                for (IngredientModel ingredient : ingredients) {
+                for (IngredientUi ingredient : ingredients) {
                     ingredientsBuilder.append(ingredient.getName()).append(" ").append(ingredient.getQuantity()).append(" ").append(ingredient.getUnit()).append("\n");
                 }
                 binding.showIngredients.setText(ingredientsBuilder.toString());
