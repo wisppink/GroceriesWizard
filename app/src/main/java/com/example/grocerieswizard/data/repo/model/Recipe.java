@@ -7,6 +7,7 @@ import com.example.grocerieswizard.addRecipe.IngredientModel;
 import java.util.List;
 
 public class Recipe {
+    private String imageUrl;
     private long id;
     private String recipeName;
     private Bitmap imageBitmap;
@@ -26,6 +27,13 @@ public class Recipe {
         this.ingredients = ingredients;
         this.instructions = instructions;
         this.imageBitmap = imageBitmap;
+    }
+
+    public Recipe(String recipeName, List<IngredientModel> ingredients, String instructions, String imageUrl) {
+        this.recipeName = recipeName;
+        this.ingredients = ingredients;
+        this.instructions = instructions;
+        this.imageUrl = imageUrl;
     }
 
     public long getId() {
@@ -67,4 +75,9 @@ public class Recipe {
     public void setIngredients(List<IngredientModel> ingredients) {
         this.ingredients = ingredients;
     }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
 }

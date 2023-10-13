@@ -381,26 +381,6 @@ public class Meal {
         return unit;
     }
 
-    public Bitmap getImageBitmap(String strMealThumb) {
-        Picasso.get().load(strMealThumb).resize(150, 150).centerCrop().into(new Target() {
-            @Override
-            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                setImageBitmap(bitmap);
-                Log.d(TAG, "onBitmapLoaded: sucsess");
-            }
-
-            @Override
-            public void onBitmapFailed(Exception e, Drawable errorDrawable) {
-                Log.e(TAG, "onBitmapFailed: ", e);
-            }
-
-            @Override
-            public void onPrepareLoad(Drawable placeHolderDrawable) {
-            }
-        });
-        Log.d(TAG, "getImageBitmap: " + imageBitmap);
-        return imageBitmap;
-    }
 
     public void setImageBitmap(Bitmap imageBitmap) {
         this.imageBitmap = imageBitmap;

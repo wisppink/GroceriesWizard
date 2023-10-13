@@ -104,7 +104,6 @@ public class AddRecipeFragment extends Fragment implements AddInterface {
             RecipeUi editedRecipeUi = new RecipeUi(recipeName, ingredientList, howToPrepare, selectedImageBitmap);
             this.recipeUi = recipeAdapter.editRecipe(position, editedRecipeUi);
             ingredientAdapter.changeItem(position);
-            //TODO: selectedImageBitmap takes a little time, don't set it immediately
             binding.addImage.setImageBitmap(selectedImageBitmap);
         } else {
             binding.addImage.setImageURI(defaultImageUri);
@@ -130,11 +129,26 @@ public class AddRecipeFragment extends Fragment implements AddInterface {
                             @Override
                             public void onSuccess(List<Recipe> data) {
                                 if (data.isEmpty()) return;
-                                //uiMapper.toRecipeUi has image in here.
-                                showAlertDialogForFoundRecipe(uiMapper.toRecipeUi(data.get(0)), binding.editRecipeHowToPrepare, binding.addImage);
-                                Log.d(TAG, "onSuccess: uiMapper image bitmap: " + uiMapper.toRecipeUi(data.get(0)).getImageBitmap());
-                                recipeUi.setImageBitmap(uiMapper.toRecipeUi(data.get(0)).getImageBitmap());
-                                Log.d(TAG, "onSuccess: recipeUi image bitmap: " + recipeUi.getImageBitmap());
+
+                                Picasso.get().load(data.get(0).getImageUrl()).resize(150, 150).centerCrop().into(new Target() {
+                                    @Override
+                                    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                                        data.get(0).setImageBitmap(bitmap);
+                                        Log.d(TAG, "onBitmapLoaded: success");
+                                        Log.d(TAG, "onBitmapLoaded: recipe image bitmap: " + data.get(0).getImageBitmap());
+                                        showAlertDialogForFoundRecipe(uiMapper.toRecipeUi(data.get(0)), binding.editRecipeHowToPrepare, binding.addImage,bitmap);
+                                        recipeUi.setImageBitmap(bitmap);
+                                    }
+
+                                    @Override
+                                    public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+                                        Log.e(TAG, "onBitmapFailed: ", e);
+                                    }
+
+                                    @Override
+                                    public void onPrepareLoad(Drawable placeHolderDrawable) {
+                                    }
+                                });
                             }
 
                             @Override
@@ -280,7 +294,7 @@ public class AddRecipeFragment extends Fragment implements AddInterface {
         dialog.show();
     }
 
-    private void showAlertDialogForFoundRecipe(RecipeUi recipeUi, TextView howToPrepare, ImageView addImage) {
+    private void showAlertDialogForFoundRecipe(RecipeUi recipeUi, TextView howToPrepare, ImageView addImage, Bitmap bitmap) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle(R.string.TitleFoundRecipe);
         builder.setMessage(R.string.MessageFoundRecipe);
@@ -288,7 +302,7 @@ public class AddRecipeFragment extends Fragment implements AddInterface {
             Log.d(TAG, "showAlert: recipeUi image bitmap: " + recipeUi.getImageBitmap());
             howToPrepare.setText(recipeUi.getInstructions());
             ingredientList.addAll(recipeUi.getIngredients());
-            addImage.setImageBitmap(recipeUi.getImageBitmap());
+            addImage.setImageBitmap(bitmap);
         });
         builder.setNegativeButton(R.string.no, (dialog, which) -> Log.d(TAG, "showAlertDialogForFoundRecipe: do nothing."));
         builder.show();
@@ -346,5 +360,6 @@ public class AddRecipeFragment extends Fragment implements AddInterface {
         AlertDialog dialog = builder.create();
         dialog.show();
     }
+
 
 }
