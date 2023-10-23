@@ -1,4 +1,4 @@
-package com.example.grocerieswizard.detail;
+package com.example.grocerieswizard.ui.detail;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;

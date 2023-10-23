@@ -1,4 +1,4 @@
-package com.example.grocerieswizard.home;
+package com.example.grocerieswizard.ui.home;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,14 +17,14 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.grocerieswizard.R;
-import com.example.grocerieswizard.addRecipe.AddRecipeFragment;
+import com.example.grocerieswizard.ui.addrecipe.AddRecipeFragment;
 import com.example.grocerieswizard.data.repo.RecipeRepository;
 import com.example.grocerieswizard.databinding.FragmentHomeBinding;
-import com.example.grocerieswizard.detail.DetailFragment;
+import com.example.grocerieswizard.ui.detail.DetailFragment;
 import com.example.grocerieswizard.di.GroceriesWizardInjector;
 import com.example.grocerieswizard.ui.model.IngredientUi;
 import com.example.grocerieswizard.ui.model.RecipeUi;
-import com.example.grocerieswizard.ui.model.UiMapper;
+import com.example.grocerieswizard.ui.UiMapper;
 
 import java.util.List;
 import java.util.stream.Collectors;

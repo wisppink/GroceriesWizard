@@ -1,4 +1,4 @@
-package com.example.grocerieswizard.home;
+package com.example.grocerieswizard.ui.home;
 
 import android.util.Log;
 import android.view.LayoutInflater;

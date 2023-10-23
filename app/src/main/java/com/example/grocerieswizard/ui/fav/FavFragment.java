@@ -1,4 +1,4 @@
-package com.example.grocerieswizard.Fav;
+package com.example.grocerieswizard.ui.fav;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -14,7 +14,7 @@ import com.example.grocerieswizard.data.repo.RecipeRepository;
 import com.example.grocerieswizard.databinding.FragmentFavBinding;
 import com.example.grocerieswizard.di.GroceriesWizardInjector;
 import com.example.grocerieswizard.ui.model.RecipeUi;
-import com.example.grocerieswizard.ui.model.UiMapper;
+import com.example.grocerieswizard.ui.UiMapper;
 
 import java.util.ArrayList;
 import java.util.List;

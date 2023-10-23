@@ -10,7 +10,7 @@ import com.example.grocerieswizard.data.remote.RecipeRemoteDataSourceImpl;
 import com.example.grocerieswizard.data.repo.RecipeRepository;
 import com.example.grocerieswizard.data.repo.RecipeRepositoryImpl;
 import com.example.grocerieswizard.data.repo.model.RepoMapper;
-import com.example.grocerieswizard.ui.model.UiMapper;
+import com.example.grocerieswizard.ui.UiMapper;
 
 public class GroceriesWizardInjector {
     private static GroceriesWizardInjector instance = null;

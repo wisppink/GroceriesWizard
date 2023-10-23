@@ -9,10 +9,10 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.example.grocerieswizard.Fav.FavFragment;
+import com.example.grocerieswizard.ui.fav.FavFragment;
 import com.example.grocerieswizard.databinding.ActivityMainBinding;
-import com.example.grocerieswizard.home.HomeFragment;
-import com.example.grocerieswizard.shop.ShopFragment;
+import com.example.grocerieswizard.ui.home.HomeFragment;
+import com.example.grocerieswizard.ui.shop.ShopFragment;
 
 public class MainActivity extends AppCompatActivity {
 

@@ -1,4 +1,4 @@
-package com.example.grocerieswizard.shop;
+package com.example.grocerieswizard.ui.shop;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.grocerieswizard.R;
 import com.example.grocerieswizard.databinding.ShoppingItemRowBinding;
 import com.example.grocerieswizard.ui.model.RecipeUi;
-import com.example.grocerieswizard.shop.subshop.SubShopAdapter;
+import com.example.grocerieswizard.ui.shop.subshop.SubShopAdapter;
 
 import java.util.ArrayList;
 import java.util.List;

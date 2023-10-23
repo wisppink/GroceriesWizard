@@ -1,9 +1,11 @@
-package com.example.grocerieswizard.ui.model;
+package com.example.grocerieswizard.ui;
 
 import android.util.Log;
 
 import com.example.grocerieswizard.data.repo.model.Ingredient;
 import com.example.grocerieswizard.data.repo.model.Recipe;
+import com.example.grocerieswizard.ui.model.IngredientUi;
+import com.example.grocerieswizard.ui.model.RecipeUi;
 
 import java.util.ArrayList;
 import java.util.List;

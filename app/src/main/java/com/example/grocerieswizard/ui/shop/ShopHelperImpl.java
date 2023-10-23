@@ -1,4 +1,4 @@
-package com.example.grocerieswizard.shop;
+package com.example.grocerieswizard.ui.shop;
 
 import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
 
@@ -6,7 +6,7 @@ import android.util.Log;
 
 import com.example.grocerieswizard.ui.model.IngredientUi;
 import com.example.grocerieswizard.ui.model.RecipeUi;
-import com.example.grocerieswizard.shop.subshop.SubShoppingItem;
+import com.example.grocerieswizard.ui.shop.subshop.SubShoppingItem;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -1,4 +1,4 @@
-package com.example.grocerieswizard.addRecipe;
+package com.example.grocerieswizard.ui.addrecipe;
 
 import android.content.Context;
 import android.util.Log;

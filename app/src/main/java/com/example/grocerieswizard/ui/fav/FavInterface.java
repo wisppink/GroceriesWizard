@@ -1,4 +1,4 @@
-package com.example.grocerieswizard.Fav;
+package com.example.grocerieswizard.ui.fav;
 
 import com.example.grocerieswizard.ui.model.RecipeUi;
 

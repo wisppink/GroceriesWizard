@@ -1,4 +1,4 @@
-package com.example.grocerieswizard.shop.subshop;
+package com.example.grocerieswizard.ui.shop.subshop;
 
 public class SubShoppingItem {
     private final String recipeName;

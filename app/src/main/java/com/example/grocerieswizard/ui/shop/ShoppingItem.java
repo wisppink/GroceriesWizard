@@ -1,6 +1,6 @@
-package com.example.grocerieswizard.shop;
+package com.example.grocerieswizard.ui.shop;
 
-import com.example.grocerieswizard.shop.subshop.SubShoppingItem;
+import com.example.grocerieswizard.ui.shop.subshop.SubShoppingItem;
 
 import java.util.ArrayList;
 

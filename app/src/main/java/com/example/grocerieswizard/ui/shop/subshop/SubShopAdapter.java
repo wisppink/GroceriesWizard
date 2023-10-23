@@ -1,4 +1,4 @@
-package com.example.grocerieswizard.shop.subshop;
+package com.example.grocerieswizard.ui.shop.subshop;
 
 import android.annotation.SuppressLint;
 import android.util.Log;
@@ -9,7 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.grocerieswizard.databinding.SubRecipeBinding;
-import com.example.grocerieswizard.shop.ShoppingItem;
+import com.example.grocerieswizard.ui.shop.ShoppingItem;
 
 import java.util.ArrayList;
 

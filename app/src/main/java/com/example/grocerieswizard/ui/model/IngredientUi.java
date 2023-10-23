@@ -5,7 +5,7 @@ import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 
-import com.example.grocerieswizard.addRecipe.AddInterface;
+import com.example.grocerieswizard.ui.addrecipe.AddInterface;
 
 public class IngredientUi implements Parcelable {
     private String name;

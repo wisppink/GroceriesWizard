@@ -1,4 +1,4 @@
-package com.example.grocerieswizard.addRecipe;
+package com.example.grocerieswizard.ui.addrecipe;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -36,10 +36,10 @@ import com.example.grocerieswizard.data.repo.model.Recipe;
 import com.example.grocerieswizard.databinding.DialogAddIngredientBinding;
 import com.example.grocerieswizard.databinding.FragmentAddRecipeBinding;
 import com.example.grocerieswizard.di.GroceriesWizardInjector;
-import com.example.grocerieswizard.home.RecipeRecyclerViewAdapter;
+import com.example.grocerieswizard.ui.home.RecipeRecyclerViewAdapter;
 import com.example.grocerieswizard.ui.model.IngredientUi;
 import com.example.grocerieswizard.ui.model.RecipeUi;
-import com.example.grocerieswizard.ui.model.UiMapper;
+import com.example.grocerieswizard.ui.UiMapper;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
