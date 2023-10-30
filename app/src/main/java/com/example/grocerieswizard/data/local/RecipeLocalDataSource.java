@@ -1,12 +1,34 @@
 package com.example.grocerieswizard.data.local;
 
-import com.example.grocerieswizard.data.repo.model.Ingredient;
-import com.example.grocerieswizard.data.repo.model.Recipe;
+import com.example.grocerieswizard.data.local.model.CartItem;
+import com.example.grocerieswizard.data.local.model.FavItem;
+import com.example.grocerieswizard.data.local.model.IngredientItem;
+import com.example.grocerieswizard.data.local.model.RecipeItem;
 
 import java.util.List;
 
 public interface RecipeLocalDataSource {
-    List<Recipe> getAllRecipes();
+    List<RecipeItem> getAllRecipes();
+
+    void deleteRecipe(int recipeId);
+
+    void insertRecipe(RecipeItem recipe);
+
+    int updateRecipe(int oldRecipeId, RecipeItem recipe);
+
+    RecipeItem getRecipeByRecipeId(int recipeId);
+
+
+    void insertCartItem(CartItem cartItem);
+
+    List<CartItem> getCartItems();
+
+    void deleteCartItem(int recipeId);
+
+    Boolean isRecipeInCart(int recipeId);
+
+
+    List<FavItem> getFavoriteRecipes();
 
     void deleteRecipeFav(int recipeId);
 
@@ -14,23 +36,9 @@ public interface RecipeLocalDataSource {
 
     boolean isRecipeFavorite(int recipeId);
 
-    void insertSelectedRecipe(int recipeId);
 
-    void deleteSelectedRecipe(int recipeId);
+    void deleteIngredient(IngredientItem ingredient);
 
-    void deleteRecipe(int recipeId);
+    void insertIngredient(IngredientItem ingredient);
 
-    void insertRecipe(Recipe recipe);
-
-    Boolean isRecipeSelected(int recipeId);
-
-    int updateRecipe(int oldRecipeId, Recipe recipe);
-
-    List<Recipe> getFavoriteRecipes();
-
-    void deleteIngredient(int ingredientId);
-
-    void insertIngredient(Ingredient ingredient);
-
-    List<Recipe> getSelectedRecipes();
 }

@@ -1,38 +1,46 @@
 package com.example.grocerieswizard.data.repo;
 
-import com.example.grocerieswizard.data.repo.model.Ingredient;
-import com.example.grocerieswizard.data.repo.model.Recipe;
+import com.example.grocerieswizard.data.local.model.CartItem;
+import com.example.grocerieswizard.data.local.model.FavItem;
+import com.example.grocerieswizard.data.local.model.IngredientItem;
+import com.example.grocerieswizard.data.local.model.RecipeItem;
 
 import java.util.List;
 
 public interface RecipeRepository {
-    List<Recipe> getAllRecipes();
+    List<RecipeItem> getAllRecipes();
+
+    void deleteRecipe(int recipeId);
+
+    void insertRecipe(RecipeItem recipeItem);
+
+    int updateRecipe(int oldRecipeId, RecipeItem recipe);
+
+    RecipeItem getRecipeByRecipeId(int recipeId);
+
 
     void deleteRecipeFromFavorites(int recipeId);
 
     void insertRecipeFav(int recipeId);
 
+    List<FavItem> getFavoriteRecipes();
+
     boolean isRecipeFavorite(int recipeId);
 
-    void insertSelectedRecipe(int recipeId);
 
-    void deleteSelectedRecipe(int recipeId);
+    List<CartItem> getCartItems();
 
-    void deleteRecipe(int recipeId);
+    void insertCartItem(CartItem cartItem);
 
-    void insertRecipe(Recipe recipe);
+    void deleteCartItem(int recipeId);
 
-    Boolean isRecipeSelected(int recipeId);
+    Boolean isRecipeInCart(int recipeId);
 
-    int updateRecipe(int oldRecipeId, Recipe recipe);
 
-    List<Recipe> getFavoriteRecipes();
+    void deleteIngredient(IngredientItem ingredientItem);
 
-    void deleteIngredient(int ingredientId);
+    void insertIngredient(IngredientItem ingredientItem);
 
-    void insertIngredient(Ingredient ingredient);
 
-    List<Recipe> getSelectedRecipes();
-
-    void searchMeals(String query, RepositoryCallback<List<Recipe>> callback);
+    void searchMeals(String query, RepositoryCallback<List<RecipeItem>> callback);
 }

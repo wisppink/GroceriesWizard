@@ -29,17 +29,17 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.grocerieswizard.R;
+import com.example.grocerieswizard.data.local.model.IngredientItem;
+import com.example.grocerieswizard.data.local.model.RecipeItem;
 import com.example.grocerieswizard.data.repo.RecipeRepository;
 import com.example.grocerieswizard.data.repo.RepositoryCallback;
-import com.example.grocerieswizard.data.repo.model.Ingredient;
-import com.example.grocerieswizard.data.repo.model.Recipe;
 import com.example.grocerieswizard.databinding.DialogAddIngredientBinding;
 import com.example.grocerieswizard.databinding.FragmentAddRecipeBinding;
 import com.example.grocerieswizard.di.GroceriesWizardInjector;
+import com.example.grocerieswizard.ui.UiMapper;
 import com.example.grocerieswizard.ui.home.RecipeRecyclerViewAdapter;
 import com.example.grocerieswizard.ui.model.IngredientUi;
 import com.example.grocerieswizard.ui.model.RecipeUi;
-import com.example.grocerieswizard.ui.UiMapper;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -86,7 +86,7 @@ public class AddRecipeFragment extends Fragment implements AddInterface {
             Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
         }
         //create an empty recipe
-        recipeUi = new RecipeUi(null, null, null, null);
+        recipeUi = new RecipeUi(null, null, null);
 
         // Check if the fragment is opened for editing
         Bundle arguments = getArguments();
@@ -98,15 +98,16 @@ public class AddRecipeFragment extends Fragment implements AddInterface {
             binding.editRecipeName.setText(recipeUi.getRecipeName());
             binding.editRecipeHowToPrepare.setText(recipeUi.getInstructions());
             ingredientList.addAll(recipeUi.getIngredients());
-            Bitmap selectedImageBitmap = recipeUi.getImageBitmap();
+            //Bitmap selectedImageBitmap = recipeUi.getImageBitmap();
             //get new ones to update
             String recipeName = binding.editRecipeName.getText().toString();
             String howToPrepare = binding.editRecipeHowToPrepare.getText().toString();
 
-            RecipeUi editedRecipeUi = new RecipeUi(recipeName, ingredientList, howToPrepare, selectedImageBitmap);
+            RecipeUi editedRecipeUi = new RecipeUi(recipeName, ingredientList, howToPrepare);
+            //, selectedImageBitmap
             this.recipeUi = recipeAdapter.editRecipe(position, editedRecipeUi);
             ingredientAdapter.changeItem(position);
-            binding.addImage.setImageBitmap(selectedImageBitmap);
+            //binding.addImage.setImageBitmap(selectedImageBitmap);
         } else {
             binding.addImage.setImageURI(defaultImageUri);
             final Handler mHandler = new Handler();
@@ -127,11 +128,13 @@ public class AddRecipeFragment extends Fragment implements AddInterface {
                         String inputText = binding.editRecipeName.getText().toString().trim();
                         Log.d(TAG, "afterTextChanged: input text " + inputText);
 
-                        recipeRepository.searchMeals(inputText, new RepositoryCallback<List<Recipe>>() {
+                        recipeRepository.searchMeals(inputText, new RepositoryCallback<List<RecipeItem>>() {
                             @Override
-                            public void onSuccess(List<Recipe> data) {
-                                if (data.isEmpty()) return;
-
+                            public void onSuccess(List<RecipeItem> data) {
+                                if (data.isEmpty())
+                                     return;
+                                //TODO:recipe image
+                                /*
                                 Picasso.get().load(data.get(0).getImageUrl()).resize(150, 150).centerCrop().into(new Target() {
                                     @Override
                                     public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
@@ -151,6 +154,10 @@ public class AddRecipeFragment extends Fragment implements AddInterface {
                                     public void onPrepareLoad(Drawable placeHolderDrawable) {
                                     }
                                 });
+
+                                */
+                                    showAlertDialogForFoundRecipe(uiMapper.toRecipeUi(data.get(0)), binding.editRecipeHowToPrepare, binding.addImage);
+                                    //,bitmap
                             }
 
                             @Override
@@ -178,7 +185,7 @@ public class AddRecipeFragment extends Fragment implements AddInterface {
                         @Override
                         public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
                             binding.addImage.setImageBitmap(bitmap);
-                            recipeUi.setImageBitmap(bitmap);
+                            //recipeUi.setImageBitmap(bitmap);
                         }
 
                         @Override
@@ -194,11 +201,11 @@ public class AddRecipeFragment extends Fragment implements AddInterface {
                 } catch (Exception e) {
                     Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
                     binding.addImage.setImageBitmap(defaultImageBitmap);
-                    recipeUi.setImageBitmap(defaultImageBitmap);
+                    //  recipeUi.setImageBitmap(defaultImageBitmap);
                 }
             } else {
                 binding.addImage.setImageBitmap(defaultImageBitmap);
-                recipeUi.setImageBitmap(defaultImageBitmap);
+                //  recipeUi.setImageBitmap(defaultImageBitmap);
             }
         });
 
@@ -216,10 +223,10 @@ public class AddRecipeFragment extends Fragment implements AddInterface {
                 Toast.makeText(context, "Please fill all fields!", Toast.LENGTH_SHORT).show();
                 return;
             }
-            if (recipeUi.getImageBitmap() == null) {
+            /*if (recipeUi.getImageBitmap() == null) {
                 recipeUi.setImageBitmap(defaultImageBitmap);
                 Log.d(TAG, "onCreateView: recipe ui image bitmap null");
-            }
+            }*/
 
             recipeUi.setRecipeName(recipeName);
             recipeUi.setInstructions(howToPrepare);
@@ -255,7 +262,7 @@ public class AddRecipeFragment extends Fragment implements AddInterface {
     @Override
     public void onItemDelete(IngredientUi ingredientUi) {
         if (ingredientUi != null) {
-            recipeRepository.deleteIngredient(ingredientUi.getId());
+            recipeRepository.deleteIngredient(uiMapper.toIngredient(ingredientUi));
             ingredientAdapter.removeIngredient(ingredientUi, context);
         }
 
@@ -288,7 +295,7 @@ public class AddRecipeFragment extends Fragment implements AddInterface {
             ingredientUi.setUnit(unit);
             ingredientUi.setQuantity(quantity);
             ingredientAdapter.addIngredient(ingredientUi);
-            Ingredient ingredient = uiMapper.toIngredient(ingredientUi);
+            IngredientItem ingredient = uiMapper.toIngredient(ingredientUi);
             recipeRepository.insertIngredient(ingredient);
 
         });
@@ -297,15 +304,16 @@ public class AddRecipeFragment extends Fragment implements AddInterface {
         dialog.show();
     }
 
-    private void showAlertDialogForFoundRecipe(RecipeUi recipeUi, TextView howToPrepare, ImageView addImage, Bitmap bitmap) {
+    private void showAlertDialogForFoundRecipe(RecipeUi recipeUi, TextView howToPrepare, ImageView addImage) {
+        //, Bitmap bitmap
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle(R.string.TitleFoundRecipe);
         builder.setMessage(R.string.MessageFoundRecipe);
         builder.setPositiveButton(R.string.yes, (dialog, which) -> {
-            Log.d(TAG, "showAlert: recipeUi image bitmap: " + recipeUi.getImageBitmap());
+            //Log.d(TAG, "showAlert: recipeUi image bitmap: " + recipeUi.getImageBitmap());
             howToPrepare.setText(recipeUi.getInstructions());
             ingredientList.addAll(recipeUi.getIngredients());
-            addImage.setImageBitmap(bitmap);
+           // addImage.setImageBitmap(bitmap);
         });
         builder.setNegativeButton(R.string.no, (dialog, which) -> Log.d(TAG, "showAlertDialogForFoundRecipe: do nothing."));
         builder.show();

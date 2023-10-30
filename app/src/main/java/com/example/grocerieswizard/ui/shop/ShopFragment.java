@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.example.grocerieswizard.data.local.model.RecipeItem;
 import com.example.grocerieswizard.data.repo.RecipeRepository;
 import com.example.grocerieswizard.databinding.FragmentShopBinding;
 import com.example.grocerieswizard.di.GroceriesWizardInjector;
@@ -41,9 +42,13 @@ public class ShopFragment extends Fragment {
         // Initialize the adapter and set it to the RecyclerView
         ShopAdapter adapter = new ShopAdapter(requireContext(), new ShopHelperImpl());
         // Retrieve selected recipes from the database
-        List<RecipeUi> recipeUis = recipeRepository.getSelectedRecipes().stream()
-                .map(uiMapper::toRecipeUi)
+        List<RecipeUi> recipeUis = recipeRepository.getCartItems().stream()
+                .map(cartItem -> {
+                    RecipeItem recipe = recipeRepository.getRecipeByRecipeId((int) cartItem.getRecipeId());
+                    return uiMapper.toRecipeUi(recipe);
+                })
                 .collect(Collectors.toList());
+
         adapter.setSelectedRecipeList(recipeUis);
         binding.shoppingCart.setAdapter(adapter);
         binding.shoppingCart.setLayoutManager(new LinearLayoutManager(requireContext()));

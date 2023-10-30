@@ -2,14 +2,14 @@ package com.example.grocerieswizard.di;
 
 import android.content.Context;
 
-import com.example.grocerieswizard.data.local.RecipeDatabaseHelper;
+import com.example.grocerieswizard.data.local.GWDatabase;
 import com.example.grocerieswizard.data.local.RecipeLocalDataSource;
 import com.example.grocerieswizard.data.local.RecipeLocalDataSourceImpl;
 import com.example.grocerieswizard.data.remote.RecipeRemoteDataSource;
 import com.example.grocerieswizard.data.remote.RecipeRemoteDataSourceImpl;
 import com.example.grocerieswizard.data.repo.RecipeRepository;
 import com.example.grocerieswizard.data.repo.RecipeRepositoryImpl;
-import com.example.grocerieswizard.data.repo.model.RepoMapper;
+import com.example.grocerieswizard.data.repo.RepoMapper;
 import com.example.grocerieswizard.ui.UiMapper;
 
 public class GroceriesWizardInjector {
@@ -20,8 +20,8 @@ public class GroceriesWizardInjector {
     private final RepoMapper repoMapper;
 
     private GroceriesWizardInjector(Context context) {
-        RecipeDatabaseHelper dbHelper = new RecipeDatabaseHelper(context);
-        RecipeLocalDataSource recipeLocalDataSource = new RecipeLocalDataSourceImpl(dbHelper);
+        GWDatabase database = GWDatabase.getInstance(context);
+        RecipeLocalDataSource recipeLocalDataSource = new RecipeLocalDataSourceImpl(database.cartDao(),database.favDao(),database.ingredientDao(), database.recipeDao());
         RecipeRemoteDataSource recipeRemoteDataSource = new RecipeRemoteDataSourceImpl();
         uiMapper = new UiMapper();
         repoMapper = new RepoMapper();

@@ -41,7 +41,7 @@ public class DetailFragment extends Fragment {
                 recipeUi.setSwiped(false);
 
                 binding.showTitle.setText(recipeUi.getRecipeName());
-                binding.showRecipeImage.setImageBitmap(recipeUi.getImageBitmap());
+                // binding.showRecipeImage.setImageBitmap(recipeUi.getImageBitmap());
                 String inst = "\t\t" + recipeUi.getInstructions();
                 binding.showHowToPrepare.setText(inst);
 

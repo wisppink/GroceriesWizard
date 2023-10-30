@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.grocerieswizard.R;
+import com.example.grocerieswizard.data.local.model.CartItem;
 import com.example.grocerieswizard.ui.addrecipe.AddRecipeFragment;
 import com.example.grocerieswizard.data.repo.RecipeRepository;
 import com.example.grocerieswizard.databinding.FragmentHomeBinding;
@@ -170,7 +171,7 @@ public class HomeFragment extends Fragment implements RecipeInterface {
 
     @Override
     public Boolean isRecipeSelected(int id) {
-        return recipeRepository.isRecipeSelected(id);
+        return recipeRepository.isRecipeInCart(id);
     }
 
     @Override
@@ -193,12 +194,13 @@ public class HomeFragment extends Fragment implements RecipeInterface {
 
     @Override
     public void deleteSelectedRecipe(int recipeId) {
-        recipeRepository.deleteSelectedRecipe(recipeId);
+        recipeRepository.deleteCartItem(recipeId);
     }
 
     @Override
     public void insertSelectedRecipe(int recipeId) {
-        recipeRepository.insertSelectedRecipe(recipeId);
+        CartItem cartItem = new CartItem(recipeId);
+        recipeRepository.insertCartItem(cartItem);
     }
 
     @Override

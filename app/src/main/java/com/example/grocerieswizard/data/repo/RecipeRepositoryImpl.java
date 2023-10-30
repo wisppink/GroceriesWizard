@@ -1,15 +1,14 @@
 package com.example.grocerieswizard.data.repo;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 
 import com.example.grocerieswizard.data.local.RecipeLocalDataSource;
+import com.example.grocerieswizard.data.local.model.CartItem;
+import com.example.grocerieswizard.data.local.model.FavItem;
+import com.example.grocerieswizard.data.local.model.IngredientItem;
+import com.example.grocerieswizard.data.local.model.RecipeItem;
 import com.example.grocerieswizard.data.remote.RecipeRemoteDataSource;
 import com.example.grocerieswizard.data.remote.model.MealResponse;
-import com.example.grocerieswizard.data.repo.model.Ingredient;
-import com.example.grocerieswizard.data.repo.model.Recipe;
-import com.example.grocerieswizard.data.repo.model.RepoMapper;
 
 import java.util.List;
 
@@ -22,7 +21,6 @@ public class RecipeRepositoryImpl implements RecipeRepository {
     private final RecipeLocalDataSource localDataSource;
     private final RecipeRemoteDataSource remoteDataSource;
     private final RepoMapper mapper;
-    private static final String TAG = "RecipeRepositoryImpl";
 
     public RecipeRepositoryImpl(RecipeLocalDataSource localDataSource, RecipeRemoteDataSource remoteDataSource, RepoMapper mapper) {
         this.localDataSource = localDataSource;
@@ -31,8 +29,35 @@ public class RecipeRepositoryImpl implements RecipeRepository {
     }
 
     @Override
-    public List<Recipe> getAllRecipes() {
+    public List<RecipeItem> getAllRecipes() {
         return localDataSource.getAllRecipes();
+    }
+
+    @Override
+    public void deleteRecipe(int recipeId) {
+        localDataSource.deleteRecipe(recipeId);
+
+    }
+
+    @Override
+    public void insertRecipe(RecipeItem recipe) {
+        localDataSource.insertRecipe(recipe);
+    }
+
+    @Override
+    public int updateRecipe(int oldRecipeId, RecipeItem recipe) {
+        return localDataSource.updateRecipe(oldRecipeId, recipe);
+    }
+
+    @Override
+    public RecipeItem getRecipeByRecipeId(int recipeId) {
+        return localDataSource.getRecipeByRecipeId(recipeId);
+    }
+
+
+    @Override
+    public List<FavItem> getFavoriteRecipes() {
+        return localDataSource.getFavoriteRecipes();
     }
 
     @Override
@@ -50,61 +75,41 @@ public class RecipeRepositoryImpl implements RecipeRepository {
         return localDataSource.isRecipeFavorite(recipeId);
     }
 
+
     @Override
-    public void insertSelectedRecipe(int recipeId) {
-        localDataSource.insertSelectedRecipe(recipeId);
+    public void deleteIngredient(IngredientItem ingredientItem) {
+        localDataSource.deleteIngredient(ingredientItem);
     }
 
     @Override
-    public void deleteSelectedRecipe(int recipeId) {
-        localDataSource.deleteSelectedRecipe(recipeId);
+    public void insertIngredient(IngredientItem ingredientItem) {
+        localDataSource.insertIngredient(ingredientItem);
+    }
+
+
+    @Override
+    public Boolean isRecipeInCart(int recipeId) {
+        return localDataSource.isRecipeInCart(recipeId);
     }
 
     @Override
-    public void deleteRecipe(int recipeId) {
-        Log.d(TAG, "deleteRecipe: before: " + localDataSource.getAllRecipes().size());
-        localDataSource.deleteRecipe(recipeId);
-        Log.d(TAG, "deleteRecipe: before: " + localDataSource.getAllRecipes().size());
-
+    public void insertCartItem(CartItem cartItem) {
+        localDataSource.insertCartItem(cartItem);
     }
 
     @Override
-    public void insertRecipe(Recipe recipe) {
-        localDataSource.insertRecipe(recipe);
+    public void deleteCartItem(int recipeId) {
+        localDataSource.deleteCartItem(recipeId);
     }
 
     @Override
-    public Boolean isRecipeSelected(int recipeId) {
-        return localDataSource.isRecipeSelected(recipeId);
+    public List<CartItem> getCartItems() {
+        return localDataSource.getCartItems();
     }
 
-    @Override
-    public int updateRecipe(int oldRecipeId, Recipe recipe) {
-        return localDataSource.updateRecipe(oldRecipeId, recipe);
-    }
 
     @Override
-    public List<Recipe> getFavoriteRecipes() {
-        return localDataSource.getFavoriteRecipes();
-    }
-
-    @Override
-    public void deleteIngredient(int ingredientId) {
-        localDataSource.deleteIngredient(ingredientId);
-    }
-
-    @Override
-    public void insertIngredient(Ingredient ingredient) {
-        localDataSource.insertIngredient(ingredient);
-    }
-
-    @Override
-    public List<Recipe> getSelectedRecipes() {
-        return localDataSource.getSelectedRecipes();
-    }
-
-    @Override
-    public void searchMeals(String query, RepositoryCallback<List<Recipe>> callback) {
+    public void searchMeals(String query, RepositoryCallback<List<RecipeItem>> callback) {
         remoteDataSource.searchMeals(query).enqueue(new Callback<MealResponse>() {
             @Override
             public void onResponse(@NonNull Call<MealResponse> call, @NonNull Response<MealResponse> response) {

@@ -1,34 +1,29 @@
 package com.example.grocerieswizard.ui.model;
 
-import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
 
 import java.util.List;
 
 public class RecipeUi implements Parcelable {
 
     private String recipeName;
-    private Bitmap imageBitmap;
     private String instructions;
     private List<IngredientUi> ingredients;
     private boolean isSwiped;
     private int id;
-    private final String TAG = "RecipeModel";
 
-    public RecipeUi(String recipeName, List<IngredientUi> ingredients, String instructions, Bitmap imageBitmap) {
+    public RecipeUi(String recipeName, List<IngredientUi> ingredients, String instructions) {
         this.recipeName = recipeName;
         this.ingredients = ingredients;
         this.instructions = instructions;
-        this.imageBitmap = imageBitmap;
+        //this.imageBitmap = imageBitmap;
         isSwiped = false;
     }
 
     protected RecipeUi(Parcel in) {
         recipeName = in.readString();
-        imageBitmap = in.readParcelable(Uri.class.getClassLoader());
+        // imageBitmap = in.readParcelable(Uri.class.getClassLoader());
         instructions = in.readString();
         ingredients = in.createTypedArrayList(IngredientUi.CREATOR);
     }
@@ -48,7 +43,7 @@ public class RecipeUi implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(recipeName);
-        dest.writeParcelable(imageBitmap, flags);
+        //dest.writeParcelable(imageBitmap, flags);
         dest.writeString(instructions);
         dest.writeTypedList(ingredients);
     }
@@ -62,14 +57,14 @@ public class RecipeUi implements Parcelable {
         return recipeName;
     }
 
-    public Bitmap getImageBitmap() {
+    /*public Bitmap getImageBitmap() {
         if (imageBitmap != null) {
             Log.d(TAG, "getImageBitmap: " + imageBitmap);
         } else {
             Log.d(TAG, "getImageBitmap:  null");
         }
         return imageBitmap;
-    }
+    }*/
 
     public String getInstructions() {
         return instructions;
@@ -83,11 +78,11 @@ public class RecipeUi implements Parcelable {
         this.recipeName = recipeName;
     }
 
-    public void setImageBitmap(Bitmap imageBitmap) {
+  /*  public void setImageBitmap(Bitmap imageBitmap) {
         this.imageBitmap = imageBitmap;
         if (imageBitmap != null)
             Log.d(TAG, imageBitmap.toString());
-    }
+    }*/
 
     public void setInstructions(String instructions) {
         this.instructions = instructions;

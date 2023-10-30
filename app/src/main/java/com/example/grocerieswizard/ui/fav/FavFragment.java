@@ -10,11 +10,13 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.example.grocerieswizard.data.local.model.CartItem;
+import com.example.grocerieswizard.data.local.model.RecipeItem;
 import com.example.grocerieswizard.data.repo.RecipeRepository;
 import com.example.grocerieswizard.databinding.FragmentFavBinding;
 import com.example.grocerieswizard.di.GroceriesWizardInjector;
-import com.example.grocerieswizard.ui.model.RecipeUi;
 import com.example.grocerieswizard.ui.UiMapper;
+import com.example.grocerieswizard.ui.model.RecipeUi;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,8 +47,12 @@ public class FavFragment extends Fragment implements FavInterface {
         binding.FavRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         List<RecipeUi> recipeUis = recipeRepository.getFavoriteRecipes().stream()
-                .map(uiMapper::toRecipeUi)
+                .map(favItem -> {
+                    RecipeItem recipe = recipeRepository.getRecipeByRecipeId(favItem.getRecipeId());
+                    return uiMapper.toRecipeUi(recipe);
+                })
                 .collect(Collectors.toList());
+
         adapter.setFavList(recipeUis);
 
         return binding.getRoot();
@@ -66,17 +72,18 @@ public class FavFragment extends Fragment implements FavInterface {
 
     @Override
     public boolean isRecipeSelected(int id) {
-        return recipeRepository.isRecipeSelected(id);
+        return recipeRepository.isRecipeInCart(id);
     }
 
     @Override
     public void insertSelectedRecipe(int id) {
-        recipeRepository.insertSelectedRecipe(id);
+        CartItem cartItem = new CartItem(id);
+        recipeRepository.insertCartItem(cartItem);
     }
 
     @Override
     public void removeSelectedRecipe(int id) {
-        recipeRepository.deleteSelectedRecipe(id);
+        recipeRepository.deleteCartItem(id);
     }
 
     @Override

@@ -2,7 +2,8 @@ package com.example.grocerieswizard.data.remote.model;
 
 import android.graphics.Bitmap;
 
-import com.example.grocerieswizard.data.repo.model.Ingredient;
+import com.example.grocerieswizard.data.local.model.IngredientDesc;
+import com.example.grocerieswizard.data.local.model.IngredientItem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,7 +62,7 @@ public class Meal {
     private String strImageSource;
     private String strCreativeCommonsConfirmed;
     private String dateModified;
-    List<Ingredient> ingredients = new ArrayList<>();
+    List<IngredientItem> ingredients = new ArrayList<>();
     private Bitmap imageBitmap;
     private static final String TAG = "Meal";
 
@@ -277,7 +278,7 @@ public class Meal {
         return dateModified;
     }
 
-    public List<Ingredient> getIngredients() {
+    public List<IngredientItem> getIngredients() {
         String[] ingredientNames = {
                 getStrIngredient1(),
                 getStrIngredient2(),
@@ -329,7 +330,8 @@ public class Meal {
             String measure = ingredientMeasures[i];
 
             if (name != null && !name.isEmpty() && measure != null && !measure.isEmpty()) {
-                Ingredient ingredient = new Ingredient(name, parseQuantity(measure), parseUnit(measure));
+                IngredientDesc desc = new IngredientDesc(name);
+                IngredientItem ingredient = new IngredientItem(desc, parseQuantity(measure), parseUnit(measure));
                 ingredients.add(ingredient);
             }
         }

@@ -1,5 +1,6 @@
-package com.example.grocerieswizard.data.repo.model;
+package com.example.grocerieswizard.data.repo;
 
+import com.example.grocerieswizard.data.local.model.RecipeItem;
 import com.example.grocerieswizard.data.remote.model.Meal;
 import com.example.grocerieswizard.data.remote.model.MealResponse;
 
@@ -9,14 +10,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class RepoMapper {
-    public List<Recipe> toRecipes(MealResponse mealResponse) {
+    public List<RecipeItem> toRecipes(MealResponse mealResponse) {
         if (mealResponse.getMeals() == null) return new ArrayList<>();
         return Arrays.stream(mealResponse.getMeals())
                 .map(this::toRecipe)
                 .collect(Collectors.toList());
     }
 
-    Recipe toRecipe(Meal meal) {
-        return new Recipe(meal.getStrMeal(), meal.getIngredients(), meal.getStrInstructions(), meal.getStrMealThumb());
+    RecipeItem toRecipe(Meal meal) {
+        return new RecipeItem(meal.getStrMeal(), meal.getStrInstructions(), meal.getIngredients());
+        //, meal.getStrMealThumb())
     }
 }

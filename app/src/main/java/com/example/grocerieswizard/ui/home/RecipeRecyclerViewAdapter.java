@@ -1,6 +1,5 @@
 package com.example.grocerieswizard.ui.home;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -109,10 +108,9 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
         if (position >= 0 && position < recipeUiList.size()) {
             RecipeUi oldRecipeUi = getItemAtPosition(position);
             oldRecipeUi.setRecipeName(editedRecipeUi.getRecipeName());
-            oldRecipeUi.setImageBitmap(editedRecipeUi.getImageBitmap());
-            String TAG = "RecipeAdapter";
-            Log.d(TAG, "editRecipe: editedRecipe" + editedRecipeUi.getImageBitmap());
-            Log.d(TAG, "editRecipe: oldRecipe" + oldRecipeUi.getImageBitmap());
+            //oldRecipeUi.setImageBitmap(editedRecipeUi.getImageBitmap());
+            //Log.d(TAG, "editRecipe: editedRecipe" + editedRecipeUi.getImageBitmap());
+            //Log.d(TAG, "editRecipe: oldRecipe" + oldRecipeUi.getImageBitmap());
 
             oldRecipeUi.setInstructions(editedRecipeUi.getInstructions());
             oldRecipeUi.setIngredients(editedRecipeUi.getIngredients());
@@ -181,11 +179,11 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
         public void bind(RecipeUi recipeUi) {
             binding.textView.setText(recipeUi.getRecipeName());
 
-            if (recipeUi.getImageBitmap() != null) {
+            /*if (recipeUi.getImageBitmap() != null) {
                 binding.defaultCardRecipeImage.setImageBitmap(recipeUi.getImageBitmap());
             } else {
                 binding.defaultCardRecipeImage.setImageResource(R.drawable.recipe_image_default);
-            }
+            }*/
 
 
             if (recipeInterface.isRecipeFavorite(recipeUi.getId())) {
