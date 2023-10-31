@@ -60,7 +60,7 @@ public class HomeFragment extends Fragment implements RecipeInterface {
                              Bundle savedInstanceState) {
         FragmentHomeBinding binding = FragmentHomeBinding.inflate(inflater, container, false);
         binding.recipeRecyclerView.setAdapter(adapter);
-        binding.recipeRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        binding.recipeRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         // Launch the AddRecipe activity to add a new recipe
         binding.fab.setOnClickListener(v -> {
             AddRecipeFragment addRecipeFragment = new AddRecipeFragment();
@@ -139,7 +139,7 @@ public class HomeFragment extends Fragment implements RecipeInterface {
             builder.setPositiveButton("Delete", (dialog, which) -> {
                 // User confirmed deletion, remove the recipe and update the RecyclerView
                 adapter.removeRecipe(recipeUi);
-                Toast.makeText(getContext(), "Recipe deleted: " + recipeUi.getRecipeName(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), "Recipe deleted: " + recipeUi.getRecipeName(), Toast.LENGTH_SHORT).show();
                 dialog.dismiss();
             });
             builder.setNegativeButton("Cancel", (dialog, which) -> {

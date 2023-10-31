@@ -2,7 +2,6 @@ package com.example.grocerieswizard.ui.addrecipe;
 
 import static android.app.Activity.RESULT_OK;
 
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
@@ -52,7 +51,6 @@ public class AddRecipeFragment extends Fragment implements AddInterface {
     private UiMapper uiMapper;
     private IngredientAdapter ingredientAdapter;
     private List<IngredientUi> ingredientList;
-    Context context;
     private Bitmap defaultImageBitmap;
     private RecipeUi recipeUi;
     private static final String TAG = "AddRecipeFragment";
@@ -72,8 +70,7 @@ public class AddRecipeFragment extends Fragment implements AddInterface {
         FragmentAddRecipeBinding binding = FragmentAddRecipeBinding.inflate(inflater, container, false);
         ingredientAdapter = new IngredientAdapter(ingredientList);
         ingredientAdapter.setRecyclerViewInterface(this);
-        context = getContext();
-        binding.recyclerViewIngredients.setLayoutManager(new LinearLayoutManager(context));
+        binding.recyclerViewIngredients.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.recyclerViewIngredients.setAdapter(ingredientAdapter);
 
         RecipeRecyclerViewAdapter recipeAdapter = new RecipeRecyclerViewAdapter();
@@ -83,7 +80,7 @@ public class AddRecipeFragment extends Fragment implements AddInterface {
         try {
             defaultImageBitmap = MediaStore.Images.Media.getBitmap(requireContext().getContentResolver(), defaultImageUri);
         } catch (Exception e) {
-            Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
         }
         //create an empty recipe
         recipeUi = new RecipeUi(null, null, null);
@@ -132,7 +129,7 @@ public class AddRecipeFragment extends Fragment implements AddInterface {
                             @Override
                             public void onSuccess(List<RecipeItem> data) {
                                 if (data.isEmpty())
-                                     return;
+                                    return;
                                 //TODO:recipe image
                                 /*
                                 Picasso.get().load(data.get(0).getImageUrl()).resize(150, 150).centerCrop().into(new Target() {
@@ -156,8 +153,8 @@ public class AddRecipeFragment extends Fragment implements AddInterface {
                                 });
 
                                 */
-                                    showAlertDialogForFoundRecipe(uiMapper.toRecipeUi(data.get(0)), binding.editRecipeHowToPrepare, binding.addImage);
-                                    //,bitmap
+                                showAlertDialogForFoundRecipe(uiMapper.toRecipeUi(data.get(0)), binding.editRecipeHowToPrepare, binding.addImage);
+                                //,bitmap
                             }
 
                             @Override
@@ -190,7 +187,7 @@ public class AddRecipeFragment extends Fragment implements AddInterface {
 
                         @Override
                         public void onBitmapFailed(Exception e, Drawable errorDrawable) {
-                            Toast.makeText(getContext(), "image error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(requireContext(), "image error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                         }
 
                         @Override
@@ -199,7 +196,7 @@ public class AddRecipeFragment extends Fragment implements AddInterface {
                     });
 
                 } catch (Exception e) {
-                    Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
                     binding.addImage.setImageBitmap(defaultImageBitmap);
                     //  recipeUi.setImageBitmap(defaultImageBitmap);
                 }
@@ -220,7 +217,7 @@ public class AddRecipeFragment extends Fragment implements AddInterface {
             String howToPrepare = binding.editRecipeHowToPrepare.getText().toString();
 
             if (recipeName.isEmpty() || ingredientList.isEmpty() || howToPrepare.isEmpty()) {
-                Toast.makeText(context, "Please fill all fields!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), "Please fill all fields!", Toast.LENGTH_SHORT).show();
                 return;
             }
             /*if (recipeUi.getImageBitmap() == null) {
@@ -250,7 +247,7 @@ public class AddRecipeFragment extends Fragment implements AddInterface {
         });
 
         binding.dischargeRecipe.setOnClickListener(v -> {
-            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
             builder.setTitle("Confirm Discharge").setMessage("Are you sure you want to discharge this recipe?")
                     .setPositiveButton(R.string.yes, (dialog, which) -> getParentFragmentManager().popBackStack())
                     .setNegativeButton(android.R.string.cancel, (dialog, which) -> dialog.dismiss())
@@ -263,7 +260,7 @@ public class AddRecipeFragment extends Fragment implements AddInterface {
     public void onItemDelete(IngredientUi ingredientUi) {
         if (ingredientUi != null) {
             recipeRepository.deleteIngredient(uiMapper.toIngredient(ingredientUi));
-            ingredientAdapter.removeIngredient(ingredientUi, context);
+            ingredientAdapter.removeIngredient(ingredientUi, requireContext());
         }
 
     }
@@ -276,7 +273,7 @@ public class AddRecipeFragment extends Fragment implements AddInterface {
     }
 
     private void showAddIngredientDialog(IngredientUi ingredientUi) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         DialogAddIngredientBinding dialogBinding = DialogAddIngredientBinding.inflate(getLayoutInflater());
         View dialogView = dialogBinding.getRoot();
         builder.setView(dialogView);
@@ -306,14 +303,14 @@ public class AddRecipeFragment extends Fragment implements AddInterface {
 
     private void showAlertDialogForFoundRecipe(RecipeUi recipeUi, TextView howToPrepare, ImageView addImage) {
         //, Bitmap bitmap
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         builder.setTitle(R.string.TitleFoundRecipe);
         builder.setMessage(R.string.MessageFoundRecipe);
         builder.setPositiveButton(R.string.yes, (dialog, which) -> {
             //Log.d(TAG, "showAlert: recipeUi image bitmap: " + recipeUi.getImageBitmap());
             howToPrepare.setText(recipeUi.getInstructions());
             ingredientList.addAll(recipeUi.getIngredients());
-           // addImage.setImageBitmap(bitmap);
+            // addImage.setImageBitmap(bitmap);
         });
         builder.setNegativeButton(R.string.no, (dialog, which) -> Log.d(TAG, "showAlertDialogForFoundRecipe: do nothing."));
         builder.show();
@@ -321,7 +318,7 @@ public class AddRecipeFragment extends Fragment implements AddInterface {
     }
 
     public void showEditIngredientDialog(IngredientUi ingredientUi) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         DialogAddIngredientBinding dialogBinding = DialogAddIngredientBinding.inflate(getLayoutInflater());
         View dialogView = dialogBinding.getRoot();
         builder.setView(dialogView);

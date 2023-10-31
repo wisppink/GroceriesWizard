@@ -44,7 +44,7 @@ public class FavFragment extends Fragment implements FavInterface {
         adapter.setFavInterface(this);
 
         binding.FavRecyclerView.setAdapter(adapter);
-        binding.FavRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        binding.FavRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
 
         List<RecipeUi> recipeUis = recipeRepository.getFavoriteRecipes().stream()
                 .map(favItem -> {
