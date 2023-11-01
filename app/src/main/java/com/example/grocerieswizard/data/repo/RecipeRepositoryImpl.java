@@ -1,20 +1,14 @@
 package com.example.grocerieswizard.data.repo;
 
-import androidx.annotation.NonNull;
-
 import com.example.grocerieswizard.data.local.RecipeLocalDataSource;
 import com.example.grocerieswizard.data.local.model.CartItem;
 import com.example.grocerieswizard.data.local.model.FavItem;
 import com.example.grocerieswizard.data.local.model.IngredientItem;
 import com.example.grocerieswizard.data.local.model.RecipeItem;
 import com.example.grocerieswizard.data.remote.RecipeRemoteDataSource;
-import com.example.grocerieswizard.data.remote.model.MealResponse;
+import com.example.grocerieswizard.data.remote.ThreadExercise;
 
 import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class RecipeRepositoryImpl implements RecipeRepository {
 
@@ -110,20 +104,6 @@ public class RecipeRepositoryImpl implements RecipeRepository {
 
     @Override
     public void searchMeals(String query, RepositoryCallback<List<RecipeItem>> callback) {
-        remoteDataSource.searchMeals(query).enqueue(new Callback<MealResponse>() {
-            @Override
-            public void onResponse(@NonNull Call<MealResponse> call, @NonNull Response<MealResponse> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    callback.onSuccess(mapper.toRecipes(response.body()));
-                } else {
-                    callback.onError(new Exception(response.message()));
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<MealResponse> call, @NonNull Throwable t) {
-                callback.onError(new Exception(t));
-            }
-        });
+        new ThreadExercise(callback, remoteDataSource, mapper).execute(query);
     }
 }
