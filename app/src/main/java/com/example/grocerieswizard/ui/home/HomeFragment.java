@@ -245,6 +245,6 @@ public class HomeFragment extends Fragment implements RecipeInterface, HomeContr
         shareIntent.putExtra(Intent.EXTRA_TEXT, shareString);
 
         // Start an activity to choose the sharing method
-        requireContext().startActivity(Intent.createChooser(shareIntent, "Share Recipe"));
+        startActivity(Intent.createChooser(shareIntent, "Share Recipe"));
     }
 }
