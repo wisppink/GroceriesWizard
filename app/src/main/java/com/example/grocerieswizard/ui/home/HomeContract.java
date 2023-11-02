@@ -16,7 +16,7 @@ public interface HomeContract {
     }
 
     interface Presenter {
-        List<RecipeUi> loadRecipes();
+        void loadRecipes();
 
         Boolean isRecipeSelected(int id);
 

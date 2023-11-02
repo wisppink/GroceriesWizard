@@ -65,7 +65,7 @@ public class HomeFragment extends Fragment implements RecipeInterface, HomeContr
     @Override
     public void onResume() {
         super.onResume();
-        showRecipes(presenter.loadRecipes());
+        presenter.loadRecipes();
     }
 
     private void setupSwipeGesture(FragmentHomeBinding binding) {

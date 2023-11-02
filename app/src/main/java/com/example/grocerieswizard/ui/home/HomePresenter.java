@@ -5,7 +5,6 @@ import com.example.grocerieswizard.data.repo.RecipeRepository;
 import com.example.grocerieswizard.ui.UiMapper;
 import com.example.grocerieswizard.ui.model.RecipeUi;
 
-import java.util.List;
 import java.util.stream.Collectors;
 
 public class HomePresenter implements HomeContract.Presenter {
@@ -20,10 +19,10 @@ public class HomePresenter implements HomeContract.Presenter {
     }
 
     // Load recipes and return a list of RecipeUi
-    public List<RecipeUi> loadRecipes() {
-        return recipeRepository.getAllRecipes().stream()
+    public void loadRecipes() {
+        view.showRecipes(recipeRepository.getAllRecipes().stream()
                 .map(uiMapper::toRecipeUi)
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()));
     }
 
     public Boolean isRecipeSelected(int id) {
