@@ -38,7 +38,8 @@ public class HomeFragment extends Fragment implements RecipeInterface, HomeContr
         adapter.setRecyclerViewInterface(this);
         GroceriesWizardInjector injector = GroceriesWizardInjector.getInstance();
         UiMapper uiMapper = injector.getUiMapper();
-        presenter = new HomePresenter(this, injector.getRecipeRepository(), uiMapper);
+        presenter = new HomePresenter(injector.getRecipeRepository(), uiMapper);
+        presenter.bindView(this);
     }
 
 

@@ -8,21 +8,31 @@ import com.example.grocerieswizard.ui.model.RecipeUi;
 import java.util.stream.Collectors;
 
 public class HomePresenter implements HomeContract.Presenter {
-    private final HomeContract.View view;
+    private HomeContract.View view;
     private final RecipeRepository recipeRepository;
     private final UiMapper uiMapper;
 
-    public HomePresenter(HomeContract.View view, RecipeRepository recipeRepository, UiMapper uiMapper) {
-        this.view = view;
+    public HomePresenter(RecipeRepository recipeRepository, UiMapper uiMapper) {
         this.recipeRepository = recipeRepository;
         this.uiMapper = uiMapper;
     }
 
+    public void bindView(HomeContract.View view){
+        if(view!=null){
+         this.view = view;
+        }
+    }
+    public void unbindView(HomeContract.View view){
+        this.view = null;
+    }
+
     // Load recipes and return a list of RecipeUi
     public void loadRecipes() {
-        view.showRecipes(recipeRepository.getAllRecipes().stream()
-                .map(uiMapper::toRecipeUi)
-                .collect(Collectors.toList()));
+        if(view!=null){
+            view.showRecipes(recipeRepository.getAllRecipes().stream()
+                    .map(uiMapper::toRecipeUi)
+                    .collect(Collectors.toList()));}
+
     }
 
     public Boolean isRecipeSelected(int id) {
