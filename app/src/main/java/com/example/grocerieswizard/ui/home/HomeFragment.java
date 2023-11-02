@@ -178,7 +178,7 @@ public class HomeFragment extends Fragment implements RecipeInterface, HomeContr
 
     @Override
     public void showRecipes(List<RecipeUi> recipes) {
-        adapter.setRecipeList(presenter.loadRecipes());
+        adapter.setRecipeList(recipes);
     }
 
     private void showRecipeDetails(RecipeUi recipe) {
