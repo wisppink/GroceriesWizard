@@ -15,8 +15,6 @@ public interface RecipeInterface {
 
     void insertRecipe(RecipeUi recipeUi);
 
-    void deleteRecipe(RecipeUi recipeUi);
-
     void deleteSelectedRecipe(int recipeId);
 
     void insertSelectedRecipe(int recipeId);

@@ -49,6 +49,7 @@ public class HomePresenter implements HomeContract.Presenter {
 
     public void deleteRecipe(RecipeUi recipeUi) {
         recipeRepository.deleteRecipe(recipeUi);
+        view.showDeleteConfirmation(recipeUi);
     }
 
     public void deleteSelectedRecipe(int recipeId) {

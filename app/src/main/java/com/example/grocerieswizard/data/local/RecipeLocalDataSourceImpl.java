@@ -8,7 +8,6 @@ import com.example.grocerieswizard.data.local.model.CartItem;
 import com.example.grocerieswizard.data.local.model.FavItem;
 import com.example.grocerieswizard.data.local.model.IngredientItem;
 import com.example.grocerieswizard.data.local.model.RecipeItem;
-import com.example.grocerieswizard.ui.UiMapper;
 import com.example.grocerieswizard.ui.model.RecipeUi;
 
 import java.util.List;
@@ -38,8 +37,7 @@ public class RecipeLocalDataSourceImpl implements RecipeLocalDataSource {
 
     @Override
     public void deleteRecipe(RecipeUi recipeUi) {
-        UiMapper mapper = new UiMapper();
-        recipeDao.delete(mapper.toRecipe(recipeUi));
+        recipeDao.delete(recipeUi.getId());
     }
 
     @Override

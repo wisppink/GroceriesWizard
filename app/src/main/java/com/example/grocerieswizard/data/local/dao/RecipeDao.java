@@ -1,7 +1,6 @@
 package com.example.grocerieswizard.data.local.dao;
 
 import androidx.room.Dao;
-import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
 
@@ -19,8 +18,8 @@ public interface RecipeDao {
     int updateRecipe(long oldRecipeId, String newName, String newInstructors, List<IngredientItem> newIngredientList);
 
 
-    @Delete
-    void delete(RecipeItem recipeItem);
+    @Query("DELETE FROM recipe WHERE id = :recipeId")
+    void delete(int recipeId);
 
     @Query("SELECT * FROM recipe")
     List<RecipeItem> getAllRecipes();

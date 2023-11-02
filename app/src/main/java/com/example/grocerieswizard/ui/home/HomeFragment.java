@@ -104,7 +104,7 @@ public class HomeFragment extends Fragment implements RecipeInterface, HomeContr
     // Handle item delete with confirmation dialog
     @Override
     public void onItemDelete(RecipeUi recipe) {
-        deleteRecipe(recipe);
+        presenter.deleteRecipe(recipe);
     }
 
     @Override
@@ -127,10 +127,7 @@ public class HomeFragment extends Fragment implements RecipeInterface, HomeContr
         presenter.insertRecipe(recipeUi);
     }
 
-    @Override
-    public void deleteRecipe(RecipeUi recipe) {
-        presenter.deleteRecipe(recipe);
-    }
+
 
     @Override
     public void deleteSelectedRecipe(int recipeId) {
