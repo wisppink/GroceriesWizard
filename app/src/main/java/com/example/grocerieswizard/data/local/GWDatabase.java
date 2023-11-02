@@ -18,7 +18,7 @@ import com.example.grocerieswizard.data.local.model.RecipeItem;
 import com.example.grocerieswizard.data.local.typeConverter.IngredientDescConverter;
 import com.example.grocerieswizard.data.local.typeConverter.IngredientItemListConverter;
 
-@Database(entities = {CartItem.class, FavItem.class, IngredientItem.class, RecipeItem.class}, version = 3)
+@Database(entities = {CartItem.class, FavItem.class, IngredientItem.class, RecipeItem.class}, version = 4)
 @TypeConverters({IngredientDescConverter.class, IngredientItemListConverter.class})
 public abstract class GWDatabase extends RoomDatabase {
 

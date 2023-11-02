@@ -11,6 +11,7 @@ import com.example.grocerieswizard.data.local.model.IngredientItem;
 import com.example.grocerieswizard.data.local.model.RecipeItem;
 import com.example.grocerieswizard.data.remote.RecipeRemoteDataSource;
 import com.example.grocerieswizard.data.remote.model.MealResponse;
+import com.example.grocerieswizard.ui.model.RecipeUi;
 
 import java.util.List;
 
@@ -36,8 +37,8 @@ public class RecipeRepositoryImpl implements RecipeRepository {
     }
 
     @Override
-    public void deleteRecipe(int recipeId) {
-        localDataSource.deleteRecipe(recipeId);
+    public void deleteRecipe(RecipeUi recipeUi) {
+        localDataSource.deleteRecipe(recipeUi);
 
     }
 

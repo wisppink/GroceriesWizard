@@ -97,18 +97,18 @@ public class HomeFragment extends Fragment implements RecipeInterface, HomeContr
     // Handle item click to show details of a recipe
     @Override
     public void onItemClick(RecipeUi recipe) {
-        presenter.showRecipeDetails(recipe);
+        showRecipeDetails(recipe);
     }
 
     // Handle item delete with confirmation dialog
     @Override
     public void onItemDelete(RecipeUi recipe) {
-        presenter.onItemDeleteClick(recipe);
+        deleteRecipe(recipe);
     }
 
     @Override
     public void onItemEdit(RecipeUi recipe) {
-        presenter.onItemEditClick(recipe);
+        showEditRecipe(recipe);
     }
 
     @Override
@@ -127,8 +127,8 @@ public class HomeFragment extends Fragment implements RecipeInterface, HomeContr
     }
 
     @Override
-    public void deleteRecipe(int id) {
-        presenter.deleteRecipe(id);
+    public void deleteRecipe(RecipeUi recipe) {
+        presenter.deleteRecipe(recipe);
     }
 
     @Override
@@ -158,7 +158,7 @@ public class HomeFragment extends Fragment implements RecipeInterface, HomeContr
 
     @Override
     public void onItemShare(RecipeUi recipe) {
-        presenter.onItemShareClick(recipe);
+        showRecipeShare(recipe);
     }
 
     private String getStringIngredients(List<IngredientUi> ingredients) {
@@ -181,8 +181,7 @@ public class HomeFragment extends Fragment implements RecipeInterface, HomeContr
         adapter.setRecipeList(presenter.loadRecipes());
     }
 
-    @Override
-    public void showRecipeDetails(RecipeUi recipe) {
+    private void showRecipeDetails(RecipeUi recipe) {
         if (recipe != null) {
             if (!recipe.isSwiped()) {
                 recipe.setSwiped(false);

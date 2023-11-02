@@ -8,8 +8,6 @@ public interface HomeContract {
     interface View {
         void showRecipes(List<RecipeUi> recipes);
 
-        void showRecipeDetails(RecipeUi recipe);
-
         void showDeleteConfirmation(RecipeUi recipe);
 
         void showEditRecipe(RecipeUi recipe);
@@ -26,7 +24,7 @@ public interface HomeContract {
 
         void insertRecipe(RecipeUi recipeUi);
 
-        void deleteRecipe(int id);
+        void deleteRecipe(RecipeUi recipeUi);
 
         void deleteSelectedRecipe(int recipeId);
 

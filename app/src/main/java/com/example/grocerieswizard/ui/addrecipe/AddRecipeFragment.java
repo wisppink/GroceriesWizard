@@ -236,7 +236,7 @@ public class AddRecipeFragment extends Fragment implements AddInterface {
                 if (arguments != null) {
                     RecipeUi recipeUi = arguments.getParcelable("recipeModel");
                     if (recipeUi != null) {
-                        recipeRepository.deleteRecipe(recipeUi.getId());
+                        recipeRepository.deleteRecipe(recipeUi);
                     }
                 }
                 recipeRepository.insertRecipe(uiMapper.toRecipe(recipeUi));

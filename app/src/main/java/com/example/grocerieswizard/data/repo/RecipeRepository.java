@@ -4,13 +4,14 @@ import com.example.grocerieswizard.data.local.model.CartItem;
 import com.example.grocerieswizard.data.local.model.FavItem;
 import com.example.grocerieswizard.data.local.model.IngredientItem;
 import com.example.grocerieswizard.data.local.model.RecipeItem;
+import com.example.grocerieswizard.ui.model.RecipeUi;
 
 import java.util.List;
 
 public interface RecipeRepository {
     List<RecipeItem> getAllRecipes();
 
-    void deleteRecipe(int recipeId);
+    void deleteRecipe(RecipeUi recipeUi);
 
     void insertRecipe(RecipeItem recipeItem);
 

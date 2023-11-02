@@ -38,8 +38,8 @@ public class HomePresenter implements HomeContract.Presenter {
         recipeRepository.insertRecipe(uiMapper.toRecipe(recipeUi));
     }
 
-    public void deleteRecipe(int id) {
-        recipeRepository.deleteRecipe(id);
+    public void deleteRecipe(RecipeUi recipeUi) {
+        recipeRepository.deleteRecipe(recipeUi);
     }
 
     public void deleteSelectedRecipe(int recipeId) {
@@ -63,17 +63,4 @@ public class HomePresenter implements HomeContract.Presenter {
         recipeRepository.deleteRecipeFromFavorites(recipeId);
     }
 
-    public void onItemShareClick(RecipeUi recipe){
-        view.showRecipeShare(recipe);
-    }
-    public void onItemEditClick(RecipeUi recipe){
-        view.showEditRecipe(recipe);
-    }
-    public void onItemDeleteClick(RecipeUi recipe){
-        view.showDeleteConfirmation(recipe);
-    }
-
-    public void showRecipeDetails(RecipeUi recipe) {
-        view.showRecipeDetails( recipe);
-    }
 }

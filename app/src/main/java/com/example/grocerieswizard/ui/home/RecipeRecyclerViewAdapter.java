@@ -143,7 +143,7 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
         notifyItemChanged(pos);
         recipeUiList.remove(pos);
         notifyItemRemoved(pos);
-        recipeInterface.deleteRecipe(recipeUi.getId());
+        recipeInterface.deleteRecipe(recipeUi);
     }
 
     public void setRecyclerViewInterface(RecipeInterface recipeInterface) {
