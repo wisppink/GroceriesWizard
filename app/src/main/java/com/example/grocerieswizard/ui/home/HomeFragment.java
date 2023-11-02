@@ -234,11 +234,9 @@ public class HomeFragment extends Fragment implements RecipeInterface, HomeContr
 
     @Override
     public void showRecipeShare(RecipeUi recipe) {
-        RecipeUi recipeUi = adapter.getItemAtPosition(adapter.getPositionForRecipe(recipe));
-        String instructions = recipeUi.getInstructions();
-        String ingredients = getStringIngredients(recipeUi.getIngredients());
-
-        String shareString = recipeUi.getRecipeName() + "\n\n\n" + instructions + "\n\n\n" + ingredients;
+        String instructions = recipe.getInstructions();
+        String ingredients = getStringIngredients(recipe.getIngredients());
+        String shareString = recipe.getRecipeName() + "\n\n\n" + instructions + "\n\n\n" + ingredients;
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
         shareIntent.setType("text/plain");
 
