@@ -1,5 +1,7 @@
 package com.example.grocerieswizard.data.repo;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import com.example.grocerieswizard.data.local.RecipeLocalDataSource;
@@ -67,6 +69,8 @@ public class RecipeRepositoryImpl implements RecipeRepository {
 
     @Override
     public void insertRecipeFav(int recipeId) {
+        String TAG = "implementer ";
+        Log.d(TAG, "insertRecipeFav: id: " + recipeId);
         localDataSource.insertRecipeFav(recipeId);
     }
 

@@ -4,11 +4,11 @@ import com.example.grocerieswizard.ui.model.RecipeUi;
 
 public interface RecipeInterface {
 
-    void onItemClick(int position);
+    void onItemClick(RecipeUi recipeUi);
 
-    void onItemDelete(int position);
+    void onItemDelete(RecipeUi recipeUi);
 
-    void onItemEdit(int position);
+    void onItemEdit(RecipeUi recipeUi);
     Boolean isRecipeSelected(int id);
 
     int updateRecipe(RecipeUi oldRecipeUi);
@@ -27,5 +27,5 @@ public interface RecipeInterface {
 
     void deleteRecipeFav(int recipeId);
 
-    void onItemShare(int adapterPosition);
+    void onItemShare(RecipeUi recipe);
 }

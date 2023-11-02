@@ -1,6 +1,7 @@
 package com.example.grocerieswizard.ui.fav;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -52,7 +53,8 @@ public class FavFragment extends Fragment implements FavInterface {
                     return uiMapper.toRecipeUi(recipe);
                 })
                 .collect(Collectors.toList());
-
+        String TAG = "fav fragment";
+        Log.d(TAG, "onCreateView: list: " + recipeUis);
         adapter.setFavList(recipeUis);
 
         return binding.getRoot();

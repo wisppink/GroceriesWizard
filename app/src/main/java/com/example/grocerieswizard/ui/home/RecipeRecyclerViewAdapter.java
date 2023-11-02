@@ -38,6 +38,10 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
         if (viewType == VIEW_TYPE_ROW) {
             RecyclerViewRowBinding rowBinding = RecyclerViewRowBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
             RecyclerView.ViewHolder rowHolder = new RowViewHolder(rowBinding, recipeInterface);
+
+            rowBinding.getRoot().setOnClickListener(
+                    v -> recipeInterface.onItemClick(recipeUiList.get(rowHolder.getAdapterPosition()))
+            );
             rowBinding.favIcon.setOnClickListener(v -> {
                 int position = rowHolder.getAdapterPosition();
                 if (position != RecyclerView.NO_POSITION) {
@@ -78,12 +82,12 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
             RecyclerViewMenuBinding menuBinding = RecyclerViewMenuBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
             RecyclerView.ViewHolder menuHolder = new MenuViewHolder(menuBinding);
 
-            menuBinding.editIcon.setOnClickListener(v -> recipeInterface.onItemEdit(menuHolder.getAdapterPosition()));
+            menuBinding.editIcon.setOnClickListener(v -> recipeInterface.onItemEdit(recipeUiList.get(menuHolder.getAdapterPosition())));
             menuBinding.shareIcon.setOnClickListener(v -> {
-                recipeInterface.onItemShare(menuHolder.getAdapterPosition());
+                recipeInterface.onItemShare(recipeUiList.get((menuHolder.getAdapterPosition())));
                 Toast.makeText(menuBinding.getRoot().getContext(), "Share icon clicked", Toast.LENGTH_SHORT).show();
             });
-            menuBinding.deleteIcon.setOnClickListener(v -> recipeInterface.onItemDelete(menuHolder.getAdapterPosition()));
+            menuBinding.deleteIcon.setOnClickListener(v -> recipeInterface.onItemDelete(recipeUiList.get(menuHolder.getAdapterPosition())));
 
             return menuHolder;
         }
@@ -158,6 +162,15 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
         notifyItemChanged(position);
     }
 
+    public int getPositionForRecipe(RecipeUi recipe) {
+        for (int i = 0; i < recipeUiList.size(); i++) {
+            if (recipeUiList.get(i).getId() == recipe.getId()) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
     public static class RowViewHolder extends RecyclerView.ViewHolder {
         RecipeInterface recipeInterface;
         RecyclerViewRowBinding binding;
@@ -171,9 +184,6 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
             setBinding(binding);
             this.recipeInterface = recipeInterface;
 
-            binding.getRoot().setOnClickListener(
-                    v -> recipeInterface.onItemClick(getAdapterPosition())
-            );
         }
 
         public void bind(RecipeUi recipeUi) {
