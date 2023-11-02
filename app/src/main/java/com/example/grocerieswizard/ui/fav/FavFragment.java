@@ -1,7 +1,6 @@
 package com.example.grocerieswizard.ui.fav;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,21 +10,15 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import com.example.grocerieswizard.data.local.model.CartItem;
-import com.example.grocerieswizard.data.local.model.RecipeItem;
-import com.example.grocerieswizard.data.repo.RecipeRepository;
 import com.example.grocerieswizard.databinding.FragmentFavBinding;
 import com.example.grocerieswizard.di.GroceriesWizardInjector;
-import com.example.grocerieswizard.ui.UiMapper;
 import com.example.grocerieswizard.ui.model.RecipeUi;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
-public class FavFragment extends Fragment implements FavInterface {
-    RecipeRepository recipeRepository;
-    private UiMapper uiMapper;
+public class FavFragment extends Fragment implements FavInterface, FavContract.View {
+    FavPresenter presenter;
     private FavRecyclerViewAdapter adapter;
     FragmentFavBinding binding;
 
@@ -33,8 +26,8 @@ public class FavFragment extends Fragment implements FavInterface {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         GroceriesWizardInjector injector = GroceriesWizardInjector.getInstance();
-        recipeRepository = injector.getRecipeRepository();
-        uiMapper = injector.getUiMapper();
+        presenter = new FavPresenter(injector.getRecipeRepository(), injector.getUiMapper());
+        presenter.bindView(this);
         adapter = new FavRecyclerViewAdapter(this);
     }
 
@@ -47,22 +40,23 @@ public class FavFragment extends Fragment implements FavInterface {
         binding.FavRecyclerView.setAdapter(adapter);
         binding.FavRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
 
-        List<RecipeUi> recipeUis = recipeRepository.getFavoriteRecipes().stream()
-                .map(favItem -> {
-                    RecipeItem recipe = recipeRepository.getRecipeByRecipeId(favItem.getRecipeId());
-                    return uiMapper.toRecipeUi(recipe);
-                })
-                .collect(Collectors.toList());
-        String TAG = "fav fragment";
-        Log.d(TAG, "onCreateView: list: " + recipeUis);
-        adapter.setFavList(recipeUis);
+        presenter.setFavList();
 
         return binding.getRoot();
     }
 
     @Override
+    public void showFavList(List<RecipeUi> recipeUis) {
+        adapter.setFavList(recipeUis);
+    }
+
+    @Override
     public void onRemoveFromFavorites(RecipeUi recipeUi) {
-        recipeRepository.deleteRecipeFromFavorites(recipeUi.getId());
+        presenter.removeFromFavorites(recipeUi);
+    }
+
+    @Override
+    public void removeFromFavorites(RecipeUi recipeUi) {
         ArrayList<RecipeUi> tempList = adapter.getFavList();
         for (int i = 0; i < tempList.size(); i++) {
             RecipeUi model = tempList.get(i);
@@ -74,18 +68,17 @@ public class FavFragment extends Fragment implements FavInterface {
 
     @Override
     public boolean isRecipeSelected(int id) {
-        return recipeRepository.isRecipeInCart(id);
+        return presenter.isRecipeInCart(id);
     }
 
     @Override
     public void insertSelectedRecipe(int id) {
-        CartItem cartItem = new CartItem(id);
-        recipeRepository.insertCartItem(cartItem);
+        presenter.insertCartItem(id);
     }
 
     @Override
     public void removeSelectedRecipe(int id) {
-        recipeRepository.deleteCartItem(id);
+        presenter.removeFromCart(id);
     }
 
     @Override
