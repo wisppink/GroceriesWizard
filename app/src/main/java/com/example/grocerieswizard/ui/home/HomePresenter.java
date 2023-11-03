@@ -49,7 +49,6 @@ public class HomePresenter implements HomeContract.Presenter {
     }
 
     public void deleteRecipe(RecipeUi recipeUi) {
-        recipeRepository.deleteRecipe(recipeUi);
         view.showDeleteConfirmation(recipeUi);
     }
 
@@ -84,5 +83,10 @@ public class HomePresenter implements HomeContract.Presenter {
                 Log.d("MainActivity", "recipe model null");
             }
         }
+    }
+
+    @Override
+    public void deleteFromDB(RecipeUi recipe) {
+        recipeRepository.deleteRecipe(recipe);
     }
 }

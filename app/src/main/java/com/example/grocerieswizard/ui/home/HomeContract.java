@@ -41,5 +41,7 @@ public interface HomeContract {
         void deleteRecipeFav(int recipeId);
 
         void showDetails(RecipeUi recipe);
+
+        void deleteFromDB(RecipeUi recipe);
     }
 }

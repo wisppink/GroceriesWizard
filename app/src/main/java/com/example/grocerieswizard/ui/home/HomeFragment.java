@@ -206,6 +206,7 @@ public class HomeFragment extends Fragment implements RecipeInterface, HomeContr
         builder.setPositiveButton("Delete", (dialog, which) -> {
             // User confirmed deletion, remove the recipe and update the RecyclerView
             adapter.removeRecipe(recipe);
+            presenter.deleteFromDB(recipe);
             Toast.makeText(requireContext(), "Recipe deleted: " + recipe.getRecipeName(), Toast.LENGTH_SHORT).show();
             dialog.dismiss();
         });
