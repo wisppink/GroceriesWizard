@@ -57,6 +57,7 @@ public class AddRecipeFragment extends Fragment implements AddInterface, AddReci
         presenter.bindView(this);
         ingredientList = new ArrayList<>();
     }
+
     public static AddRecipeFragment newInstance(RecipeUi recipe, int position) {
         AddRecipeFragment addRecipeFragment = new AddRecipeFragment();
         Bundle bundle = new Bundle();
@@ -65,6 +66,7 @@ public class AddRecipeFragment extends Fragment implements AddInterface, AddReci
         addRecipeFragment.setArguments(bundle);
         return addRecipeFragment;
     }
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         FragmentAddRecipeBinding binding = FragmentAddRecipeBinding.inflate(inflater, container, false);
@@ -263,6 +265,7 @@ public class AddRecipeFragment extends Fragment implements AddInterface, AddReci
         AlertDialog dialog = builder.create();
         dialog.show();
     }
+
     @Override
     public void showAlertDialogForFoundRecipe(RecipeUi recipeUi, TextView howToPrepare, ImageView addImage) {
         //, Bitmap bitmap
@@ -273,6 +276,7 @@ public class AddRecipeFragment extends Fragment implements AddInterface, AddReci
             //Log.d(TAG, "showAlert: recipeUi image bitmap: " + recipeUi.getImageBitmap());
             howToPrepare.setText(recipeUi.getInstructions());
             ingredientList.addAll(recipeUi.getIngredients());
+            ingredientAdapter.notifyDataSetChanged();
             // addImage.setImageBitmap(bitmap);
         });
         builder.setNegativeButton(R.string.no, (dialog, which) -> Log.d(TAG, "showAlertDialogForFoundRecipe: do nothing."));

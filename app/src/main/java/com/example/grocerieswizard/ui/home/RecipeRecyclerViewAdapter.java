@@ -44,20 +44,19 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
             );
             rowBinding.favIcon.setOnClickListener(v -> {
                 int position = rowHolder.getAdapterPosition();
-                if (position != RecyclerView.NO_POSITION) {
-                    RecipeUi recipeUi = recipeUiList.get(position);
-                    int recipeId = recipeUi.getId();
-                    boolean isCurrentlyFavorite = recipeInterface.isRecipeFavorite(recipeUi.getId());
-                    if (!isCurrentlyFavorite) {
-                        rowBinding.favIcon.setImageResource(R.drawable.baseline_favorite_24);
-                        recipeInterface.insertRecipeFav(recipeId);
-                        Toast.makeText(rowBinding.getRoot().getContext(), "Added to Favorites", Toast.LENGTH_SHORT).show();
-                    } else {
-                        rowBinding.favIcon.setImageResource(R.drawable.baseline_unfavorite_border_24);
-                        recipeInterface.deleteRecipeFav(recipeId);
-                        Toast.makeText(rowBinding.getRoot().getContext(), "Removed from Favorites", Toast.LENGTH_SHORT).show();
-                    }
+                RecipeUi recipeUi = recipeUiList.get(position);
+                boolean isCurrentlyFavorite = recipeInterface.isRecipeFavorite(recipeUi.getId());
+                if (!isCurrentlyFavorite) {
+                    rowBinding.favIcon.setImageResource(R.drawable.baseline_favorite_24);
+                    recipeUi.setFav(true);
+                } else {
+                    rowBinding.favIcon.setImageResource(R.drawable.baseline_unfavorite_border_24);
+                    recipeUi.setFav(false);
                 }
+                if (position != RecyclerView.NO_POSITION) {
+                    recipeInterface.toggleFavoriteRecipe(recipeUi);
+                }
+
             });
             rowBinding.addCart.setOnClickListener(v -> {
                 int position = rowHolder.getAdapterPosition();

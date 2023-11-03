@@ -151,20 +151,14 @@ public class HomeFragment extends Fragment implements RecipeInterface, HomeContr
     public boolean isRecipeFavorite(int id) {
         return presenter.isRecipeFavorite(id);
     }
-
-    @Override
-    public void insertRecipeFav(int recipeId) {
-        presenter.insertRecipeFav(recipeId);
-    }
-
-    @Override
-    public void deleteRecipeFav(int recipeId) {
-        presenter.deleteRecipeFav(recipeId);
-    }
-
     @Override
     public void onItemShare(RecipeUi recipe) {
         showRecipeShare(recipe);
+    }
+
+    @Override
+    public void toggleFavoriteRecipe(RecipeUi recipeUi) {
+        presenter.onToggleFavoriteRecipeClick(recipeUi);
     }
 
     private String getStringIngredients(List<IngredientUi> ingredients) {
@@ -196,6 +190,16 @@ public class HomeFragment extends Fragment implements RecipeInterface, HomeContr
                 .replace(R.id.frameLayout, detailFragment)
                 .addToBackStack(null)
                 .commit();
+    }
+
+    @Override
+    public void recipeAddedToFavorites(RecipeUi recipeUi) {
+        Toast.makeText(requireContext(), "Added to Favorites", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void recipeRemovedFromFavorites(RecipeUi recipeUi) {
+        Toast.makeText(requireContext(), "Removed from Favorites", Toast.LENGTH_SHORT).show();
     }
 
     @Override

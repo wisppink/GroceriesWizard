@@ -21,9 +21,7 @@ public interface RecipeInterface {
 
     boolean isRecipeFavorite(int id);
 
-    void insertRecipeFav(int recipeId);
-
-    void deleteRecipeFav(int recipeId);
-
     void onItemShare(RecipeUi recipe);
+
+    void toggleFavoriteRecipe(RecipeUi recipeUi);
 }

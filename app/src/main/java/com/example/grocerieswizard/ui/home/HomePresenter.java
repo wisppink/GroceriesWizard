@@ -89,4 +89,16 @@ public class HomePresenter implements HomeContract.Presenter {
     public void deleteFromDB(RecipeUi recipe) {
         recipeRepository.deleteRecipe(recipe);
     }
+
+    @Override
+    public void onToggleFavoriteRecipeClick(RecipeUi recipeUi) {
+        if(recipeUi.isFav()){
+            recipeRepository.insertRecipeFav(recipeUi.getId());
+            view.recipeAddedToFavorites(recipeUi);
+        }
+        else{
+            recipeRepository.deleteRecipeFromFavorites(recipeUi.getId());
+            view.recipeRemovedFromFavorites(recipeUi);
+        }
+    }
 }

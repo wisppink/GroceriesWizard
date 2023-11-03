@@ -14,6 +14,10 @@ public interface HomeContract {
 
         void showRecipeShare(RecipeUi recipe);
         void showRecipeDetails(RecipeUi recipe);
+
+        void recipeAddedToFavorites(RecipeUi recipeUi);
+
+        void recipeRemovedFromFavorites(RecipeUi recipeUi);
     }
 
     interface Presenter {
@@ -36,12 +40,10 @@ public interface HomeContract {
 
         boolean isRecipeFavorite(int id);
 
-        void insertRecipeFav(int recipeId);
-
-        void deleteRecipeFav(int recipeId);
-
         void showDetails(RecipeUi recipe);
 
         void deleteFromDB(RecipeUi recipe);
+
+        void onToggleFavoriteRecipeClick(RecipeUi recipeUi);
     }
 }
