@@ -13,9 +13,13 @@ public interface HomeContract {
         void showEditRecipe(RecipeUi recipe);
 
         void showRecipeShare(RecipeUi recipe);
+        void showRecipeDetails(RecipeUi recipe);
     }
 
     interface Presenter {
+        void bindView(HomeContract.View view);
+        void unbindView();
+
         void loadRecipes();
 
         Boolean isRecipeSelected(int id);
@@ -35,5 +39,7 @@ public interface HomeContract {
         void insertRecipeFav(int recipeId);
 
         void deleteRecipeFav(int recipeId);
+
+        void showDetails(RecipeUi recipe);
     }
 }

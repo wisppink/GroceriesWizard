@@ -1,5 +1,7 @@
 package com.example.grocerieswizard.ui.home;
 
+import android.util.Log;
+
 import com.example.grocerieswizard.data.local.model.CartItem;
 import com.example.grocerieswizard.data.repo.RecipeRepository;
 import com.example.grocerieswizard.ui.UiMapper;
@@ -16,13 +18,12 @@ public class HomePresenter implements HomeContract.Presenter {
         this.recipeRepository = recipeRepository;
         this.uiMapper = uiMapper;
     }
-
+    @Override
     public void bindView(HomeContract.View view){
-        if(view!=null){
          this.view = view;
-        }
     }
-    public void unbindView(HomeContract.View view){
+    @Override
+    public void unbindView(){
         this.view = null;
     }
 
@@ -73,4 +74,15 @@ public class HomePresenter implements HomeContract.Presenter {
         recipeRepository.deleteRecipeFromFavorites(recipeId);
     }
 
+    @Override
+    public void showDetails(RecipeUi recipe) {
+        if (recipe != null) {
+            if (!recipe.isSwiped()) {
+                recipe.setSwiped(false);
+                view.showRecipeDetails(recipe);
+            } else {
+                Log.d("MainActivity", "recipe model null");
+            }
+        }
+    }
 }

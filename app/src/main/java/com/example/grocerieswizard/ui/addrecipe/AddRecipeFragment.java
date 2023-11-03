@@ -57,7 +57,14 @@ public class AddRecipeFragment extends Fragment implements AddInterface, AddReci
         presenter.bindView(this);
         ingredientList = new ArrayList<>();
     }
-
+    public static AddRecipeFragment newInstance(RecipeUi recipe, int position) {
+        AddRecipeFragment addRecipeFragment = new AddRecipeFragment();
+        Bundle bundle = new Bundle();
+        bundle.putParcelable("recipeModel", recipe);
+        bundle.putInt("position", position);
+        addRecipeFragment.setArguments(bundle);
+        return addRecipeFragment;
+    }
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         FragmentAddRecipeBinding binding = FragmentAddRecipeBinding.inflate(inflater, container, false);

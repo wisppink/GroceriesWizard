@@ -2,7 +2,6 @@ package com.example.grocerieswizard.ui.home;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,7 +27,7 @@ import com.example.grocerieswizard.ui.model.RecipeUi;
 import java.util.List;
 
 public class HomeFragment extends Fragment implements RecipeInterface, HomeContract.View {
-    HomePresenter presenter;
+    HomeContract.Presenter presenter;
     private RecipeRecyclerViewAdapter adapter;
 
     @Override
@@ -39,9 +38,19 @@ public class HomeFragment extends Fragment implements RecipeInterface, HomeContr
         GroceriesWizardInjector injector = GroceriesWizardInjector.getInstance();
         UiMapper uiMapper = injector.getUiMapper();
         presenter = new HomePresenter(injector.getRecipeRepository(), uiMapper);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
         presenter.bindView(this);
     }
 
+    @Override
+    public void onStop() {
+        presenter.unbindView();
+        super.onStop();
+    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -98,7 +107,7 @@ public class HomeFragment extends Fragment implements RecipeInterface, HomeContr
     // Handle item click to show details of a recipe
     @Override
     public void onItemClick(RecipeUi recipe) {
-        showRecipeDetails(recipe);
+        presenter.showDetails(recipe);
     }
 
     // Handle item delete with confirmation dialog
@@ -126,7 +135,6 @@ public class HomeFragment extends Fragment implements RecipeInterface, HomeContr
     public void insertRecipe(RecipeUi recipeUi) {
         presenter.insertRecipe(recipeUi);
     }
-
 
 
     @Override
@@ -179,53 +187,43 @@ public class HomeFragment extends Fragment implements RecipeInterface, HomeContr
         adapter.setRecipeList(recipes);
     }
 
-    private void showRecipeDetails(RecipeUi recipe) {
-        if (recipe != null) {
-            if (!recipe.isSwiped()) {
-                recipe.setSwiped(false);
-                adapter.itemChanged(adapter.getPositionForRecipe(recipe));
-                DetailFragment detailFragment = DetailFragment.newInstance(recipe);
-                requireActivity().getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.frameLayout, detailFragment)
-                        .addToBackStack(null)
-                        .commit();
-            } else {
-                Log.d("MainActivity", "recipe model null");
-            }
-        }
+    @Override
+    public void showRecipeDetails(RecipeUi recipe) {
+        adapter.itemChanged(adapter.getPositionForRecipe(recipe));
+        DetailFragment detailFragment = DetailFragment.newInstance(recipe);
+        requireActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.frameLayout, detailFragment)
+                .addToBackStack(null)
+                .commit();
     }
 
     @Override
     public void showDeleteConfirmation(RecipeUi recipe) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-            builder.setTitle("Confirm Deletion");
-            builder.setMessage("Are you sure you want to delete " + recipe.getRecipeName() + " recipe?");
-            builder.setPositiveButton("Delete", (dialog, which) -> {
-                // User confirmed deletion, remove the recipe and update the RecyclerView
-                adapter.removeRecipe(recipe);
-                Toast.makeText(requireContext(), "Recipe deleted: " + recipe.getRecipeName(), Toast.LENGTH_SHORT).show();
-                dialog.dismiss();
-            });
-            builder.setNegativeButton("Cancel", (dialog, which) -> {
-                recipe.setSwiped(false);
-                adapter.itemChanged(adapter.getPositionForRecipe(recipe));
-                dialog.dismiss();
-            });
-            // Create and show the dialog
-            AlertDialog alertDialog = builder.create();
-            alertDialog.show();
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setTitle("Confirm Deletion");
+        builder.setMessage("Are you sure you want to delete " + recipe.getRecipeName() + " recipe?");
+        builder.setPositiveButton("Delete", (dialog, which) -> {
+            // User confirmed deletion, remove the recipe and update the RecyclerView
+            adapter.removeRecipe(recipe);
+            Toast.makeText(requireContext(), "Recipe deleted: " + recipe.getRecipeName(), Toast.LENGTH_SHORT).show();
+            dialog.dismiss();
+        });
+        builder.setNegativeButton("Cancel", (dialog, which) -> {
+            recipe.setSwiped(false);
+            adapter.itemChanged(adapter.getPositionForRecipe(recipe));
+            dialog.dismiss();
+        });
+        // Create and show the dialog
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
     }
 
     @Override
     public void showEditRecipe(RecipeUi recipe) {
         FragmentTransaction transaction = requireActivity().getSupportFragmentManager().beginTransaction();
-        AddRecipeFragment addRecipeFragment = new AddRecipeFragment();
-        Bundle bundle = new Bundle();
-        bundle.putParcelable("recipeModel", recipe);
-        bundle.putInt("position", adapter.getPositionForRecipe(recipe));
-        addRecipeFragment.setArguments(bundle);
-        transaction.replace(R.id.frameLayout, addRecipeFragment);
+        AddRecipeFragment fragment = AddRecipeFragment.newInstance(recipe, adapter.getPositionForRecipe(recipe));
+        transaction.replace(R.id.frameLayout, fragment);
         transaction.addToBackStack(null);
         transaction.commit();
     }
