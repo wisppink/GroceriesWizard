@@ -18,6 +18,8 @@ public interface HomeContract {
         void recipeAddedToFavorites(RecipeUi recipeUi);
 
         void recipeRemovedFromFavorites(RecipeUi recipeUi);
+
+        void onRecipeDeleted(RecipeUi recipe);
     }
 
     interface Presenter {

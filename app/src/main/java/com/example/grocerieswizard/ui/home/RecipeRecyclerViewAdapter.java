@@ -45,19 +45,11 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
             rowBinding.favIcon.setOnClickListener(v -> {
                 int position = rowHolder.getAdapterPosition();
                 RecipeUi recipeUi = recipeUiList.get(position);
-                boolean isCurrentlyFavorite = recipeInterface.isRecipeFavorite(recipeUi.getId());
-                if (!isCurrentlyFavorite) {
-                    rowBinding.favIcon.setImageResource(R.drawable.baseline_favorite_24);
-                    recipeUi.setFav(true);
-                } else {
-                    rowBinding.favIcon.setImageResource(R.drawable.baseline_unfavorite_border_24);
-                    recipeUi.setFav(false);
-                }
                 if (position != RecyclerView.NO_POSITION) {
                     recipeInterface.toggleFavoriteRecipe(recipeUi);
                 }
-
             });
+
             rowBinding.addCart.setOnClickListener(v -> {
                 int position = rowHolder.getAdapterPosition();
                 if (position != RecyclerView.NO_POSITION) {
@@ -186,21 +178,16 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
 
         public void bind(RecipeUi recipeUi) {
             binding.textView.setText(recipeUi.getRecipeName());
-
+            if (recipeUi.isFav()) {
+                binding.favIcon.setImageResource(R.drawable.baseline_favorite_24);
+            } else {
+                binding.favIcon.setImageResource(R.drawable.baseline_unfavorite_border_24);
+            }
             /*if (recipeUi.getImageBitmap() != null) {
                 binding.defaultCardRecipeImage.setImageBitmap(recipeUi.getImageBitmap());
             } else {
                 binding.defaultCardRecipeImage.setImageResource(R.drawable.recipe_image_default);
             }*/
-
-
-            if (recipeInterface.isRecipeFavorite(recipeUi.getId())) {
-                // Set the favorite icon if it is favorite
-                binding.favIcon.setImageResource(R.drawable.baseline_favorite_24);
-            } else {
-                // Set the non-favorite icon if it is not favorite
-                binding.favIcon.setImageResource(R.drawable.baseline_unfavorite_border_24);
-            }
 
             if (recipeInterface.isRecipeSelected(recipeUi.getId())) {
                 binding.addCart.setImageResource(R.drawable.baseline_remove_shopping_cart_24);

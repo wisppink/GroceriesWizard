@@ -125,7 +125,6 @@ public class HomeFragment extends Fragment implements RecipeInterface, HomeContr
     public Boolean isRecipeSelected(int id) {
         return presenter.isRecipeSelected(id);
     }
-
     @Override
     public int updateRecipe(RecipeUi oldRecipeUi) {
         return presenter.updateRecipe(oldRecipeUi);
@@ -135,7 +134,6 @@ public class HomeFragment extends Fragment implements RecipeInterface, HomeContr
     public void insertRecipe(RecipeUi recipeUi) {
         presenter.insertRecipe(recipeUi);
     }
-
 
     @Override
     public void deleteSelectedRecipe(int recipeId) {
@@ -194,12 +192,20 @@ public class HomeFragment extends Fragment implements RecipeInterface, HomeContr
 
     @Override
     public void recipeAddedToFavorites(RecipeUi recipeUi) {
+        adapter.itemChanged(adapter.getPositionForRecipe(recipeUi));
         Toast.makeText(requireContext(), "Added to Favorites", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void recipeRemovedFromFavorites(RecipeUi recipeUi) {
+        adapter.itemChanged(adapter.getPositionForRecipe(recipeUi));
         Toast.makeText(requireContext(), "Removed from Favorites", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onRecipeDeleted(RecipeUi recipe) {
+        adapter.removeRecipe(recipe);
+        Toast.makeText(requireContext(), "Recipe deleted: " + recipe.getRecipeName(), Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -207,17 +213,11 @@ public class HomeFragment extends Fragment implements RecipeInterface, HomeContr
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         builder.setTitle("Confirm Deletion");
         builder.setMessage("Are you sure you want to delete " + recipe.getRecipeName() + " recipe?");
-        builder.setPositiveButton("Delete", (dialog, which) -> {
-            // User confirmed deletion, remove the recipe and update the RecyclerView
-            adapter.removeRecipe(recipe);
-            presenter.deleteFromDB(recipe);
-            Toast.makeText(requireContext(), "Recipe deleted: " + recipe.getRecipeName(), Toast.LENGTH_SHORT).show();
-            dialog.dismiss();
-        });
+        builder.setPositiveButton("Delete", (dialog, which) -> presenter.deleteFromDB(recipe));
         builder.setNegativeButton("Cancel", (dialog, which) -> {
             recipe.setSwiped(false);
             adapter.itemChanged(adapter.getPositionForRecipe(recipe));
-            dialog.dismiss();
+            builder.setCancelable(true);
         });
         // Create and show the dialog
         AlertDialog alertDialog = builder.create();

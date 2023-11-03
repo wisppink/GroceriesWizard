@@ -65,14 +65,6 @@ public class HomePresenter implements HomeContract.Presenter {
         return recipeRepository.isRecipeFavorite(id);
     }
 
-    public void insertRecipeFav(int recipeId) {
-        recipeRepository.insertRecipeFav(recipeId);
-    }
-
-    public void deleteRecipeFav(int recipeId) {
-        recipeRepository.deleteRecipeFromFavorites(recipeId);
-    }
-
     @Override
     public void showDetails(RecipeUi recipe) {
         if (recipe != null) {
@@ -88,15 +80,18 @@ public class HomePresenter implements HomeContract.Presenter {
     @Override
     public void deleteFromDB(RecipeUi recipe) {
         recipeRepository.deleteRecipe(recipe);
+        view.onRecipeDeleted(recipe);
     }
 
     @Override
     public void onToggleFavoriteRecipeClick(RecipeUi recipeUi) {
-        if(recipeUi.isFav()){
+        if(!recipeUi.isFav()){
+            recipeUi.setFav(true);
             recipeRepository.insertRecipeFav(recipeUi.getId());
             view.recipeAddedToFavorites(recipeUi);
         }
         else{
+            recipeUi.setFav(false);
             recipeRepository.deleteRecipeFromFavorites(recipeUi.getId());
             view.recipeRemovedFromFavorites(recipeUi);
         }
