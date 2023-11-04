@@ -9,19 +9,11 @@ public interface RecipeInterface {
     void onItemDelete(RecipeUi recipeUi);
 
     void onItemEdit(RecipeUi recipeUi);
-    Boolean isRecipeSelected(int id);
-
     int updateRecipe(RecipeUi oldRecipeUi);
-
-    void insertRecipe(RecipeUi recipeUi);
-
-    void deleteSelectedRecipe(int recipeId);
-
-    void insertSelectedRecipe(int recipeId);
-
-    boolean isRecipeFavorite(int id);
 
     void onItemShare(RecipeUi recipe);
 
     void toggleFavoriteRecipe(RecipeUi recipeUi);
+
+    void toggleCartRecipe(RecipeUi recipeUi);
 }

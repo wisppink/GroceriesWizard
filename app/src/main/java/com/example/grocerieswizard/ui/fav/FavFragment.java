@@ -72,13 +72,13 @@ public class FavFragment extends Fragment implements FavInterface, FavContract.V
     }
 
     @Override
-    public void insertSelectedRecipe(int id) {
-        presenter.insertCartItem(id);
+    public void insertSelectedRecipe(RecipeUi recipeUi) {
+        presenter.insertCartItem(recipeUi);
     }
 
     @Override
-    public void removeSelectedRecipe(int id) {
-        presenter.removeFromCart(id);
+    public void removeSelectedRecipe(RecipeUi recipeUi) {
+        presenter.removeFromCart(recipeUi);
     }
 
     @Override

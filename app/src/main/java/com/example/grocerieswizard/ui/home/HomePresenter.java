@@ -2,7 +2,6 @@ package com.example.grocerieswizard.ui.home;
 
 import android.util.Log;
 
-import com.example.grocerieswizard.data.local.model.CartItem;
 import com.example.grocerieswizard.data.repo.RecipeRepository;
 import com.example.grocerieswizard.ui.UiMapper;
 import com.example.grocerieswizard.ui.model.RecipeUi;
@@ -13,58 +12,40 @@ public class HomePresenter implements HomeContract.Presenter {
     private HomeContract.View view;
     private final RecipeRepository recipeRepository;
     private final UiMapper uiMapper;
+    private static final String TAG = "HomePresenter";
 
     public HomePresenter(RecipeRepository recipeRepository, UiMapper uiMapper) {
         this.recipeRepository = recipeRepository;
         this.uiMapper = uiMapper;
     }
+
     @Override
-    public void bindView(HomeContract.View view){
-         this.view = view;
+    public void bindView(HomeContract.View view) {
+        this.view = view;
     }
+
     @Override
-    public void unbindView(){
+    public void unbindView() {
         this.view = null;
     }
 
     // Load recipes and return a list of RecipeUi
     public void loadRecipes() {
-        if(view!=null){
+        if (view != null) {
             view.showRecipes(recipeRepository.getAllRecipes().stream()
                     .map(uiMapper::toRecipeUi)
-                    .collect(Collectors.toList()));}
+                    .collect(Collectors.toList()));
+        }
 
-    }
-
-    public Boolean isRecipeSelected(int id) {
-        return recipeRepository.isRecipeInCart(id);
     }
 
     public int updateRecipe(RecipeUi oldRecipeUi) {
         return recipeRepository.updateRecipe(oldRecipeUi.getId(), uiMapper.toRecipe(oldRecipeUi));
     }
 
-    public void insertRecipe(RecipeUi recipeUi) {
-        recipeRepository.insertRecipe(uiMapper.toRecipe(recipeUi));
-    }
-
     public void deleteRecipe(RecipeUi recipeUi) {
         view.showDeleteConfirmation(recipeUi);
     }
-
-    public void deleteSelectedRecipe(int recipeId) {
-        recipeRepository.deleteCartItem(recipeId);
-    }
-
-    public void insertSelectedRecipe(int recipeId) {
-        CartItem cartItem = new CartItem(recipeId);
-        recipeRepository.insertCartItem(cartItem);
-    }
-
-    public boolean isRecipeFavorite(int id) {
-        return recipeRepository.isRecipeFavorite(id);
-    }
-
     @Override
     public void showDetails(RecipeUi recipe) {
         if (recipe != null) {
@@ -85,15 +66,29 @@ public class HomePresenter implements HomeContract.Presenter {
 
     @Override
     public void onToggleFavoriteRecipeClick(RecipeUi recipeUi) {
-        if(!recipeUi.isFav()){
+        Log.d(TAG, "onToggleFavoriteRecipeClick: recipeUi came to the presenter as: " + recipeUi.isFav());
+        if (recipeUi.isFav()) {
+            recipeUi.setFav(false);
+            recipeRepository.deleteRecipeFromFavorites(recipeUi);
+            view.recipeRemovedFromFavorites(recipeUi);
+        } else {
             recipeUi.setFav(true);
-            recipeRepository.insertRecipeFav(recipeUi.getId());
+            recipeRepository.insertRecipeFav(recipeUi);
             view.recipeAddedToFavorites(recipeUi);
         }
-        else{
-            recipeUi.setFav(false);
-            recipeRepository.deleteRecipeFromFavorites(recipeUi.getId());
-            view.recipeRemovedFromFavorites(recipeUi);
+    }
+
+    @Override
+    public void onToggleCartRecipeClick(RecipeUi recipeUi) {
+        Log.d(TAG, "onToggleCartRecipeClick: recipeUi came to the presenter as: " + recipeUi.isCart());
+        if (recipeUi.isCart()) {
+            recipeUi.setCart(false);
+            recipeRepository.deleteRecipeFromCart(recipeUi);
+            view.recipeRemovedFromCart(recipeUi);
+        } else {
+            recipeUi.setCart(true);
+            recipeRepository.insertCartItem(recipeUi);
+            view.recipeAddedToCart(recipeUi);
         }
     }
 }

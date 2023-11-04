@@ -20,6 +20,10 @@ public interface HomeContract {
         void recipeRemovedFromFavorites(RecipeUi recipeUi);
 
         void onRecipeDeleted(RecipeUi recipe);
+
+        void recipeAddedToCart(RecipeUi recipeUi);
+
+        void recipeRemovedFromCart(RecipeUi recipeUi);
     }
 
     interface Presenter {
@@ -28,24 +32,16 @@ public interface HomeContract {
 
         void loadRecipes();
 
-        Boolean isRecipeSelected(int id);
-
         int updateRecipe(RecipeUi oldRecipeUi);
 
-        void insertRecipe(RecipeUi recipeUi);
-
         void deleteRecipe(RecipeUi recipeUi);
-
-        void deleteSelectedRecipe(int recipeId);
-
-        void insertSelectedRecipe(int recipeId);
-
-        boolean isRecipeFavorite(int id);
 
         void showDetails(RecipeUi recipe);
 
         void deleteFromDB(RecipeUi recipe);
 
         void onToggleFavoriteRecipeClick(RecipeUi recipeUi);
+
+        void onToggleCartRecipeClick(RecipeUi recipeUi);
     }
 }

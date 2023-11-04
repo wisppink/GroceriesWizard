@@ -21,8 +21,8 @@ public interface FavContract {
 
         boolean isRecipeInCart(int id);
 
-        void insertCartItem(int id);
+        void insertCartItem(RecipeUi id);
 
-        void removeFromCart(int id);
+        void removeFromCart(RecipeUi id);
     }
 }

@@ -24,7 +24,7 @@ public interface RecipeLocalDataSource {
 
     List<CartItem> getCartItems();
 
-    void deleteCartItem(int recipeId);
+    void deleteCartItem(RecipeUi recipeUi);
 
     Boolean isRecipeInCart(int recipeId);
 
@@ -33,10 +33,7 @@ public interface RecipeLocalDataSource {
 
     void deleteRecipeFav(int recipeId);
 
-    void insertRecipeFav(int recipeId);
-
-    boolean isRecipeFavorite(int recipeId);
-
+    void insertRecipeFav(RecipeUi recipeUi);
 
     void deleteIngredient(IngredientItem ingredient);
 

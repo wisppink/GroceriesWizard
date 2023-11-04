@@ -12,6 +12,9 @@ public class RecipeItem {
     String name;
     String instructors;
     List<IngredientItem> ingredientList;
+    boolean isFav;
+
+    boolean isCart;
 
     public RecipeItem(String name, String instructors, List<IngredientItem> ingredientList) {
         this.name = name;
@@ -51,4 +54,19 @@ public class RecipeItem {
         this.ingredientList = ingredientList;
     }
 
+    public boolean isFav() {
+        return isFav;
+    }
+
+    public void setFav(boolean fav) {
+        isFav = fav;
+    }
+
+    public boolean isCart() {
+        return isCart;
+    }
+
+    public void setCart(boolean cart) {
+        isCart = cart;
+    }
 }

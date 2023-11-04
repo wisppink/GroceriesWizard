@@ -20,20 +20,15 @@ public interface RecipeRepository {
     RecipeItem getRecipeByRecipeId(int recipeId);
 
 
-    void deleteRecipeFromFavorites(int recipeId);
+    void deleteRecipeFromFavorites(RecipeUi recipeUi);
 
-    void insertRecipeFav(int recipeId);
+    void insertRecipeFav(RecipeUi recipe);
 
     List<FavItem> getFavoriteRecipes();
 
-    boolean isRecipeFavorite(int recipeId);
-
+    void insertCartItem(RecipeUi recipeUi);
 
     List<CartItem> getCartItems();
-
-    void insertCartItem(CartItem cartItem);
-
-    void deleteCartItem(int recipeId);
 
     Boolean isRecipeInCart(int recipeId);
 
@@ -44,4 +39,6 @@ public interface RecipeRepository {
 
 
     void searchMeals(String query, RepositoryCallback<List<RecipeItem>> callback);
+
+    void deleteRecipeFromCart(RecipeUi recipeUi);
 }

@@ -7,9 +7,9 @@ public interface FavInterface {
 
     boolean isRecipeSelected(int id);
 
-    void insertSelectedRecipe(int id);
+    void insertSelectedRecipe(RecipeUi recipeUi);
 
-    void removeSelectedRecipe(int id);
+    void removeSelectedRecipe(RecipeUi recipeUi);
 
     void updateIt(int adapterPosition);
 }

@@ -2,6 +2,7 @@ package com.example.grocerieswizard.ui.home;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,7 +30,7 @@ import java.util.List;
 public class HomeFragment extends Fragment implements RecipeInterface, HomeContract.View {
     HomeContract.Presenter presenter;
     private RecipeRecyclerViewAdapter adapter;
-
+    private static final String TAG = "HomeFragment";
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,6 +54,12 @@ public class HomeFragment extends Fragment implements RecipeInterface, HomeContr
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        presenter.loadRecipes();
+    }
+
+    @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container,
                              Bundle savedInstanceState) {
@@ -70,12 +77,6 @@ public class HomeFragment extends Fragment implements RecipeInterface, HomeContr
         });
         setupSwipeGesture(binding);
         return binding.getRoot();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        presenter.loadRecipes();
     }
 
     private void setupSwipeGesture(FragmentHomeBinding binding) {
@@ -104,13 +105,12 @@ public class HomeFragment extends Fragment implements RecipeInterface, HomeContr
         new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(binding.recipeRecyclerView);
     }
 
-    // Handle item click to show details of a recipe
+
     @Override
     public void onItemClick(RecipeUi recipe) {
         presenter.showDetails(recipe);
     }
 
-    // Handle item delete with confirmation dialog
     @Override
     public void onItemDelete(RecipeUi recipe) {
         presenter.deleteRecipe(recipe);
@@ -122,33 +122,10 @@ public class HomeFragment extends Fragment implements RecipeInterface, HomeContr
     }
 
     @Override
-    public Boolean isRecipeSelected(int id) {
-        return presenter.isRecipeSelected(id);
-    }
-    @Override
     public int updateRecipe(RecipeUi oldRecipeUi) {
         return presenter.updateRecipe(oldRecipeUi);
     }
 
-    @Override
-    public void insertRecipe(RecipeUi recipeUi) {
-        presenter.insertRecipe(recipeUi);
-    }
-
-    @Override
-    public void deleteSelectedRecipe(int recipeId) {
-        presenter.deleteSelectedRecipe(recipeId);
-    }
-
-    @Override
-    public void insertSelectedRecipe(int recipeId) {
-        presenter.insertSelectedRecipe(recipeId);
-    }
-
-    @Override
-    public boolean isRecipeFavorite(int id) {
-        return presenter.isRecipeFavorite(id);
-    }
     @Override
     public void onItemShare(RecipeUi recipe) {
         showRecipeShare(recipe);
@@ -157,6 +134,11 @@ public class HomeFragment extends Fragment implements RecipeInterface, HomeContr
     @Override
     public void toggleFavoriteRecipe(RecipeUi recipeUi) {
         presenter.onToggleFavoriteRecipeClick(recipeUi);
+    }
+
+    @Override
+    public void toggleCartRecipe(RecipeUi recipeUi) {
+        presenter.onToggleCartRecipeClick(recipeUi);
     }
 
     private String getStringIngredients(List<IngredientUi> ingredients) {
@@ -193,12 +175,14 @@ public class HomeFragment extends Fragment implements RecipeInterface, HomeContr
     @Override
     public void recipeAddedToFavorites(RecipeUi recipeUi) {
         adapter.itemChanged(adapter.getPositionForRecipe(recipeUi));
+        Log.d(TAG, "recipeAddedToFavorites: added to fav: " + recipeUi.isFav() + " id: " + recipeUi.getId());
         Toast.makeText(requireContext(), "Added to Favorites", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void recipeRemovedFromFavorites(RecipeUi recipeUi) {
         adapter.itemChanged(adapter.getPositionForRecipe(recipeUi));
+        Log.d(TAG, "recipeAddedToFavorites: removed to fav: " + recipeUi.isFav() + " id: " + recipeUi.getId());
         Toast.makeText(requireContext(), "Removed from Favorites", Toast.LENGTH_SHORT).show();
     }
 
@@ -206,6 +190,20 @@ public class HomeFragment extends Fragment implements RecipeInterface, HomeContr
     public void onRecipeDeleted(RecipeUi recipe) {
         adapter.removeRecipe(recipe);
         Toast.makeText(requireContext(), "Recipe deleted: " + recipe.getRecipeName(), Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void recipeAddedToCart(RecipeUi recipeUi) {
+        adapter.itemChanged(adapter.getPositionForRecipe(recipeUi));
+        Log.d(TAG, "recipeAddedToFavorites: added to CART: " + recipeUi.isFav() + " id: " + recipeUi.getId());
+        Toast.makeText(requireContext(), R.string.added_to_cart, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void recipeRemovedFromCart(RecipeUi recipeUi) {
+        adapter.itemChanged(adapter.getPositionForRecipe(recipeUi));
+        Log.d(TAG, "recipeAddedToFavorites: deleted to CART: " + recipeUi.isFav() + " id: " + recipeUi.getId());
+        Toast.makeText(requireContext(), R.string.removed_from_cart, Toast.LENGTH_SHORT).show();
     }
 
     @Override

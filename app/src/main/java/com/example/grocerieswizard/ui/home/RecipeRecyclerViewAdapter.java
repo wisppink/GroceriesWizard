@@ -52,18 +52,9 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
 
             rowBinding.addCart.setOnClickListener(v -> {
                 int position = rowHolder.getAdapterPosition();
+                RecipeUi recipeUi = recipeUiList.get(position);
                 if (position != RecyclerView.NO_POSITION) {
-                    RecipeUi recipeUi = recipeUiList.get(position);
-                    boolean isItInCart = recipeInterface.isRecipeSelected(recipeUi.getId());
-                    if (!isItInCart) {
-                        rowBinding.addCart.setImageResource(R.drawable.baseline_remove_shopping_cart_24);
-                        recipeInterface.insertSelectedRecipe(recipeUi.getId());
-                        Toast.makeText(rowBinding.getRoot().getContext(), R.string.added_to_cart, Toast.LENGTH_SHORT).show();
-                    } else {
-                        rowBinding.addCart.setImageResource(R.drawable.add_cart);
-                        recipeInterface.deleteSelectedRecipe(recipeUi.getId());
-                        Toast.makeText(rowBinding.getRoot().getContext(), R.string.removed_from_cart, Toast.LENGTH_SHORT).show();
-                    }
+                   recipeInterface.toggleCartRecipe(recipeUi);
                 }
             });
 
@@ -189,7 +180,7 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
                 binding.defaultCardRecipeImage.setImageResource(R.drawable.recipe_image_default);
             }*/
 
-            if (recipeInterface.isRecipeSelected(recipeUi.getId())) {
+            if (recipeUi.isCart()) {
                 binding.addCart.setImageResource(R.drawable.baseline_remove_shopping_cart_24);
 
             } else {

@@ -46,11 +46,11 @@ public class FavRecyclerViewAdapter extends RecyclerView.Adapter<FavRecyclerView
             RecipeUi recipeUi = favList.get(holder.getAdapterPosition());
             if (!favInterface.isRecipeSelected(recipeUi.getId())) {
                 binding.unCart.setImageResource(R.drawable.baseline_remove_shopping_cart_24);
-                favInterface.insertSelectedRecipe(recipeUi.getId());
+                favInterface.insertSelectedRecipe(recipeUi);
                 Toast.makeText(binding.getRoot().getContext(), R.string.added_to_cart, Toast.LENGTH_SHORT).show();
             } else {
                 binding.unCart.setImageResource(R.drawable.add_cart);
-                favInterface.removeSelectedRecipe(recipeUi.getId());
+                favInterface.removeSelectedRecipe(recipeUi);
                 Toast.makeText(binding.getRoot().getContext(), R.string.removed_from_cart, Toast.LENGTH_SHORT).show();
             }
             favInterface.updateIt(holder.getAdapterPosition());
