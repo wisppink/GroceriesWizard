@@ -25,7 +25,7 @@ public class FavRecyclerViewAdapter extends RecyclerView.Adapter<FavRecyclerView
     @Override
     public FavViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         FavItemRowBinding binding = FavItemRowBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
-        FavViewHolder holder = new FavViewHolder(binding, favInterface);
+        FavViewHolder holder = new FavViewHolder(binding);
         binding.unFav.setOnClickListener(v -> {
             int position = holder.getAdapterPosition();
             RecipeUi recipeUi = favList.get(position);
@@ -91,16 +91,9 @@ public class FavRecyclerViewAdapter extends RecyclerView.Adapter<FavRecyclerView
 
         private FavItemRowBinding binding;
 
-        FavInterface favInterface;
-
-        public void setFavInterface(FavInterface favInterface) {
-            this.favInterface = favInterface;
-        }
-
-        public FavViewHolder(FavItemRowBinding binding, FavInterface favInterface) {
+        public FavViewHolder(FavItemRowBinding binding) {
             super(binding.getRoot());
             setBinding(binding);
-            setFavInterface(favInterface);
         }
 
         public void bind(RecipeUi recipeUi) {
