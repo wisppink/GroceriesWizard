@@ -1,11 +1,12 @@
 package com.example.grocerieswizard.ui.fav;
 
+import android.util.Log;
+
 import com.example.grocerieswizard.data.local.model.RecipeItem;
 import com.example.grocerieswizard.data.repo.RecipeRepository;
 import com.example.grocerieswizard.ui.UiMapper;
 import com.example.grocerieswizard.ui.model.RecipeUi;
 
-import java.util.List;
 import java.util.stream.Collectors;
 
 public class FavPresenter implements FavContract.Presenter {
@@ -13,6 +14,7 @@ public class FavPresenter implements FavContract.Presenter {
     FavContract.View view;
     private final RecipeRepository recipeRepository;
     private final UiMapper uiMapper;
+    private static final String TAG = "FavPresenter";
 
     public FavPresenter(RecipeRepository recipeRepository, UiMapper uiMapper) {
         this.recipeRepository = recipeRepository;
@@ -23,35 +25,51 @@ public class FavPresenter implements FavContract.Presenter {
         this.view = view;
     }
 
-    public void setFavList() {
-        List<RecipeUi> recipeUis = recipeRepository.getFavoriteRecipes().stream()
-                .map(favItem -> {
-                    RecipeItem recipe = recipeRepository.getRecipeByRecipeId(favItem.getRecipeId());
-                    recipe.setFav(true);
-                    return uiMapper.toRecipeUi(recipe);
-                })
-                .collect(Collectors.toList());
+    @Override
+    public void unbindView() {
+        this.view = null;
+    }
+
+    public void loadRecipes() {
         if (view != null) {
-            view.showFavList(recipeUis);
+            view.showRecipes(recipeRepository.getFavoriteRecipes().stream()
+                    .map(favItem -> {
+                        RecipeItem recipe = recipeRepository.getRecipeByRecipeId(favItem.getRecipeId());
+                        recipe.setFav(true);
+                        return uiMapper.toRecipeUi(recipe);
+                    })
+                    .collect(Collectors.toList()));
         }
     }
 
-    public void removeFromFavorites(RecipeUi recipeUi) {
-        recipeRepository.deleteRecipeFromFavorites(recipeUi);
-        if (view != null) {
-            view.removeFromFavorites(recipeUi);
+    public void onToggleFavoriteRecipeClick(RecipeUi recipeUi) {
+        Log.d(TAG, "onToggleFavoriteRecipeClick: recipeUi came to the presenter as: " + recipeUi.isFav());
+        if (recipeUi.isFav()) {
+            recipeUi.setFav(false);
+           view.showDeleteConfirmation(recipeUi);
+        } else {
+            recipeUi.setFav(true);
+            recipeRepository.insertRecipeFav(recipeUi);
+            view.recipeAddedToFavorites(recipeUi);
         }
     }
 
-    public boolean isRecipeInCart(int id) {
-        return recipeRepository.isRecipeInCart(id);
+    public void onToggleCartRecipeClick(RecipeUi recipeUi) {
+        Log.d(TAG, "onToggleCartRecipeClick: recipeUi came to the presenter as: " + recipeUi.isCart());
+        if (recipeUi.isCart()) {
+            recipeUi.setCart(false);
+            recipeRepository.deleteRecipeFromCart(recipeUi);
+            view.recipeRemovedFromCart(recipeUi);
+        } else {
+            recipeUi.setCart(true);
+            recipeRepository.insertCartItem(recipeUi);
+            view.recipeAddedToCart(recipeUi);
+        }
     }
 
-    public void insertCartItem(RecipeUi recipeUi) {
-        recipeRepository.insertCartItem(recipeUi);
-    }
-
-    public void removeFromCart(RecipeUi recipeUi) {
-        recipeRepository.deleteRecipeFromCart(recipeUi);
+    public void deleteFromDB(RecipeUi recipe) {
+        recipeRepository.deleteRecipeFromFavorites(recipe);
+        view.onRecipeDeleted(recipe);
     }
 }
+

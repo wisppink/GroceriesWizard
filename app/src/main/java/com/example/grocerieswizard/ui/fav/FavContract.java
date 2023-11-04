@@ -6,23 +6,29 @@ import java.util.List;
 
 public interface FavContract {
     interface View {
-        void showFavList(List<RecipeUi> recipeUis);
 
-        void removeFromFavorites(RecipeUi recipeUi);
+        void recipeAddedToFavorites(RecipeUi recipeUi);
+
+        void recipeAddedToCart(RecipeUi recipeUi);
+
+        void recipeRemovedFromCart(RecipeUi recipeUi);
+
+        void showRecipes(List<RecipeUi> recipeUiList);
+
+        void showDeleteConfirmation(RecipeUi recipeUi);
+
+        void onRecipeDeleted(RecipeUi recipe);
     }
 
     interface Presenter {
 
         void bindView(View view);
 
-        void setFavList();
+        void unbindView();
+        void loadRecipes();
 
-        void removeFromFavorites(RecipeUi recipeUi);
+        void onToggleFavoriteRecipeClick(RecipeUi recipeUi);
 
-        boolean isRecipeInCart(int id);
-
-        void insertCartItem(RecipeUi id);
-
-        void removeFromCart(RecipeUi id);
+        void onToggleCartRecipeClick(RecipeUi recipeUi);
     }
 }
