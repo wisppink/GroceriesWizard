@@ -31,7 +31,6 @@ import com.example.grocerieswizard.R;
 import com.example.grocerieswizard.databinding.DialogAddIngredientBinding;
 import com.example.grocerieswizard.databinding.FragmentAddRecipeBinding;
 import com.example.grocerieswizard.di.GroceriesWizardInjector;
-import com.example.grocerieswizard.ui.home.RecipeRecyclerViewAdapter;
 import com.example.grocerieswizard.ui.model.IngredientUi;
 import com.example.grocerieswizard.ui.model.RecipeUi;
 import com.squareup.picasso.Picasso;
@@ -75,7 +74,6 @@ public class AddRecipeFragment extends Fragment implements AddInterface, AddReci
         binding.recyclerViewIngredients.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.recyclerViewIngredients.setAdapter(ingredientAdapter);
 
-        RecipeRecyclerViewAdapter recipeAdapter = new RecipeRecyclerViewAdapter();
         Uri defaultImageUri = Uri.parse("android.resource://com.example.grocerieswizard/" + R.drawable.recipe_image_default);
 
 
@@ -98,13 +96,8 @@ public class AddRecipeFragment extends Fragment implements AddInterface, AddReci
             binding.editRecipeHowToPrepare.setText(recipeUi.getInstructions());
             ingredientList.addAll(recipeUi.getIngredients());
             //Bitmap selectedImageBitmap = recipeUi.getImageBitmap();
-            //get new ones to update
-            String recipeName = binding.editRecipeName.getText().toString();
-            String howToPrepare = binding.editRecipeHowToPrepare.getText().toString();
-
-            RecipeUi editedRecipeUi = new RecipeUi(recipeName, ingredientList, howToPrepare);
             //, selectedImageBitmap
-            this.recipeUi = recipeAdapter.editRecipe(position, editedRecipeUi);
+
             ingredientAdapter.changeItem(position);
             //binding.addImage.setImageBitmap(selectedImageBitmap);
         } else {
