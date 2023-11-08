@@ -11,6 +11,8 @@ public class RecipeUi implements Parcelable {
     private String instructions;
     private List<IngredientUi> ingredients;
     private boolean isSwiped;
+    private boolean isFav;
+    private boolean isCart;
     private int id;
 
     public RecipeUi(String recipeName, List<IngredientUi> ingredients, String instructions) {
@@ -19,6 +21,8 @@ public class RecipeUi implements Parcelable {
         this.instructions = instructions;
         //this.imageBitmap = imageBitmap;
         isSwiped = false;
+        isFav = false;
+        isCart = false;
     }
 
     protected RecipeUi(Parcel in) {
@@ -106,6 +110,21 @@ public class RecipeUi implements Parcelable {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public boolean isFav() {
+        return isFav;
+    }
+
+    public void setFav(boolean fav) {
+        isFav = fav;
+    }
+    public boolean isCart() {
+        return isCart;
+    }
+
+    public void setCart(boolean cart) {
+        isCart = cart;
     }
 
 }

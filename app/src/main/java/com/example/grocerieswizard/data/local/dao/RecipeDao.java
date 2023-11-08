@@ -14,8 +14,8 @@ public interface RecipeDao {
     @Insert
     void insert(RecipeItem recipeItem);
 
-    @Query("UPDATE recipe SET name = :newName, instructors = :newInstructors, ingredientList = :newIngredientList WHERE id = :oldRecipeId")
-    int updateRecipe(long oldRecipeId, String newName, String newInstructors, List<IngredientItem> newIngredientList);
+    @Query("UPDATE recipe SET name = :newName, instructors = :newInstructors, ingredientList = :newIngredientList, isFav = :newIsFav, isCart = :newIsCart  WHERE id = :oldRecipeId")
+    int updateRecipe(long oldRecipeId, String newName, String newInstructors, List<IngredientItem> newIngredientList,Boolean newIsFav, Boolean newIsCart );
 
 
     @Query("DELETE FROM recipe WHERE id = :recipeId")

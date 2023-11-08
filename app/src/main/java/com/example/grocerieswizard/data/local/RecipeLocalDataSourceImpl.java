@@ -8,6 +8,7 @@ import com.example.grocerieswizard.data.local.model.CartItem;
 import com.example.grocerieswizard.data.local.model.FavItem;
 import com.example.grocerieswizard.data.local.model.IngredientItem;
 import com.example.grocerieswizard.data.local.model.RecipeItem;
+import com.example.grocerieswizard.ui.model.RecipeUi;
 
 import java.util.List;
 
@@ -35,13 +36,13 @@ public class RecipeLocalDataSourceImpl implements RecipeLocalDataSource {
     }
 
     @Override
-    public void deleteRecipe(int recipeId) {
-        recipeDao.delete(recipeId);
+    public void deleteRecipe(RecipeUi recipeUi) {
+        recipeDao.delete(recipeUi.getId());
     }
 
     @Override
     public int updateRecipe(int oldRecipeId, RecipeItem recipe) {
-        return recipeDao.updateRecipe(oldRecipeId, recipe.getName(), recipe.getInstructors(), recipe.getIngredientList());
+        return recipeDao.updateRecipe(oldRecipeId, recipe.getName(), recipe.getInstructors(), recipe.getIngredientList(), recipe.isFav(), recipe.isCart());
     }
 
     @Override
@@ -61,8 +62,8 @@ public class RecipeLocalDataSourceImpl implements RecipeLocalDataSource {
     }
 
     @Override
-    public void deleteCartItem(int recipeId) {
-        cartDao.deleteCartItem(recipeId);
+    public void deleteCartItem(RecipeUi recipeUi) {
+        cartDao.deleteCartItem(recipeUi.getId());
     }
 
     @Override
@@ -77,8 +78,8 @@ public class RecipeLocalDataSourceImpl implements RecipeLocalDataSource {
     }
 
     @Override
-    public void insertRecipeFav(int recipeId) {
-        FavItem favItem = new FavItem(recipeId);
+    public void insertRecipeFav(RecipeUi recipeUi) {
+        FavItem favItem = new FavItem(recipeUi.getId());
         favDao.insert(favItem);
     }
 
@@ -86,12 +87,6 @@ public class RecipeLocalDataSourceImpl implements RecipeLocalDataSource {
     public void deleteRecipeFav(int recipeId) {
         favDao.deleteFavItem(recipeId);
     }
-
-    @Override
-    public boolean isRecipeFavorite(int recipeId) {
-        return favDao.isRecipeInFav(recipeId);
-    }
-
 
     @Override
     public void deleteIngredient(IngredientItem ingredientItem) {

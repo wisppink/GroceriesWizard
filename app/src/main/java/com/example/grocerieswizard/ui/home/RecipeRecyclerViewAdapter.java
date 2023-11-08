@@ -39,37 +39,23 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
         if (viewType == VIEW_TYPE_ROW) {
             RecyclerViewRowBinding rowBinding = RecyclerViewRowBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
             RecyclerView.ViewHolder rowHolder = new RowViewHolder(rowBinding, recipeInterface);
+
+            rowBinding.getRoot().setOnClickListener(
+                    v -> recipeInterface.onItemClick(recipeUiList.get(rowHolder.getAdapterPosition()))
+            );
             rowBinding.favIcon.setOnClickListener(v -> {
                 int position = rowHolder.getAdapterPosition();
+                RecipeUi recipeUi = recipeUiList.get(position);
                 if (position != RecyclerView.NO_POSITION) {
-                    RecipeUi recipeUi = recipeUiList.get(position);
-                    int recipeId = recipeUi.getId();
-                    boolean isCurrentlyFavorite = recipeInterface.isRecipeFavorite(recipeUi.getId());
-                    if (!isCurrentlyFavorite) {
-                        rowBinding.favIcon.setImageResource(R.drawable.baseline_favorite_24);
-                        recipeInterface.insertRecipeFav(recipeId);
-                        Toast.makeText(rowBinding.getRoot().getContext(), "Added to Favorites", Toast.LENGTH_SHORT).show();
-                    } else {
-                        rowBinding.favIcon.setImageResource(R.drawable.baseline_unfavorite_border_24);
-                        recipeInterface.deleteRecipeFav(recipeId);
-                        Toast.makeText(rowBinding.getRoot().getContext(), "Removed from Favorites", Toast.LENGTH_SHORT).show();
-                    }
+                    recipeInterface.toggleFavoriteRecipe(recipeUi);
                 }
             });
+
             rowBinding.addCart.setOnClickListener(v -> {
                 int position = rowHolder.getAdapterPosition();
+                RecipeUi recipeUi = recipeUiList.get(position);
                 if (position != RecyclerView.NO_POSITION) {
-                    RecipeUi recipeUi = recipeUiList.get(position);
-                    boolean isItInCart = recipeInterface.isRecipeSelected(recipeUi.getId());
-                    if (!isItInCart) {
-                        rowBinding.addCart.setImageResource(R.drawable.baseline_remove_shopping_cart_24);
-                        recipeInterface.insertSelectedRecipe(recipeUi.getId());
-                        Toast.makeText(rowBinding.getRoot().getContext(), R.string.added_to_cart, Toast.LENGTH_SHORT).show();
-                    } else {
-                        rowBinding.addCart.setImageResource(R.drawable.add_cart);
-                        recipeInterface.deleteSelectedRecipe(recipeUi.getId());
-                        Toast.makeText(rowBinding.getRoot().getContext(), R.string.removed_from_cart, Toast.LENGTH_SHORT).show();
-                    }
+                   recipeInterface.toggleCartRecipe(recipeUi);
                 }
             });
 
@@ -79,12 +65,12 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
             RecyclerViewMenuBinding menuBinding = RecyclerViewMenuBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
             RecyclerView.ViewHolder menuHolder = new MenuViewHolder(menuBinding);
 
-            menuBinding.editIcon.setOnClickListener(v -> recipeInterface.onItemEdit(menuHolder.getAdapterPosition()));
+            menuBinding.editIcon.setOnClickListener(v -> recipeInterface.onItemEdit(recipeUiList.get(menuHolder.getAdapterPosition())));
             menuBinding.shareIcon.setOnClickListener(v -> {
-                recipeInterface.onItemShare(menuHolder.getAdapterPosition());
+                recipeInterface.onItemShare(recipeUiList.get((menuHolder.getAdapterPosition())));
                 Toast.makeText(menuBinding.getRoot().getContext(), "Share icon clicked", Toast.LENGTH_SHORT).show();
             });
-            menuBinding.deleteIcon.setOnClickListener(v -> recipeInterface.onItemDelete(menuHolder.getAdapterPosition()));
+            menuBinding.deleteIcon.setOnClickListener(v -> recipeInterface.onItemDelete(recipeUiList.get(menuHolder.getAdapterPosition())));
 
             return menuHolder;
         }
@@ -118,7 +104,6 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
         notifyItemChanged(pos);
         recipeUiList.remove(pos);
         notifyItemRemoved(pos);
-        recipeInterface.deleteRecipe(recipeUi.getId());
     }
 
     public void setRecyclerViewInterface(RecipeInterface recipeInterface) {
@@ -136,6 +121,15 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
         notifyItemChanged(position);
     }
 
+    public int getPositionForRecipe(RecipeUi recipe) {
+        for (int i = 0; i < recipeUiList.size(); i++) {
+            if (recipeUiList.get(i).getId() == recipe.getId()) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
     public static class RowViewHolder extends RecyclerView.ViewHolder {
         RecipeInterface recipeInterface;
         RecyclerViewRowBinding binding;
@@ -149,30 +143,22 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
             setBinding(binding);
             this.recipeInterface = recipeInterface;
 
-            binding.getRoot().setOnClickListener(
-                    v -> recipeInterface.onItemClick(getAdapterPosition())
-            );
         }
 
         public void bind(RecipeUi recipeUi) {
             binding.textView.setText(recipeUi.getRecipeName());
-
+            if (recipeUi.isFav()) {
+                binding.favIcon.setImageResource(R.drawable.baseline_favorite_24);
+            } else {
+                binding.favIcon.setImageResource(R.drawable.baseline_unfavorite_border_24);
+            }
             /*if (recipeUi.getImageBitmap() != null) {
                 binding.defaultCardRecipeImage.setImageBitmap(recipeUi.getImageBitmap());
             } else {
                 binding.defaultCardRecipeImage.setImageResource(R.drawable.recipe_image_default);
             }*/
 
-
-            if (recipeInterface.isRecipeFavorite(recipeUi.getId())) {
-                // Set the favorite icon if it is favorite
-                binding.favIcon.setImageResource(R.drawable.baseline_favorite_24);
-            } else {
-                // Set the non-favorite icon if it is not favorite
-                binding.favIcon.setImageResource(R.drawable.baseline_unfavorite_border_24);
-            }
-
-            if (recipeInterface.isRecipeSelected(recipeUi.getId())) {
+            if (recipeUi.isCart()) {
                 binding.addCart.setImageResource(R.drawable.baseline_remove_shopping_cart_24);
 
             } else {

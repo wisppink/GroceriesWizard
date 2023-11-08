@@ -1,5 +1,7 @@
 package com.example.grocerieswizard.data.repo;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import com.example.grocerieswizard.data.local.RecipeLocalDataSource;
@@ -9,6 +11,7 @@ import com.example.grocerieswizard.data.local.model.IngredientItem;
 import com.example.grocerieswizard.data.local.model.RecipeItem;
 import com.example.grocerieswizard.data.remote.RecipeRemoteDataSource;
 import com.example.grocerieswizard.data.remote.model.MealResponse;
+import com.example.grocerieswizard.ui.model.RecipeUi;
 
 import java.util.List;
 
@@ -34,8 +37,8 @@ public class RecipeRepositoryImpl implements RecipeRepository {
     }
 
     @Override
-    public void deleteRecipe(int recipeId) {
-        localDataSource.deleteRecipe(recipeId);
+    public void deleteRecipe(RecipeUi recipeUi) {
+        localDataSource.deleteRecipe(recipeUi);
 
     }
 
@@ -61,21 +64,21 @@ public class RecipeRepositoryImpl implements RecipeRepository {
     }
 
     @Override
-    public void deleteRecipeFromFavorites(int recipeId) {
-        localDataSource.deleteRecipeFav(recipeId);
+    public void deleteRecipeFromFavorites(RecipeUi recipeUi) {
+        String TAG = "implementer ";
+        Log.d(TAG, "insertRecipeFav: id: " + recipeUi.getId());
+        localDataSource.deleteRecipeFav(recipeUi.getId());
+        localDataSource.updateRecipe(recipeUi.getId(),mapper.uiToRecipe(recipeUi));
     }
 
     @Override
-    public void insertRecipeFav(int recipeId) {
-        localDataSource.insertRecipeFav(recipeId);
+    public void insertRecipeFav(RecipeUi recipeUi) {
+        String TAG = "implementer ";
+        Log.d(TAG, "insertRecipeFav: recipeUi: " + recipeUi.isFav());
+        Log.d(TAG, "insertRecipeFav: id: " + recipeUi.getId());
+        localDataSource.insertRecipeFav(recipeUi);
+        localDataSource.updateRecipe(recipeUi.getId(),mapper.uiToRecipe(recipeUi));
     }
-
-    @Override
-    public boolean isRecipeFavorite(int recipeId) {
-        return localDataSource.isRecipeFavorite(recipeId);
-    }
-
-
     @Override
     public void deleteIngredient(IngredientItem ingredientItem) {
         localDataSource.deleteIngredient(ingredientItem);
@@ -93,14 +96,14 @@ public class RecipeRepositoryImpl implements RecipeRepository {
     }
 
     @Override
-    public void insertCartItem(CartItem cartItem) {
-        localDataSource.insertCartItem(cartItem);
+    public void insertCartItem(RecipeUi recipeUi) {
+        String TAG = "implementer ";
+        Log.d(TAG, "insertCartItem: recipeUi: " + recipeUi.isCart());
+        Log.d(TAG, "insertCartItem: id: " + recipeUi.getId());
+        localDataSource.insertCartItem(new CartItem(recipeUi.getId()));
+        localDataSource.updateRecipe(recipeUi.getId(),mapper.uiToRecipe(recipeUi));
     }
 
-    @Override
-    public void deleteCartItem(int recipeId) {
-        localDataSource.deleteCartItem(recipeId);
-    }
 
     @Override
     public List<CartItem> getCartItems() {
@@ -125,5 +128,11 @@ public class RecipeRepositoryImpl implements RecipeRepository {
                 callback.onError(new Exception(t));
             }
         });
+    }
+
+    @Override
+    public void deleteRecipeFromCart(RecipeUi recipeUi) {
+        localDataSource.deleteCartItem(recipeUi);
+        localDataSource.updateRecipe(recipeUi.getId(),mapper.uiToRecipe(recipeUi));
     }
 }

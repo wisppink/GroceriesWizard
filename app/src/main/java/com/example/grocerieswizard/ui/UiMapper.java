@@ -1,5 +1,7 @@
 package com.example.grocerieswizard.ui;
 
+import android.util.Log;
+
 import com.example.grocerieswizard.data.local.model.IngredientDesc;
 import com.example.grocerieswizard.data.local.model.IngredientItem;
 import com.example.grocerieswizard.data.local.model.RecipeItem;
@@ -11,8 +13,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class UiMapper {
+    private static final String TAG = "UiMapper";
+
     public RecipeUi toRecipeUi(RecipeItem recipe) {
+        Log.d(TAG, "toRecipeUi: recipe is fav: " + recipe.isFav());
         RecipeUi recipeUi = new RecipeUi(recipe.getName(), toIngredientUi(recipe.getIngredientList()), recipe.getInstructors());
+        recipeUi.setFav(recipe.isFav());
+        Log.d(TAG, "toRecipeUi: recipe is cart: " + recipe.isCart());
+        recipeUi.setCart(recipe.isCart());
         //, recipe.getImageBitmap()
         //Log.d(TAG, "toRecipeUi: recipe image bitmap: " + recipe.getImageBitmap());
         recipeUi.setId((int) recipe.getId());
@@ -21,7 +29,12 @@ public class UiMapper {
 
 
     public RecipeItem toRecipe(RecipeUi recipeUi) {
-        return new RecipeItem(recipeUi.getRecipeName(), recipeUi.getInstructions(), toIngredients(recipeUi.getIngredients()));
+        RecipeItem recipe = new RecipeItem(recipeUi.getRecipeName(), recipeUi.getInstructions(), toIngredients(recipeUi.getIngredients()));
+        recipe.setFav(recipeUi.isFav());
+        recipe.setCart(recipeUi.isCart());
+        Log.d(TAG, "toRecipe: recipeUi: FAV " + recipeUi.isFav());
+        Log.d(TAG, "toRecipe: recipeUi: CART " + recipeUi.isCart());
+        return recipe;
         //,recipeUi.getImageBitmap())
     }
 
@@ -44,4 +57,5 @@ public class UiMapper {
         IngredientDesc ingredientDesc = new IngredientDesc(ingredientUi.getName());
         return new IngredientItem(ingredientDesc, ingredientUi.getQuantity(), ingredientUi.getUnit());
     }
+
 }
