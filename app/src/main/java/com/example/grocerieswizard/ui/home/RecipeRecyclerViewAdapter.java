@@ -1,5 +1,6 @@
 package com.example.grocerieswizard.ui.home;
 
+import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -104,26 +105,6 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
         return recipeUiList.size();
     }
 
-    public RecipeUi editRecipe(int position, RecipeUi editedRecipeUi) {
-        if (position >= 0 && position < recipeUiList.size()) {
-            RecipeUi oldRecipeUi = getItemAtPosition(position);
-            oldRecipeUi.setRecipeName(editedRecipeUi.getRecipeName());
-            //oldRecipeUi.setImageBitmap(editedRecipeUi.getImageBitmap());
-            //Log.d(TAG, "editRecipe: editedRecipe" + editedRecipeUi.getImageBitmap());
-            //Log.d(TAG, "editRecipe: oldRecipe" + oldRecipeUi.getImageBitmap());
-
-            oldRecipeUi.setInstructions(editedRecipeUi.getInstructions());
-            oldRecipeUi.setIngredients(editedRecipeUi.getIngredients());
-            editedRecipeUi.setSwiped(false);
-            int updatedRows = recipeInterface.updateRecipe(oldRecipeUi);
-            if (updatedRows > 0) {
-                notifyItemChanged(position);
-            }
-        }
-
-        return editedRecipeUi;
-    }
-
     public RecipeUi getItemAtPosition(int position) {
         if (position >= 0 && position < recipeUiList.size()) {
             return recipeUiList.get(position);
@@ -133,8 +114,6 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
 
     // Remove a recipe from the list and notify the adapter
     public void removeRecipe(RecipeUi recipeUi) {
-        // Find the position of the recipe in the list
-        recipeUi.setSwiped(false);
         int pos = recipeUiList.indexOf(recipeUi);
         notifyItemChanged(pos);
         recipeUiList.remove(pos);
@@ -146,12 +125,11 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
         this.recipeInterface = recipeInterface;
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     public void setRecipeList(List<RecipeUi> rList) {
         recipeUiList.clear();
-        for (RecipeUi recipeUi : rList) {
-            recipeUiList.add(recipeUi);
-            notifyItemInserted(recipeUiList.size() - 1);
-        }
+        recipeUiList.addAll(rList);
+        notifyDataSetChanged();
     }
 
     public void itemChanged(int position) {
