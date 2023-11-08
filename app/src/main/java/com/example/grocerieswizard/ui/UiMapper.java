@@ -21,8 +21,8 @@ public class UiMapper {
         recipeUi.setFav(recipe.isFav());
         Log.d(TAG, "toRecipeUi: recipe is cart: " + recipe.isCart());
         recipeUi.setCart(recipe.isCart());
-        //, recipe.getImageBitmap()
-        //Log.d(TAG, "toRecipeUi: recipe image bitmap: " + recipe.getImageBitmap());
+        recipeUi.setImage(recipe.getImage());
+        Log.d(TAG, "toRecipeUi: " + recipe.getImage());
         recipeUi.setId((int) recipe.getId());
         return recipeUi;
     }
@@ -32,10 +32,10 @@ public class UiMapper {
         RecipeItem recipe = new RecipeItem(recipeUi.getRecipeName(), recipeUi.getInstructions(), toIngredients(recipeUi.getIngredients()));
         recipe.setFav(recipeUi.isFav());
         recipe.setCart(recipeUi.isCart());
+        recipe.setImage(recipeUi.getImage());
         Log.d(TAG, "toRecipe: recipeUi: FAV " + recipeUi.isFav());
         Log.d(TAG, "toRecipe: recipeUi: CART " + recipeUi.isCart());
         return recipe;
-        //,recipeUi.getImageBitmap())
     }
 
     private List<IngredientItem> toIngredients(List<IngredientUi> ingredients) {

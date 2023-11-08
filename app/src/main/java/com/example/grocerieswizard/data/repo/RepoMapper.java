@@ -26,8 +26,11 @@ public class RepoMapper {
     }
 
     RecipeItem toRecipe(Meal meal) {
-        return new RecipeItem(meal.getStrMeal(), meal.getStrInstructions(), meal.getIngredients());
-        //, meal.getStrMealThumb())
+        RecipeItem recipe = new RecipeItem(meal.getStrMeal(), meal.getStrInstructions(), meal.getIngredients());
+        Log.d(TAG, "toRecipe: image: " + meal.getStrMealThumb());
+        recipe.setImage(meal.getStrMealThumb());
+        Log.d(TAG, "toRecipe: recipe image " + recipe.getImage());
+        return recipe;
     }
 
     public RecipeItem uiToRecipe(RecipeUi recipeUi) {
@@ -35,6 +38,7 @@ public class RepoMapper {
         RecipeItem recipeItem = new RecipeItem(recipeUi.getRecipeName(), recipeUi.getInstructions(), toIngredient(recipeUi.getIngredients()));
         recipeItem.setFav(recipeUi.isFav());
         recipeItem.setCart(recipeUi.isCart());
+        recipeItem.setImage(recipeUi.getImage());
         return recipeItem;
     }
 

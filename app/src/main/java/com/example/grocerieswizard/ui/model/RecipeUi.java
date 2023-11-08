@@ -2,6 +2,7 @@ package com.example.grocerieswizard.ui.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 import java.util.List;
 
@@ -14,12 +15,12 @@ public class RecipeUi implements Parcelable {
     private boolean isFav;
     private boolean isCart;
     private int id;
+    private String image;
 
     public RecipeUi(String recipeName, List<IngredientUi> ingredients, String instructions) {
         this.recipeName = recipeName;
         this.ingredients = ingredients;
         this.instructions = instructions;
-        //this.imageBitmap = imageBitmap;
         isSwiped = false;
         isFav = false;
         isCart = false;
@@ -27,7 +28,6 @@ public class RecipeUi implements Parcelable {
 
     protected RecipeUi(Parcel in) {
         recipeName = in.readString();
-        // imageBitmap = in.readParcelable(Uri.class.getClassLoader());
         instructions = in.readString();
         ingredients = in.createTypedArrayList(IngredientUi.CREATOR);
     }
@@ -127,4 +127,12 @@ public class RecipeUi implements Parcelable {
         isCart = cart;
     }
 
+    public String getImage() {
+        Log.d("ui", "getImage: +  " + image);
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
 }

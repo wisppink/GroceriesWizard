@@ -59,6 +59,7 @@ public class AddRecipePresenter implements AddRecipeContract.Presenter {
                 if (data.isEmpty())
                     return;
                 //TODO:recipe image
+
                                 /*
                                 Picasso.get().load(data.get(0).getImageUrl()).resize(150, 150).centerCrop().into(new Target() {
                                     @Override
@@ -83,6 +84,7 @@ public class AddRecipePresenter implements AddRecipeContract.Presenter {
                                 */
 
                 if (view != null) {
+                    Log.d(TAG, "onSuccess: data0: " + data.get(0).getImage());
                     view.showAlertDialogForFoundRecipe(uiMapper.toRecipeUi(data.get(0)), editRecipeHowToPrepare, addImage);
                 }
 

@@ -1,7 +1,5 @@
 package com.example.grocerieswizard.data.remote.model;
 
-import android.graphics.Bitmap;
-
 import com.example.grocerieswizard.data.local.model.IngredientDesc;
 import com.example.grocerieswizard.data.local.model.IngredientItem;
 
@@ -63,7 +61,6 @@ public class Meal {
     private String strCreativeCommonsConfirmed;
     private String dateModified;
     List<IngredientItem> ingredients = new ArrayList<>();
-    private Bitmap imageBitmap;
     private static final String TAG = "Meal";
 
     public String getIdMeal() {
@@ -379,8 +376,4 @@ public class Meal {
         return unit;
     }
 
-
-    public void setImageBitmap(Bitmap imageBitmap) {
-        this.imageBitmap = imageBitmap;
-    }
 }

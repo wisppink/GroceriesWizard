@@ -1,5 +1,7 @@
 package com.example.grocerieswizard.data.local.model;
 
+import android.util.Log;
+
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
@@ -13,7 +15,7 @@ public class RecipeItem {
     String instructors;
     List<IngredientItem> ingredientList;
     boolean isFav;
-
+    String image;
     boolean isCart;
 
     public RecipeItem(String name, String instructors, List<IngredientItem> ingredientList) {
@@ -69,4 +71,14 @@ public class RecipeItem {
     public void setCart(boolean cart) {
         isCart = cart;
     }
+
+    public String getImage() {
+        Log.d("item", "getImage: " + image);
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
 }

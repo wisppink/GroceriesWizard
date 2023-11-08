@@ -1,6 +1,7 @@
 package com.example.grocerieswizard.ui.home;
 
 import android.annotation.SuppressLint;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -12,6 +13,7 @@ import com.example.grocerieswizard.R;
 import com.example.grocerieswizard.databinding.RecyclerViewMenuBinding;
 import com.example.grocerieswizard.databinding.RecyclerViewRowBinding;
 import com.example.grocerieswizard.ui.model.RecipeUi;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +23,7 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
     private static final int VIEW_TYPE_ROW = 0;
     private final ArrayList<RecipeUi> recipeUiList = new ArrayList<>();
     private RecipeInterface recipeInterface;
+    private static final String TAG = "RecipeRecyclerViewAdapt";
 
 
     public RecipeRecyclerViewAdapter() {
@@ -152,11 +155,12 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
             } else {
                 binding.favIcon.setImageResource(R.drawable.baseline_unfavorite_border_24);
             }
-            /*if (recipeUi.getImageBitmap() != null) {
-                binding.defaultCardRecipeImage.setImageBitmap(recipeUi.getImageBitmap());
+            if (recipeUi.getImage() != null) {
+                Picasso.get().load(recipeUi.getImage()).into(binding.defaultCardRecipeImage);
+                Log.d(TAG, "bind: " + recipeUi.getImage());
             } else {
                 binding.defaultCardRecipeImage.setImageResource(R.drawable.recipe_image_default);
-            }*/
+            }
 
             if (recipeUi.isCart()) {
                 binding.addCart.setImageResource(R.drawable.baseline_remove_shopping_cart_24);

@@ -47,6 +47,7 @@ public class AddRecipeFragment extends Fragment implements AddInterface, AddReci
     private RecipeUi recipeUi;
     private static final String TAG = "AddRecipeFragment";
     private ActivityResultLauncher<Intent> pickImageLauncher;
+    private String imageStr;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -188,6 +189,7 @@ public class AddRecipeFragment extends Fragment implements AddInterface, AddReci
             recipeUi.setInstructions(howToPrepare);
             recipeUi.setSwiped(false);
             recipeUi.setIngredients(ingredientList);
+            recipeUi.setImage(imageStr);
 
             Bundle checkEdit = getArguments();
             //if it comes from edit mode, delete original put edited version as new recipe
@@ -269,6 +271,8 @@ public class AddRecipeFragment extends Fragment implements AddInterface, AddReci
             //Log.d(TAG, "showAlert: recipeUi image bitmap: " + recipeUi.getImageBitmap());
             howToPrepare.setText(recipeUi.getInstructions());
             ingredientList.addAll(recipeUi.getIngredients());
+            imageStr = recipeUi.getImage();
+            Log.d(TAG, "showAlertDialogForFoundRecipe: ui image: " + recipeUi.getImage());
             ingredientAdapter.notifyDataSetChanged();
             // addImage.setImageBitmap(bitmap);
         });
