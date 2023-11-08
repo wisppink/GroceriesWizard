@@ -14,7 +14,7 @@ import androidx.room.PrimaryKey;
         )
 )
 public class FavItem {
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
     long id;
     int recipeId;
 

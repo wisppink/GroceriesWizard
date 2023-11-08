@@ -4,13 +4,14 @@ import com.example.grocerieswizard.data.local.model.CartItem;
 import com.example.grocerieswizard.data.local.model.FavItem;
 import com.example.grocerieswizard.data.local.model.IngredientItem;
 import com.example.grocerieswizard.data.local.model.RecipeItem;
+import com.example.grocerieswizard.ui.model.RecipeUi;
 
 import java.util.List;
 
 public interface RecipeRepository {
     List<RecipeItem> getAllRecipes();
 
-    void deleteRecipe(int recipeId);
+    void deleteRecipe(RecipeUi recipeUi);
 
     void insertRecipe(RecipeItem recipeItem);
 
@@ -19,20 +20,15 @@ public interface RecipeRepository {
     RecipeItem getRecipeByRecipeId(int recipeId);
 
 
-    void deleteRecipeFromFavorites(int recipeId);
+    void deleteRecipeFromFavorites(RecipeUi recipeUi);
 
-    void insertRecipeFav(int recipeId);
+    void insertRecipeFav(RecipeUi recipe);
 
     List<FavItem> getFavoriteRecipes();
 
-    boolean isRecipeFavorite(int recipeId);
-
+    void insertCartItem(RecipeUi recipeUi);
 
     List<CartItem> getCartItems();
-
-    void insertCartItem(CartItem cartItem);
-
-    void deleteCartItem(int recipeId);
 
     Boolean isRecipeInCart(int recipeId);
 
@@ -43,4 +39,6 @@ public interface RecipeRepository {
 
 
     void searchMeals(String query, RepositoryCallback<List<RecipeItem>> callback);
+
+    void deleteRecipeFromCart(RecipeUi recipeUi);
 }

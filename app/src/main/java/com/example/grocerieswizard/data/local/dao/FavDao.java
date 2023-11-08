@@ -1,8 +1,8 @@
 package com.example.grocerieswizard.data.local.dao;
 
 import androidx.room.Dao;
+import androidx.room.Insert;
 import androidx.room.Query;
-import androidx.room.Upsert;
 
 import com.example.grocerieswizard.data.local.model.FavItem;
 
@@ -10,9 +10,8 @@ import java.util.List;
 
 @Dao
 public interface FavDao {
-    @Upsert
+    @Insert
     void insert(FavItem favItem);
-
 
     @Query("SELECT * FROM favorite")
     List<FavItem> getAllFavItems();

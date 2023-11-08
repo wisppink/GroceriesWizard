@@ -1,6 +1,7 @@
 package com.example.grocerieswizard.ui.shop;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +26,7 @@ public class ShopFragment extends Fragment {
     private FragmentShopBinding binding;
     private RecipeRepository recipeRepository;
     private UiMapper uiMapper;
+    private static final String TAG = "ShopFragment";
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -45,6 +47,8 @@ public class ShopFragment extends Fragment {
         List<RecipeUi> recipeUis = recipeRepository.getCartItems().stream()
                 .map(cartItem -> {
                     RecipeItem recipe = recipeRepository.getRecipeByRecipeId((int) cartItem.getRecipeId());
+                    recipe.setCart(true);
+                    Log.d(TAG, "onCreateView: recipe set true");
                     return uiMapper.toRecipeUi(recipe);
                 })
                 .collect(Collectors.toList());

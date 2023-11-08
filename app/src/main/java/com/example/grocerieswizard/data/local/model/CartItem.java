@@ -14,7 +14,7 @@ import androidx.room.PrimaryKey;
         )
 )
 public class CartItem {
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
     long id;
     long recipeId;
 

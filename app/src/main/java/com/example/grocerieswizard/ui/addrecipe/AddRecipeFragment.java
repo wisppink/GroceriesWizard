@@ -28,14 +28,9 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.grocerieswizard.R;
-import com.example.grocerieswizard.data.local.model.IngredientItem;
-import com.example.grocerieswizard.data.local.model.RecipeItem;
-import com.example.grocerieswizard.data.repo.RecipeRepository;
-import com.example.grocerieswizard.data.repo.RepositoryCallback;
 import com.example.grocerieswizard.databinding.DialogAddIngredientBinding;
 import com.example.grocerieswizard.databinding.FragmentAddRecipeBinding;
 import com.example.grocerieswizard.di.GroceriesWizardInjector;
-import com.example.grocerieswizard.ui.UiMapper;
 import com.example.grocerieswizard.ui.home.RecipeRecyclerViewAdapter;
 import com.example.grocerieswizard.ui.model.IngredientUi;
 import com.example.grocerieswizard.ui.model.RecipeUi;
@@ -45,10 +40,8 @@ import com.squareup.picasso.Target;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AddRecipeFragment extends Fragment implements AddInterface {
-
-    private RecipeRepository recipeRepository;
-    private UiMapper uiMapper;
+public class AddRecipeFragment extends Fragment implements AddInterface, AddRecipeContract.View {
+    AddRecipePresenter presenter;
     private IngredientAdapter ingredientAdapter;
     private List<IngredientUi> ingredientList;
     private Bitmap defaultImageBitmap;
@@ -60,9 +53,18 @@ public class AddRecipeFragment extends Fragment implements AddInterface {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         GroceriesWizardInjector injector = GroceriesWizardInjector.getInstance();
-        recipeRepository = injector.getRecipeRepository();
-        uiMapper = injector.getUiMapper();
+        presenter = new AddRecipePresenter(injector.getRecipeRepository(), injector.getUiMapper());
+        presenter.bindView(this);
         ingredientList = new ArrayList<>();
+    }
+
+    public static AddRecipeFragment newInstance(RecipeUi recipe, int position) {
+        AddRecipeFragment addRecipeFragment = new AddRecipeFragment();
+        Bundle bundle = new Bundle();
+        bundle.putParcelable("recipeModel", recipe);
+        bundle.putInt("position", position);
+        addRecipeFragment.setArguments(bundle);
+        return addRecipeFragment;
     }
 
     @Override
@@ -125,43 +127,7 @@ public class AddRecipeFragment extends Fragment implements AddInterface {
                         String inputText = binding.editRecipeName.getText().toString().trim();
                         Log.d(TAG, "afterTextChanged: input text " + inputText);
 
-                        recipeRepository.searchMeals(inputText, new RepositoryCallback<List<RecipeItem>>() {
-                            @Override
-                            public void onSuccess(List<RecipeItem> data) {
-                                if (data.isEmpty())
-                                    return;
-                                //TODO:recipe image
-                                /*
-                                Picasso.get().load(data.get(0).getImageUrl()).resize(150, 150).centerCrop().into(new Target() {
-                                    @Override
-                                    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                                        data.get(0).setImageBitmap(bitmap);
-                                        Log.d(TAG, "onBitmapLoaded: success");
-                                        Log.d(TAG, "onBitmapLoaded: recipe image bitmap: " + data.get(0).getImageBitmap());
-                                        showAlertDialogForFoundRecipe(uiMapper.toRecipeUi(data.get(0)), binding.editRecipeHowToPrepare, binding.addImage,bitmap);
-                                        recipeUi.setImageBitmap(bitmap);
-                                    }
-
-                                    @Override
-                                    public void onBitmapFailed(Exception e, Drawable errorDrawable) {
-                                        Log.e(TAG, "onBitmapFailed: ", e);
-                                    }
-
-                                    @Override
-                                    public void onPrepareLoad(Drawable placeHolderDrawable) {
-                                    }
-                                });
-
-                                */
-                                showAlertDialogForFoundRecipe(uiMapper.toRecipeUi(data.get(0)), binding.editRecipeHowToPrepare, binding.addImage);
-                                //,bitmap
-                            }
-
-                            @Override
-                            public void onError(Exception e) {
-                                Log.e(TAG, "onError", e);
-                            }
-                        });
+                        presenter.searchMeal(inputText, binding.editRecipeHowToPrepare, binding.addImage);
                     }, 1000); // 0.5 saniye
                 }
             });
@@ -236,12 +202,12 @@ public class AddRecipeFragment extends Fragment implements AddInterface {
                 if (arguments != null) {
                     RecipeUi recipeUi = arguments.getParcelable("recipeModel");
                     if (recipeUi != null) {
-                        recipeRepository.deleteRecipe(recipeUi.getId());
+                        presenter.deleteRecipe(recipeUi);
                     }
                 }
-                recipeRepository.insertRecipe(uiMapper.toRecipe(recipeUi));
+                presenter.insertRecipe(recipeUi);
             } else {
-                recipeRepository.insertRecipe(uiMapper.toRecipe(recipeUi));
+                presenter.insertRecipe(recipeUi);
             }
             getParentFragmentManager().popBackStack();
         });
@@ -259,7 +225,7 @@ public class AddRecipeFragment extends Fragment implements AddInterface {
     @Override
     public void onItemDelete(IngredientUi ingredientUi) {
         if (ingredientUi != null) {
-            recipeRepository.deleteIngredient(uiMapper.toIngredient(ingredientUi));
+            presenter.deleteIngredient(ingredientUi);
             ingredientAdapter.removeIngredient(ingredientUi, requireContext());
         }
 
@@ -291,9 +257,8 @@ public class AddRecipeFragment extends Fragment implements AddInterface {
             ingredientUi.setName(name);
             ingredientUi.setUnit(unit);
             ingredientUi.setQuantity(quantity);
+            presenter.insertIngredient(ingredientUi);
             ingredientAdapter.addIngredient(ingredientUi);
-            IngredientItem ingredient = uiMapper.toIngredient(ingredientUi);
-            recipeRepository.insertIngredient(ingredient);
 
         });
         builder.setNegativeButton(android.R.string.cancel, (dialog, which) -> dialog.dismiss());
@@ -301,7 +266,8 @@ public class AddRecipeFragment extends Fragment implements AddInterface {
         dialog.show();
     }
 
-    private void showAlertDialogForFoundRecipe(RecipeUi recipeUi, TextView howToPrepare, ImageView addImage) {
+    @Override
+    public void showAlertDialogForFoundRecipe(RecipeUi recipeUi, TextView howToPrepare, ImageView addImage) {
         //, Bitmap bitmap
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         builder.setTitle(R.string.TitleFoundRecipe);
@@ -310,6 +276,7 @@ public class AddRecipeFragment extends Fragment implements AddInterface {
             //Log.d(TAG, "showAlert: recipeUi image bitmap: " + recipeUi.getImageBitmap());
             howToPrepare.setText(recipeUi.getInstructions());
             ingredientList.addAll(recipeUi.getIngredients());
+            ingredientAdapter.notifyDataSetChanged();
             // addImage.setImageBitmap(bitmap);
         });
         builder.setNegativeButton(R.string.no, (dialog, which) -> Log.d(TAG, "showAlertDialogForFoundRecipe: do nothing."));
