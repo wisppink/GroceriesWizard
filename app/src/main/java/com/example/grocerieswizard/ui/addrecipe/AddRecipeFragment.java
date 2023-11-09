@@ -137,6 +137,9 @@ public class AddRecipeFragment extends Fragment implements AddInterface, AddReci
         pickImageLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
             if (result.getResultCode() == RESULT_OK && result.getData() != null) {
                 Uri selectedImageUri = result.getData().getData();
+                if (selectedImageUri != null) {
+                    recipeUi.setImage(selectedImageUri.toString());
+                }
                 try {
                     Picasso.get().load(selectedImageUri).resize(150, 150).centerCrop().into(new Target() {
                         @Override

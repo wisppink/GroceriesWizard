@@ -58,7 +58,7 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
                 int position = rowHolder.getAdapterPosition();
                 RecipeUi recipeUi = recipeUiList.get(position);
                 if (position != RecyclerView.NO_POSITION) {
-                   recipeInterface.toggleCartRecipe(recipeUi);
+                    recipeInterface.toggleCartRecipe(recipeUi);
                 }
             });
 
@@ -156,7 +156,7 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
                 binding.favIcon.setImageResource(R.drawable.baseline_unfavorite_border_24);
             }
             if (recipeUi.getImage() != null) {
-                Picasso.get().load(recipeUi.getImage()).into(binding.defaultCardRecipeImage);
+                Picasso.get().load(android.net.Uri.parse(recipeUi.getImage())).into(binding.defaultCardRecipeImage);
                 Log.d(TAG, "bind: " + recipeUi.getImage());
             } else {
                 binding.defaultCardRecipeImage.setImageResource(R.drawable.recipe_image_default);
