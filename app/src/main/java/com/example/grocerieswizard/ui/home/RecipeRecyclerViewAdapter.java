@@ -22,7 +22,6 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
     private static final int VIEW_TYPE_ROW = 0;
     private final ArrayList<RecipeUi> recipeUiList = new ArrayList<>();
     private RecipeInterface recipeInterface;
-    private static final String TAG = "RecipeRecyclerViewAdapt";
 
     public RecipeRecyclerViewAdapter() {
     }
