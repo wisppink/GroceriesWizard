@@ -25,7 +25,6 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
     private RecipeInterface recipeInterface;
     private static final String TAG = "RecipeRecyclerViewAdapt";
 
-
     public RecipeRecyclerViewAdapter() {
     }
 
@@ -38,11 +37,9 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-
         if (viewType == VIEW_TYPE_ROW) {
             RecyclerViewRowBinding rowBinding = RecyclerViewRowBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
             RecyclerView.ViewHolder rowHolder = new RowViewHolder(rowBinding, recipeInterface);
-
             rowBinding.getRoot().setOnClickListener(
                     v -> recipeInterface.onItemClick(recipeUiList.get(rowHolder.getAdapterPosition()))
             );
@@ -53,7 +50,6 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
                     recipeInterface.toggleFavoriteRecipe(recipeUi);
                 }
             });
-
             rowBinding.addCart.setOnClickListener(v -> {
                 int position = rowHolder.getAdapterPosition();
                 RecipeUi recipeUi = recipeUiList.get(position);
@@ -61,9 +57,7 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
                     recipeInterface.toggleCartRecipe(recipeUi);
                 }
             });
-
             return rowHolder;
-
         } else {
             RecyclerViewMenuBinding menuBinding = RecyclerViewMenuBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
             RecyclerView.ViewHolder menuHolder = new MenuViewHolder(menuBinding);
@@ -71,10 +65,8 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
             menuBinding.editIcon.setOnClickListener(v -> recipeInterface.onItemEdit(recipeUiList.get(menuHolder.getAdapterPosition())));
             menuBinding.shareIcon.setOnClickListener(v -> {
                 recipeInterface.onItemShare(recipeUiList.get((menuHolder.getAdapterPosition())));
-                Toast.makeText(menuBinding.getRoot().getContext(), "Share icon clicked", Toast.LENGTH_SHORT).show();
             });
             menuBinding.deleteIcon.setOnClickListener(v -> recipeInterface.onItemDelete(recipeUiList.get(menuHolder.getAdapterPosition())));
-
             return menuHolder;
         }
     }
@@ -88,7 +80,6 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
         }
     }
 
-
     @Override
     public int getItemCount() {
         return recipeUiList.size();
@@ -101,10 +92,8 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
         return null;
     }
 
-    // Remove a recipe from the list and notify the adapter
     public void removeRecipe(RecipeUi recipeUi) {
         int pos = recipeUiList.indexOf(recipeUi);
-        notifyItemChanged(pos);
         recipeUiList.remove(pos);
         notifyItemRemoved(pos);
     }
@@ -145,7 +134,6 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
             super(binding.getRoot());
             setBinding(binding);
             this.recipeInterface = recipeInterface;
-
         }
 
         public void bind(RecipeUi recipeUi) {
@@ -157,17 +145,13 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
             }
             if (recipeUi.getImage() != null) {
                 Picasso.get().load(android.net.Uri.parse(recipeUi.getImage())).into(binding.defaultCardRecipeImage);
-                Log.d(TAG, "bind: " + recipeUi.getImage());
             } else {
                 binding.defaultCardRecipeImage.setImageResource(R.drawable.recipe_image_default);
             }
-
             if (recipeUi.isCart()) {
                 binding.addCart.setImageResource(R.drawable.baseline_remove_shopping_cart_24);
-
             } else {
                 binding.addCart.setImageResource(R.drawable.add_cart);
-
             }
         }
     }

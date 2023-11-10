@@ -31,6 +31,7 @@ public class HomeFragment extends Fragment implements RecipeInterface, HomeContr
     HomeContract.Presenter presenter;
     private RecipeRecyclerViewAdapter adapter;
     private static final String TAG = "HomeFragment";
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -129,6 +130,7 @@ public class HomeFragment extends Fragment implements RecipeInterface, HomeContr
     @Override
     public void onItemShare(RecipeUi recipe) {
         showRecipeShare(recipe);
+        Toast.makeText(requireContext(), "Share icon clicked", Toast.LENGTH_SHORT).show();
     }
 
     @Override
