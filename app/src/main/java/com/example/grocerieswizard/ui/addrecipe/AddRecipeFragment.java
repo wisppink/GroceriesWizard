@@ -3,12 +3,9 @@ package com.example.grocerieswizard.ui.addrecipe;
 import static android.app.Activity.RESULT_OK;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -34,16 +31,17 @@ import com.example.grocerieswizard.di.GroceriesWizardInjector;
 import com.example.grocerieswizard.ui.model.IngredientUi;
 import com.example.grocerieswizard.ui.model.RecipeUi;
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class AddRecipeFragment extends Fragment implements AddInterface, AddRecipeContract.View {
+    // TODO: This should be [AddRecipeContract.Presenter]
     AddRecipePresenter presenter;
     private IngredientAdapter ingredientAdapter;
+    // TODO: Remove this, Ingredient adapter should have this list
     private List<IngredientUi> ingredientList;
-    private Bitmap defaultImageBitmap;
+    // TODO: Can we make this local object? Always strive to make objects as local as possible.
     private RecipeUi recipeUi;
     private static final String TAG = "AddRecipeFragment";
     private ActivityResultLauncher<Intent> pickImageLauncher;
@@ -61,6 +59,7 @@ public class AddRecipeFragment extends Fragment implements AddInterface, AddReci
     public static AddRecipeFragment newInstance(RecipeUi recipe, int position) {
         AddRecipeFragment addRecipeFragment = new AddRecipeFragment();
         Bundle bundle = new Bundle();
+        // TODO: Create constants for bundle keys
         bundle.putParcelable("recipeModel", recipe);
         bundle.putInt("position", position);
         addRecipeFragment.setArguments(bundle);
@@ -75,15 +74,8 @@ public class AddRecipeFragment extends Fragment implements AddInterface, AddReci
         binding.recyclerViewIngredients.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.recyclerViewIngredients.setAdapter(ingredientAdapter);
 
-        Uri defaultImageUri = Uri.parse("android.resource://com.example.grocerieswizard/" + R.drawable.recipe_image_default);
-
-
-        try {
-            defaultImageBitmap = MediaStore.Images.Media.getBitmap(requireContext().getContentResolver(), defaultImageUri);
-        } catch (Exception e) {
-            Toast.makeText(requireContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
-        }
         //create an empty recipe
+        // TODO: Why do we need empty recipe?
         recipeUi = new RecipeUi(null, null, null);
 
         // Check if the fragment is opened for editing
@@ -102,7 +94,7 @@ public class AddRecipeFragment extends Fragment implements AddInterface, AddReci
             ingredientAdapter.changeItem(position);
             //binding.addImage.setImageBitmap(selectedImageBitmap);
         } else {
-            binding.addImage.setImageURI(defaultImageUri);
+            binding.addImage.setImageResource(R.drawable.recipe_image_default);
             final Handler mHandler = new Handler();
             binding.editRecipeName.addTextChangedListener(new TextWatcher() {
                 @Override
@@ -133,7 +125,6 @@ public class AddRecipeFragment extends Fragment implements AddInterface, AddReci
             showAddIngredientDialog(newIngredient);
         });
 
-
         pickImageLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
             if (result.getResultCode() == RESULT_OK && result.getData() != null) {
                 Uri selectedImageUri = result.getData().getData();
@@ -141,31 +132,16 @@ public class AddRecipeFragment extends Fragment implements AddInterface, AddReci
                     recipeUi.setImage(selectedImageUri.toString());
                 }
                 try {
-                    Picasso.get().load(selectedImageUri).resize(150, 150).centerCrop().into(new Target() {
-                        @Override
-                        public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                            binding.addImage.setImageBitmap(bitmap);
-                            //recipeUi.setImageBitmap(bitmap);
-                        }
-
-                        @Override
-                        public void onBitmapFailed(Exception e, Drawable errorDrawable) {
-                            Toast.makeText(requireContext(), "image error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                        }
-
-                        @Override
-                        public void onPrepareLoad(Drawable placeHolderDrawable) {
-                        }
-                    });
-
+                    Picasso.get().load(selectedImageUri)
+                            .resize(150, 150)
+                            .centerCrop()
+                            .into(binding.addImage);
                 } catch (Exception e) {
                     Toast.makeText(requireContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
-                    binding.addImage.setImageBitmap(defaultImageBitmap);
-                    //  recipeUi.setImageBitmap(defaultImageBitmap);
+                    binding.addImage.setImageResource(R.drawable.recipe_image_default);
                 }
             } else {
-                binding.addImage.setImageBitmap(defaultImageBitmap);
-                //  recipeUi.setImageBitmap(defaultImageBitmap);
+                binding.addImage.setImageResource(R.drawable.recipe_image_default);
             }
         });
 
@@ -183,10 +159,6 @@ public class AddRecipeFragment extends Fragment implements AddInterface, AddReci
                 Toast.makeText(requireContext(), "Please fill all fields!", Toast.LENGTH_SHORT).show();
                 return;
             }
-            /*if (recipeUi.getImageBitmap() == null) {
-                recipeUi.setImageBitmap(defaultImageBitmap);
-                Log.d(TAG, "onCreateView: recipe ui image bitmap null");
-            }*/
 
             recipeUi.setRecipeName(recipeName);
             recipeUi.setInstructions(howToPrepare);
@@ -226,7 +198,6 @@ public class AddRecipeFragment extends Fragment implements AddInterface, AddReci
             presenter.deleteIngredient(ingredientUi);
             ingredientAdapter.removeIngredient(ingredientUi, requireContext());
         }
-
     }
 
     @Override
@@ -274,6 +245,8 @@ public class AddRecipeFragment extends Fragment implements AddInterface, AddReci
             //Log.d(TAG, "showAlert: recipeUi image bitmap: " + recipeUi.getImageBitmap());
             howToPrepare.setText(recipeUi.getInstructions());
             ingredientList.addAll(recipeUi.getIngredients());
+            // TODO: You should probably wanna display the image here?
+            // Picasso.get().load(recipeUi.getImage()).into(binding.defaultCardRecipeImage);
             imageStr = recipeUi.getImage();
             Log.d(TAG, "showAlertDialogForFoundRecipe: ui image: " + recipeUi.getImage());
             ingredientAdapter.notifyDataSetChanged();
@@ -281,7 +254,6 @@ public class AddRecipeFragment extends Fragment implements AddInterface, AddReci
         });
         builder.setNegativeButton(R.string.no, (dialog, which) -> Log.d(TAG, "showAlertDialogForFoundRecipe: do nothing."));
         builder.show();
-
     }
 
     public void showEditIngredientDialog(IngredientUi ingredientUi) {
@@ -289,7 +261,6 @@ public class AddRecipeFragment extends Fragment implements AddInterface, AddReci
         DialogAddIngredientBinding dialogBinding = DialogAddIngredientBinding.inflate(getLayoutInflater());
         View dialogView = dialogBinding.getRoot();
         builder.setView(dialogView);
-
 
         EditText ingredientNameEditText = dialogBinding.ingredientNameEditText;
         EditText ingredientQuantityEditText = dialogBinding.ingredientQuantityEditText;
@@ -329,12 +300,9 @@ public class AddRecipeFragment extends Fragment implements AddInterface, AddReci
             dialog.dismiss(); // Dismiss the dialog after saving
         });
 
-
         builder.setNegativeButton(android.R.string.cancel, (dialog, which) -> dialog.dismiss());
 
         AlertDialog dialog = builder.create();
         dialog.show();
     }
-
-
 }

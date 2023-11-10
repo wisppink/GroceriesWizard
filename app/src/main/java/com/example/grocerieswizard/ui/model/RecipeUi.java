@@ -28,6 +28,7 @@ public class RecipeUi implements Parcelable {
 
     protected RecipeUi(Parcel in) {
         recipeName = in.readString();
+        image = in.readString();
         instructions = in.readString();
         ingredients = in.createTypedArrayList(IngredientUi.CREATOR);
     }
@@ -47,7 +48,7 @@ public class RecipeUi implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(recipeName);
-        //dest.writeParcelable(imageBitmap, flags);
+        dest.writeString(image);
         dest.writeString(instructions);
         dest.writeTypedList(ingredients);
     }
@@ -61,15 +62,6 @@ public class RecipeUi implements Parcelable {
         return recipeName;
     }
 
-    /*public Bitmap getImageBitmap() {
-        if (imageBitmap != null) {
-            Log.d(TAG, "getImageBitmap: " + imageBitmap);
-        } else {
-            Log.d(TAG, "getImageBitmap:  null");
-        }
-        return imageBitmap;
-    }*/
-
     public String getInstructions() {
         return instructions;
     }
@@ -81,12 +73,6 @@ public class RecipeUi implements Parcelable {
     public void setRecipeName(String recipeName) {
         this.recipeName = recipeName;
     }
-
-  /*  public void setImageBitmap(Bitmap imageBitmap) {
-        this.imageBitmap = imageBitmap;
-        if (imageBitmap != null)
-            Log.d(TAG, imageBitmap.toString());
-    }*/
 
     public void setInstructions(String instructions) {
         this.instructions = instructions;
@@ -128,7 +114,6 @@ public class RecipeUi implements Parcelable {
     }
 
     public String getImage() {
-        Log.d("ui", "getImage: +  " + image);
         return image;
     }
 

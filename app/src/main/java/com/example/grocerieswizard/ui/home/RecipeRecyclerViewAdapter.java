@@ -1,10 +1,9 @@
 package com.example.grocerieswizard.ui.home;
 
 import android.annotation.SuppressLint;
-import android.util.Log;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -144,7 +143,7 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
                 binding.favIcon.setImageResource(R.drawable.baseline_unfavorite_border_24);
             }
             if (recipeUi.getImage() != null) {
-                Picasso.get().load(android.net.Uri.parse(recipeUi.getImage())).into(binding.defaultCardRecipeImage);
+                Picasso.get().load(Uri.parse(recipeUi.getImage())).into(binding.defaultCardRecipeImage);
             } else {
                 binding.defaultCardRecipeImage.setImageResource(R.drawable.recipe_image_default);
             }

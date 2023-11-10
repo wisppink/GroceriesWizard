@@ -24,15 +24,13 @@ public class AddRecipePresenter implements AddRecipeContract.Presenter {
     public AddRecipePresenter(RecipeRepository recipeRepository, UiMapper uiMapper) {
         this.recipeRepository = recipeRepository;
         this.uiMapper = uiMapper;
-
     }
 
     public void bindView(AddRecipeContract.View view) {
-        if (view != null) {
-            this.view = view;
-        }
+        this.view = view;
     }
 
+    // TODO: Not used, should be used in onStop lifecycle method of the fragment.
     public void unbindView() {
         this.view = null;
     }
@@ -47,49 +45,23 @@ public class AddRecipePresenter implements AddRecipeContract.Presenter {
     public void deleteRecipe(RecipeUi recipeUi) {
         recipeRepository.deleteRecipe(recipeUi);
     }
+
     @Override
     public void insertRecipe(RecipeUi recipeUi) {
         recipeRepository.insertRecipe(uiMapper.toRecipe(recipeUi));
     }
+
+    // TODO: We shouldn't pass views to presenter.
     @Override
     public void searchMeal(String inputText, TextView editRecipeHowToPrepare, ImageView addImage) {
         recipeRepository.searchMeals(inputText, new RepositoryCallback<List<RecipeItem>>() {
             @Override
             public void onSuccess(List<RecipeItem> data) {
-                if (data.isEmpty())
-                    return;
-                //TODO:recipe image
-
-                                /*
-                                Picasso.get().load(data.get(0).getImageUrl()).resize(150, 150).centerCrop().into(new Target() {
-                                    @Override
-                                    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                                        data.get(0).setImageBitmap(bitmap);
-                                        Log.d(TAG, "onBitmapLoaded: success");
-                                        Log.d(TAG, "onBitmapLoaded: recipe image bitmap: " + data.get(0).getImageBitmap());
-                                        showAlertDialogForFoundRecipe(uiMapper.toRecipeUi(data.get(0)), binding.editRecipeHowToPrepare, binding.addImage,bitmap);
-                                        recipeUi.setImageBitmap(bitmap);
-                                    }
-
-                                    @Override
-                                    public void onBitmapFailed(Exception e, Drawable errorDrawable) {
-                                        Log.e(TAG, "onBitmapFailed: ", e);
-                                    }
-
-                                    @Override
-                                    public void onPrepareLoad(Drawable placeHolderDrawable) {
-                                    }
-                                });
-
-                                */
-
+                if (data.isEmpty()) return;
                 if (view != null) {
                     Log.d(TAG, "onSuccess: data0: " + data.get(0).getImage());
                     view.showAlertDialogForFoundRecipe(uiMapper.toRecipeUi(data.get(0)), editRecipeHowToPrepare, addImage);
                 }
-
-
-                //,bitmap
             }
 
             @Override
@@ -98,6 +70,7 @@ public class AddRecipePresenter implements AddRecipeContract.Presenter {
             }
         });
     }
+
     @Override
     public void insertIngredient(IngredientUi ingredientUi) {
         IngredientItem ingredient = uiMapper.toIngredient(ingredientUi);
