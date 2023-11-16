@@ -2,8 +2,6 @@ package com.example.grocerieswizard.ui.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
-
 import java.util.List;
 
 public class RecipeUi implements Parcelable {
@@ -105,6 +103,7 @@ public class RecipeUi implements Parcelable {
     public void setFav(boolean fav) {
         isFav = fav;
     }
+
     public boolean isCart() {
         return isCart;
     }

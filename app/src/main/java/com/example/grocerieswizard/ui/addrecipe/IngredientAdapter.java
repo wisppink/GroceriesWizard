@@ -14,6 +14,7 @@ import com.example.grocerieswizard.R;
 import com.example.grocerieswizard.databinding.ItemIngredientBinding;
 import com.example.grocerieswizard.ui.model.IngredientUi;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.IngredientViewHolder> {
@@ -21,8 +22,8 @@ public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.In
     private AddInterface addInterface;
     private static final String TAG = "IngredientAdapter";
 
-    public IngredientAdapter(List<IngredientUi> ingredientList) {
-        IngredientAdapter.ingredientList = ingredientList;
+    public IngredientAdapter() {
+        ingredientList = new ArrayList<>();
     }
 
     @NonNull
@@ -66,6 +67,14 @@ public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.In
     public void addIngredient(IngredientUi ingredientUi) {
         ingredientList.add(ingredientUi);
         notifyItemInserted(ingredientList.size() - 1);
+    }
+
+    public List<IngredientUi> getIngredientList() {
+        return ingredientList;
+    }
+
+    public void setIngredientList(List<IngredientUi> ingredientList) {
+        IngredientAdapter.ingredientList = ingredientList;
     }
 
     public void removeIngredient(IngredientUi ingredientUi, Context context) {

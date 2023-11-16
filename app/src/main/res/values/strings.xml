@@ -40,4 +40,8 @@
     <string name="recipe_need">Which recipe needs this?</string>
     <string name="added_to_cart">Added to Cart!</string>
     <string name="removed_from_cart">Removed from Cart!</string>
+    <string name="please_fill_all_fields">Please fill all fields!</string>
+    <string name="discharge_recipe_question">Are you sure you want to discharge this recipe?</string>
+    <string name="confirm_discharge">Confirm Discharge</string>
+    <string name="save">Save</string>
 </resources>

@@ -1,8 +1,6 @@
 package com.example.grocerieswizard.ui.addrecipe;
 
 import android.util.Log;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.example.grocerieswizard.data.local.model.IngredientItem;
 import com.example.grocerieswizard.data.local.model.RecipeItem;
@@ -26,15 +24,19 @@ public class AddRecipePresenter implements AddRecipeContract.Presenter {
         this.uiMapper = uiMapper;
     }
 
-    public void bindView(AddRecipeContract.View view) {
-        this.view = view;
-    }
-
-    // TODO: Not used, should be used in onStop lifecycle method of the fragment.
     public void unbindView() {
         this.view = null;
     }
 
+    @Override
+    public void PositiveButton(RecipeItem recipeItem) {
+        view.onPositiveButtonCalled(uiMapper.toRecipeUi(recipeItem));
+    }
+
+    @Override
+    public void negativeButton() {
+        view.onNegativeButtonCalled();
+    }
 
     @Override
     public void deleteIngredient(IngredientUi ingredient) {
@@ -51,16 +53,20 @@ public class AddRecipePresenter implements AddRecipeContract.Presenter {
         recipeRepository.insertRecipe(uiMapper.toRecipe(recipeUi));
     }
 
-    // TODO: We shouldn't pass views to presenter.
     @Override
-    public void searchMeal(String inputText, TextView editRecipeHowToPrepare, ImageView addImage) {
+    public void searchMeal(String inputText) {
         recipeRepository.searchMeals(inputText, new RepositoryCallback<List<RecipeItem>>() {
             @Override
             public void onSuccess(List<RecipeItem> data) {
-                if (data.isEmpty()) return;
-                if (view != null) {
-                    Log.d(TAG, "onSuccess: data0: " + data.get(0).getImage());
-                    view.showAlertDialogForFoundRecipe(uiMapper.toRecipeUi(data.get(0)), editRecipeHowToPrepare, addImage);
+                if (data.isEmpty()) {
+                    if (view != null) {
+                        Log.d(TAG, "No recipes found");
+                    }
+                } else {
+                    if (view != null) {
+                        Log.d(TAG, "onSuccess: data0: " + data.get(0).getImage());
+                        view.showAlertDialogForFoundRecipe(data.get(0));
+                    }
                 }
             }
 
@@ -75,5 +81,10 @@ public class AddRecipePresenter implements AddRecipeContract.Presenter {
     public void insertIngredient(IngredientUi ingredientUi) {
         IngredientItem ingredient = uiMapper.toIngredient(ingredientUi);
         recipeRepository.insertIngredient(ingredient);
+    }
+
+    @Override
+    public void bindView(AddRecipeContract.View view) {
+        this.view = view;
     }
 }
